@@ -1,22 +1,12 @@
 <template>
   <v-app id="inspire">
-    <v-app-bar app color="white" flat>
-      <v-container class="py-0 fill-height">
-        <v-toolbar-title v-text="title" />
-
-        <v-btn v-for="link in links" :key="link" text>{{ link }}</v-btn>
-
-        <v-spacer></v-spacer>
-
-        <v-avatar color="primary" size="36">MN</v-avatar>
-      </v-container>
-    </v-app-bar>
+    <topbar />
 
     <v-main class="grey lighten-3">
       <v-container>
         <v-row>
           <v-col cols="2">
-            <v-sheet rounded="lg">
+            <v-sheet rounded="lg" elevation="1">
               <v-list color="transparent  ">
                 <v-list-item
                   v-show="showMenu(item)"
@@ -53,7 +43,7 @@
           </v-col>
 
           <v-col>
-            <v-sheet min-height="70vh" rounded="lg">
+            <v-sheet min-height="70vh" rounded="lg" elevation="1">
               <v-container>
                 <Nuxt />
               </v-container>
@@ -66,10 +56,14 @@
 </template>
 
 <script lang="ts">
+import topbar from '../components/topbar.vue'
 import { defineComponent } from '@vue/composition-api'
 import { MsalPlugin } from '@/plugins/msal'
 
 export default defineComponent({
+  components: {
+    topbar
+  },
   methods: {
     clickSignIn() {
       this.$msal.signIn()
@@ -105,8 +99,6 @@ export default defineComponent({
           requireAuth: true,
         },
       ],
-      title: 'Easy Dinner Planner',
-      links: ['Dashboard', 'Report'],
     }
   },
 })
