@@ -1,6 +1,5 @@
 import * as msal from "@azure/msal-browser";
 import Vue, { PluginObject, VueConstructor } from "vue";
-import { provide } from '@vue/composition-api'
 
 // https://dev.to/425show/secure-your-vue-js-apis-with-azure-ad-b2c-42j6
 // https://github.com/AspNetMonsters/vue-azure-b2c-sample
