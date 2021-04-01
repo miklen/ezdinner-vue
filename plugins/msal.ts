@@ -87,7 +87,7 @@ export class MsalPlugin implements PluginObject<MsalPluginOptions> {
     public async signIn() {
         try {
             const loginRequest: msal.PopupRequest = {
-                scopes: ["openid", "profile", "offline_access"],
+                scopes: ["openid", "profile", "offline_access", "https://ezlifehacks.onmicrosoft.com/98d97e1a-7c16-4f2f-89e3-ca839335a122/backendapi"],
             };
             const loginResponse: msal.AuthenticationResult = await msalInstance.loginPopup(loginRequest);
             this.isAuthenticated = !!loginResponse.account;
@@ -97,7 +97,7 @@ export class MsalPlugin implements PluginObject<MsalPluginOptions> {
             if (err.errorMessage && err.errorMessage.indexOf("AADB2C90118") > -1) {
                 try {
                     const passwordResetResponse: msal.AuthenticationResult = await msalInstance.loginPopup({
-                        scopes: ["openid", "profile", "offline_access"],
+                        scopes: ["openid", "profile", "offline_access", 'https://ezlifehacks.onmicrosoft.com/98d97e1a-7c16-4f2f-89e3-ca839335a122/backendapi'],
                         authority: this.pluginOptions.passwordAuthority
                     });
                     this.isAuthenticated = !!passwordResetResponse.account;
@@ -119,7 +119,7 @@ export class MsalPlugin implements PluginObject<MsalPluginOptions> {
     public async acquireToken() {
         const request = {
             account: msalInstance.getAllAccounts()[0],
-            scopes: []
+            scopes: ['https://ezlifehacks.onmicrosoft.com/98d97e1a-7c16-4f2f-89e3-ca839335a122/backendapi']
         };
         try {
             const response = await msalInstance.acquireTokenSilent(request);
@@ -132,6 +132,23 @@ export class MsalPlugin implements PluginObject<MsalPluginOptions> {
             }
             return false;
         }
+    }
+
+    public getFirstName(): string | undefined {
+        const account = this.getAccount()
+        const claims: any = account?.idTokenClaims
+        return claims?.given_name
+    }
+
+    public getLastName(): string | undefined {
+        const account = this.getAccount()
+        const claims: any = account?.idTokenClaims
+        return claims?.family_name
+    }
+
+    private getAccount(): msal.AccountInfo | undefined {
+        if (this.isAuthenticated) return msalInstance.getAllAccounts()[0]
+        return undefined
     }
 
     private getIsAuthenticated(): boolean {

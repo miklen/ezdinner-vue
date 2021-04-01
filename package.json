@@ -15,7 +15,6 @@
     "@azure/msal-browser": "^2.13.0",
     "@nuxtjs/axios": "^5.13.1",
     "@nuxtjs/pwa": "^3.3.5",
-    "@vue/composition-api": "^1.0.0-rc.6",
     "core-js": "^3.9.1",
     "nuxt": "^2.15.3"
   },

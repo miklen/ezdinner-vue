@@ -1,6 +1,6 @@
 <template>
   <v-app id="inspire">
-    <topbar />
+    <Topbar />
 
     <v-main class="grey lighten-3">
       <v-container>
@@ -24,15 +24,8 @@
                   </v-list-item-content>
                 </v-list-item>
 
-                <v-divider class="my-2"></v-divider>
-
-                <v-list-item v-if="!$msal.isAuthenticated" @click="clickSignIn">
-                  <v-list-item-action>
-                    <v-icon>mdi-login</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-title>Sign in</v-list-item-title>
-                </v-list-item>
-                <v-list-item v-else @click="clickSignOut">
+                <v-divider v-if="$msal.isAuthenticated" class="my-2"></v-divider>
+                <v-list-item v-if="$msal.isAuthenticated" @click="clickSignOut">
                   <v-list-item-action>
                     <v-icon>mdi-logout</v-icon>
                   </v-list-item-action>
@@ -56,18 +49,15 @@
 </template>
 
 <script lang="ts">
-import topbar from '../components/topbar.vue'
-import { defineComponent } from '@vue/composition-api'
+import Vue from 'vue'
+import Topbar from '../components/Topbar.vue'
 import { MsalPlugin } from '@/plugins/msal'
 
-export default defineComponent({
+export default Vue.extend({
   components: {
-    topbar
+    Topbar
   },
   methods: {
-    clickSignIn() {
-      this.$msal.signIn()
-    },
     clickSignOut() {
       this.$msal.signOut()
     },
@@ -96,6 +86,12 @@ export default defineComponent({
           icon: 'mdi-account-group',
           title: 'Families',
           to: '/families',
+          requireAuth: true,
+        },
+        {
+          icon: 'mdi-silverware-fork-knife',
+          title: 'Plan',
+          to: '/plan',
           requireAuth: true,
         },
       ],
