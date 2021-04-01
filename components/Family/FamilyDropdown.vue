@@ -1,5 +1,13 @@
 <template>
-  <v-select dense :items="families" item-text="name" return-object label="Family" solo single-line></v-select>
+  <v-select
+    dense
+    :items="families"
+    item-text="name"
+    return-object
+    label="Family"
+    solo
+    single-line
+  ></v-select>
 </template>
 
 <script lang="ts">
@@ -13,14 +21,14 @@ export default Vue.extend({
       families: [],
     }
   },
+  mounted() {
+    this.getFamilies()
+  },
   methods: {
     async getFamilies() {
       const result = await this.$axios.get('/api/GetFamilies')
       this.families = result.data
     },
-  },
-  mounted() {
-    this.getFamilies()
   },
 })
 </script>

@@ -9,8 +9,8 @@
             <v-sheet rounded="lg" elevation="1">
               <v-list color="transparent  ">
                 <v-list-item
-                  v-show="showMenu(item)"
                   v-for="(item, i) in items"
+                  v-show="showMenu(item)"
                   :key="i"
                   :to="item.to"
                   router
@@ -24,7 +24,10 @@
                   </v-list-item-content>
                 </v-list-item>
 
-                <v-divider v-if="$msal.isAuthenticated" class="my-2"></v-divider>
+                <v-divider
+                  v-if="$msal.isAuthenticated"
+                  class="my-2"
+                ></v-divider>
                 <v-list-item v-if="$msal.isAuthenticated" @click="clickSignOut">
                   <v-list-item-action>
                     <v-icon>mdi-logout</v-icon>
@@ -51,20 +54,10 @@
 <script lang="ts">
 import Vue from 'vue'
 import Topbar from '../components/Topbar.vue'
-import { MsalPlugin } from '@/plugins/msal'
 
 export default Vue.extend({
   components: {
-    Topbar
-  },
-  methods: {
-    clickSignOut() {
-      this.$msal.signOut()
-    },
-    showMenu(item: any) {
-      if (!item.requireAuth) return true
-      return this.$msal.isAuthenticated
-    },
+    Topbar,
   },
   data() {
     return {
@@ -96,6 +89,15 @@ export default Vue.extend({
         },
       ],
     }
+  },
+  methods: {
+    clickSignOut() {
+      this.$msal.signOut()
+    },
+    showMenu(item: any) {
+      if (!item.requireAuth) return true
+      return this.$msal.isAuthenticated
+    },
   },
 })
 </script>
