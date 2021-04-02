@@ -121,7 +121,7 @@ export class MsalPlugin implements PluginObject<MsalPluginOptions> {
   }
 
   public async signOut() {
-    await msalInstance.logout()
+    await msalInstance.logoutRedirect()
     this.isAuthenticated = false
   }
 
