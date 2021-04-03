@@ -56,6 +56,7 @@ import Vue from 'vue'
 import Topbar from '@/components/Topbar.vue'
 
 export default Vue.extend({
+  name: 'Default',
   components: {
     Topbar,
   },

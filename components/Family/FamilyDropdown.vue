@@ -12,22 +12,20 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Family } from '@/types/Family'
+import { Family } from '~/types/Family'
+
 export default Vue.extend({
-  data(): {
-    families: Family[]
-  } {
-    return {
-      families: [],
-    }
+  computed: {
+    families(): Family[] {
+      return this.$accessor.families.families
+    },
   },
   mounted() {
     this.getFamilies()
   },
   methods: {
-    async getFamilies() {
-      const result = await this.$axios.get('/api/GetFamilies')
-      this.families = result.data
+    getFamilies(): Promise<void> {
+      return this.$accessor.families.getFamilies()
     },
   },
 })

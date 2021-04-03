@@ -8,5 +8,7 @@ namespace EzDinner.Functions.Models.Query
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public Guid OwnerId { get; set; }
+        public string OwnerName { get; set; }
     }
 }

@@ -9,7 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{BB81855C-2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EzDinner.Functions", "src\EzDinner.Functions\EzDinner.Functions.csproj", "{E31FFB21-764D-4673-BD3A-CEA3D3146A74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EzDinner.Core", "src\EzDinner.Core\EzDinner.Core.csproj", "{4DA65C3E-7B3F-48A6-87B7-22433147989A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EzDinner.Core", "src\EzDinner.Core\EzDinner.Core.csproj", "{4DA65C3E-7B3F-48A6-87B7-22433147989A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EzDinner.Infrastructure", "src\EzDinner.Infrastructure\EzDinner.Infrastructure.csproj", "{E973266F-85E3-4229-9732-D6C68DA3AAE2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +27,10 @@ Global
 		{4DA65C3E-7B3F-48A6-87B7-22433147989A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DA65C3E-7B3F-48A6-87B7-22433147989A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DA65C3E-7B3F-48A6-87B7-22433147989A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E973266F-85E3-4229-9732-D6C68DA3AAE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E973266F-85E3-4229-9732-D6C68DA3AAE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E973266F-85E3-4229-9732-D6C68DA3AAE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E973266F-85E3-4229-9732-D6C68DA3AAE2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +38,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E31FFB21-764D-4673-BD3A-CEA3D3146A74} = {2EFB582B-9F04-4AF5-BF2B-AACBA41527D9}
 		{4DA65C3E-7B3F-48A6-87B7-22433147989A} = {2EFB582B-9F04-4AF5-BF2B-AACBA41527D9}
+		{E973266F-85E3-4229-9732-D6C68DA3AAE2} = {2EFB582B-9F04-4AF5-BF2B-AACBA41527D9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {638197C5-C783-476B-BD42-B8A65826C2B1}
