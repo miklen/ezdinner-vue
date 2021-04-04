@@ -33,8 +33,7 @@ namespace EzDinner.Functions
                 ConnectionStringSetting = "CosmosDBConnectionString",
                 PartitionKey = "partitionKey",
                 CreateIfNotExists = true
-                )]
-                IAsyncCollector<Family> cosmosDbFamilies
+                )] IAsyncCollector<Family> cosmosDbFamilies
             )
         {
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();

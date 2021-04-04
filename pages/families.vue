@@ -42,12 +42,13 @@
                   placeholder="Family name"
                 ></v-text-field>
                 <v-alert
-                  :value="alert"
+                  v-model="alert"
+                  dismissible
                   color="error"
-                  dark
-                  border="top"
-                  icon="mdi-alert-circle-outline"
-                  transition="scale-transition"
+                  border="left"
+                  elevation="2"
+                  colored-border
+                  icon="mdi-alert-decagram"
                 >
                   An error occured
                 </v-alert>
@@ -81,7 +82,7 @@ export default Vue.extend({
     return {
       dialog: false as boolean,
       newFamilyName: '' as string,
-      alert: false as boolean,
+      alert: true as boolean,
     }
   },
   computed: {
