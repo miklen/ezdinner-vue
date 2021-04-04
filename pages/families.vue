@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col v-for="family in families" :key="family.id">
+      <v-col v-for="family in families" :key="family.id" class="col-4">
         <v-card>
           <v-card-title>{{ family.name }}</v-card-title>
           <v-card-subtitle>Family members</v-card-subtitle>
@@ -20,14 +20,52 @@
           >
         </v-card>
       </v-col>
-      <v-col>
+      <v-col class="col-4">
         <v-card>
           <v-card-title>New family</v-card-title>
-          <v-card-actions
-            ><v-btn text color="primary"
-              ><v-icon>mdi-account-multiple-plus</v-icon></v-btn
-            ></v-card-actions
-          >
+          <v-dialog v-model="dialog" width="500">
+            <template #activator="{ on, attrs }">
+              <v-card-actions
+                ><v-btn text color="primary" v-bind="attrs" v-on="on"
+                  ><v-icon>mdi-account-multiple-plus</v-icon></v-btn
+                ></v-card-actions
+              >
+            </template>
+
+            <v-card>
+              <v-card-title class="headline grey lighten-2">
+                New family
+              </v-card-title>
+              <v-card-text>
+                <v-text-field
+                  v-model="newFamilyName"
+                  placeholder="Family name"
+                ></v-text-field>
+                <v-alert
+                  :value="alert"
+                  color="error"
+                  dark
+                  border="top"
+                  icon="mdi-alert-circle-outline"
+                  transition="scale-transition"
+                >
+                  An error occured
+                </v-alert>
+              </v-card-text>
+
+              <v-divider></v-divider>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" text @click="createFamily">
+                  Create
+                </v-btn>
+                <v-btn color="primary" text @click="dialog = false">
+                  Cancel
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-card>
       </v-col>
     </v-row>
@@ -39,12 +77,34 @@ import Vue from 'vue'
 import { Family } from '~/types/Family'
 export default Vue.extend({
   middleware: ['auth'],
+  data() {
+    return {
+      dialog: false as boolean,
+      newFamilyName: '' as string,
+      alert: false as boolean,
+    }
+  },
   computed: {
     families(): Family[] {
       return this.$accessor.families.families
     },
     familyMembers(): string[] {
       return ['Mikkel Nygaard', 'Linda Nygaard']
+    },
+  },
+  methods: {
+    async createFamily() {
+      this.alert = false
+      const result = await this.$axios.post('api/family', {
+        name: this.newFamilyName,
+      })
+      if (result.status === 200 || result.status === 204) {
+        this.$accessor.families.getFamilies()
+        this.newFamilyName = ''
+        this.dialog = false
+        return
+      }
+      this.alert = true
     },
   },
 })

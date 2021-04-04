@@ -1,10 +1,14 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
+using EzDinner.Core.Aggregates.FamilyAggregate;
+using EzDinner.Functions.Models.Command;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
 using Newtonsoft.Json;
 
@@ -18,24 +22,28 @@ namespace EzDinner.Functions
         {
             _logger = logger;
         }
-        
+
         [FunctionName("family")]
         [RequiredScope("backendapi")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req)
+        public async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+            [CosmosDB(
+                databaseName: "EzDinner",
+                collectionName: "Families",
+                ConnectionStringSetting = "CosmosDBConnectionString",
+                PartitionKey = "partitionKey",
+                CreateIfNotExists = true
+                )]
+                IAsyncCollector<Family> cosmosDbFamilies
+            )
         {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
+            var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
+            if (!authenticationStatus) return authenticationResponse;
 
-            string name = req.Query["name"];
+            var newFamily = await req.GetBodyAs<CreateFamilyCommandModel>();
+            await cosmosDbFamilies.AddAsync(new Family(Guid.Parse(req.HttpContext.User.GetNameIdentifierId()), newFamily.Name));
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-            return new OkObjectResult(responseMessage);
+            return new OkResult();
         }
     }
 }

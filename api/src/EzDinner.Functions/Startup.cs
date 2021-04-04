@@ -35,28 +35,20 @@ namespace EzDinner.Functions
             // Get the original configuration provider from the Azure Function
             var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
 
+
             // Create a new IConfigurationRoot and add our configuration along with Azure's original configuration 
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(currentDirectory)
                 .AddConfiguration(configuration) // Add the original function configuration 
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.development.json", optional: true, reloadOnChange: true) // add local development variables if present - file is not committed to git so won't be present for prod
                 .Build();
 
-            var adConfig = Configuration.GetSection("AzureAdB2C");
-
-            IConfidentialClientApplication confidentialClientApplication = ConfidentialClientApplicationBuilder
-                .Create(adConfig.GetValue<string>("ClientId"))
-                .WithTenantId(adConfig.GetValue<string>("TenantId"))
-                .WithClientSecret(adConfig.GetValue<string>("ClientSecret"))
-                .Build();
-
-            ClientCredentialProvider authProvider = new ClientCredentialProvider(confidentialClientApplication);
-            GraphServiceClient graphClient = new GraphServiceClient(authProvider);
-
+            builder.Services.AddLogging();
 
             // Replace the Azure Function configuration with our new one
             builder.Services.AddSingleton(Configuration);
-            builder.Services.AddSingleton(graphClient);
+            builder.Services.RegisterMsGraph(Configuration.GetSection("AzureAdB2C"));
 
             builder.Services.AddScoped<IFamilyMemberRepository, FamilyMemberRepository>();
             

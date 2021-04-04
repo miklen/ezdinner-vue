@@ -5,10 +5,13 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using EzDinner.Core.Aggregates.FamilyAggregate;
 using EzDinner.Core.Aggregates.FamilyMemberAggregate;
 using EzDinner.Functions.Models.Query;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -31,18 +34,29 @@ namespace EzDinner.Functions
 
         [FunctionName("Families")]
         [RequiredScope("backendapi")] // The Azure Function will only accept tokens 1) for users, and 2) having the "access_as_user" scope for this API
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req)
+        public async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
+            [CosmosDB(
+                databaseName: "EzDinner",
+                collectionName: "Families",
+                ConnectionStringSetting = "CosmosDBConnectionString",
+                PartitionKey = "partitionKey",
+                CreateIfNotExists = true
+                )] DocumentClient client
+            )
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
 
-            // TODO replace with getting the families that a user is a member of
-            var families = new List<FamilyQueryModel>() { new FamilyQueryModel() { Id = Guid.NewGuid(), Name = "Nygaard", OwnerId = Guid.Parse("211c4ea8-f8cb-49df-9b04-75d9669d035e") }, new FamilyQueryModel() { Id = Guid.NewGuid(), Name = "Bengtson", OwnerId = Guid.Parse("211c4ea8-f8cb-49df-9b04-75d9669d035e") } };
+            var userId = Guid.Parse(req.HttpContext.User.GetNameIdentifierId());
+            var families = await GetUsersFamilies(client, userId);
 
-            var owners = GetOwnerNames(families);
-            foreach (var family in families)
+            var familieyQueryModels = families.Select(familiy => new FamilyQueryModel() { Id = familiy.Id, OwnerId = familiy.OwnerId, Name = familiy.Name });
+
+            var owners = GetOwnerNames(familieyQueryModels);
+            foreach (var family in familieyQueryModels)
             {
                 family.OwnerName = owners[family.OwnerId];
             }
@@ -50,7 +64,26 @@ namespace EzDinner.Functions
             return new OkObjectResult(families);
         }
 
-        private Dictionary<Guid, string> GetOwnerNames(List<FamilyQueryModel> families)
+        private static async Task<List<Family>> GetUsersFamilies(DocumentClient client, Guid userId)
+        {
+            var collectionUri = UriFactory.CreateDocumentCollectionUri("EzDinner", "Families");
+            var query = client.CreateDocumentQuery<Family>(collectionUri, new FeedOptions { EnableCrossPartitionQuery = true })
+                .Where(p => p.OwnerId == userId)
+                .AsDocumentQuery();
+
+            var families = new List<Family>();
+            while (query.HasMoreResults)
+            {
+                foreach (Family family in await query.ExecuteNextAsync())
+                {
+                    families.Add(family);
+                }
+            }
+
+            return families;
+        }
+
+        private Dictionary<Guid, string> GetOwnerNames(IEnumerable<FamilyQueryModel> families)
         {
             // N+1 microservice problem... TODO solve by saving necessary information closer to usage or get list of users in one request
             var ownerIds = families.Select(s => s.OwnerId).Distinct();
