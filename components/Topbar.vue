@@ -1,6 +1,9 @@
 <template>
   <v-app-bar app color="white" elevation="1">
     <v-container class="py-0 fill-height">
+      <v-avatar>
+        <v-img src="/android-chrome-192x192.png"></v-img>
+      </v-avatar>
       <v-toolbar-title v-text="title" />
       <div class="families-select">
         <FamilyDropdown v-if="$msal.isAuthenticated" />
@@ -27,7 +30,7 @@ export default Vue.extend({
     links: string[]
   } {
     return {
-      title: 'Easy Dinner Planner',
+      title: 'Dinner Planner',
       links: [],
     }
   },

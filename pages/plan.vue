@@ -106,6 +106,10 @@ export default {
     nonce: 0,
   }),
 
+  head: {
+    title: 'Plan',
+  },
+
   computed: {
     timeline() {
       return this.events.slice().reverse()

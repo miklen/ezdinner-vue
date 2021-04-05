@@ -9,8 +9,8 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - ezdinner-nuxt',
-    title: 'ezdinner-nuxt',
+    titleTemplate: 'Dinner Planner - %s',
+    title: 'Dinner Planner',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },

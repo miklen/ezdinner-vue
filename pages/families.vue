@@ -84,6 +84,11 @@ export default Vue.extend({
       alert: false as boolean,
     }
   },
+
+  head: {
+    title: 'Family',
+  },
+
   computed: {
     families(): Family[] {
       return this.$accessor.families.families

@@ -1,8 +1,11 @@
 <template>
   <v-app>
     <v-app-bar app color="white" height="100">
+      <v-avatar>
+        <v-img src="/android-chrome-192x192.png"></v-img>
+      </v-avatar>
       <v-toolbar-title class="font-weight-black headline">
-        Easy Dinner Planner
+        Dinner Planner
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn color="primary" large @click="signIn">
@@ -324,6 +327,9 @@ export default Vue.extend({
       //   ['5m', 'Total Downloads'],
       // ],
     }
+  },
+  head: {
+    title: 'Welcome',
   },
   computed: {
     isAuthenticated() {
