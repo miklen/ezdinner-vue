@@ -1,5 +1,5 @@
 <template>
-  <v-app id="inspire">
+  <v-app id="ezdinner">
     <Topbar />
 
     <v-main class="grey lighten-3">
@@ -10,7 +10,6 @@
               <v-list color="transparent  ">
                 <v-list-item
                   v-for="(item, i) in items"
-                  v-show="showMenu(item)"
                   :key="i"
                   :to="item.to"
                   router
@@ -24,10 +23,7 @@
                   </v-list-item-content>
                 </v-list-item>
 
-                <v-divider
-                  v-if="$msal.isAuthenticated"
-                  class="my-2"
-                ></v-divider>
+                <v-divider class="my-2"></v-divider>
                 <v-list-item v-if="$msal.isAuthenticated" @click="clickSignOut">
                   <v-list-item-action>
                     <v-icon>mdi-logout</v-icon>
@@ -60,6 +56,7 @@ export default Vue.extend({
   components: {
     Topbar,
   },
+  middleware: ['auth'],
   data() {
     return {
       clipped: true,
@@ -67,26 +64,19 @@ export default Vue.extend({
       fixed: true,
       items: [
         {
-          icon: 'mdi-apps',
-          title: 'Welcome',
-          to: '/',
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire',
+          icon: 'mdi-home',
+          title: 'Home',
+          to: '/home',
         },
         {
           icon: 'mdi-account-group',
           title: 'Families',
           to: '/families',
-          requireAuth: true,
         },
         {
           icon: 'mdi-silverware-fork-knife',
           title: 'Plan',
           to: '/plan',
-          requireAuth: true,
         },
       ],
     }

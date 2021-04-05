@@ -77,12 +77,11 @@
 import Vue from 'vue'
 import { Family } from '~/types/Family'
 export default Vue.extend({
-  middleware: ['auth'],
   data() {
     return {
       dialog: false as boolean,
       newFamilyName: '' as string,
-      alert: true as boolean,
+      alert: false as boolean,
     }
   },
   computed: {

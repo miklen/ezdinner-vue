@@ -100,7 +100,6 @@
 
 <script>
 export default {
-  middleware: ['auth'],
   data: () => ({
     events: [],
     input: null,
