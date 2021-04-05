@@ -19,9 +19,18 @@ export default {
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
 
-  // publicRuntimeConfig: {
-  //   browserBaseURL: process.env.BROWSER_BASE_URL
-  // },
+  publicRuntimeConfig: {
+    clientId: '654aa80d-4783-43db-8ed9-4e160bb1d765',
+    loginAuthority:
+      'https://ezlifehacks.b2clogin.com/ezlifehacks.onmicrosoft.com/B2C_1_signupsignin/',
+    passwordAuthority:
+      'https://ezlifehacks.b2clogin.com/ezlifehacks.onmicrosoft.com/B2C_1_passwordreset/',
+    knownAuthority: 'https://ezlifehacks.b2clogin.com',
+    browserBaseURL:
+      process.env.NODE_ENV === 'production'
+        ? 'https://dinner.bnyg.dk'
+        : 'http://localhost:3000',
+  },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [],

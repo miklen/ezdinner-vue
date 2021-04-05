@@ -23,7 +23,7 @@ namespace EzDinner.Functions
             _logger = logger;
         }
 
-        [FunctionName("family")]
+        [FunctionName("Family")]
         [RequiredScope("backendapi")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
