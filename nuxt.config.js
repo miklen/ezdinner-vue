@@ -53,9 +53,7 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     baseURL:
-      process.env.NODE_ENV === 'production'
-        ? 'https://func-ezdinner-prod-01.azurewebsites.net'
-        : 'http://localhost:7071',
+      process.env.NODE_ENV === 'production' ? '/' : 'http://localhost:7071',
   },
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
