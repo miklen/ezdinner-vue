@@ -20,7 +20,6 @@ export const actions = actionTree(
   {
     async getFamilies({ commit }) {
       const result = await this.$axios.get('/api/families')
-      console.log(result)
       commit('updateFamilies', result.data)
     },
   },

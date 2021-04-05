@@ -22,14 +22,6 @@
                     <v-list-item-title v-text="item.title" />
                   </v-list-item-content>
                 </v-list-item>
-
-                <v-divider class="my-2"></v-divider>
-                <v-list-item v-if="$msal.isAuthenticated" @click="clickSignOut">
-                  <v-list-item-action>
-                    <v-icon>mdi-logout</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-title>Sign out</v-list-item-title>
-                </v-list-item>
               </v-list>
             </v-sheet>
           </v-col>

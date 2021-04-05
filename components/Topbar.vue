@@ -5,14 +5,13 @@
         <v-img src="/android-chrome-192x192.png"></v-img>
       </v-avatar>
       <v-toolbar-title v-text="title" />
-      <div class="families-select">
+      <div :class="familiesDropdownClasses">
         <FamilyDropdown v-if="$msal.isAuthenticated" />
       </div>
       <v-btn v-for="link in links" :key="link" text>{{ link }}</v-btn>
 
       <v-spacer></v-spacer>
-      <v-btn v-if="!$msal.isAuthenticated" @click="clickSignIn">Sign in</v-btn>
-      <v-avatar v-else color="primary" size="36">{{ getInitials() }}</v-avatar>
+      <TopbarProfile />
     </v-container>
   </v-app-bar>
 </template>
@@ -20,10 +19,12 @@
 <script lang="ts">
 import Vue from 'vue'
 import FamilyDropdown from '@/components/Family/FamilyDropdown.vue'
+import TopbarProfile from './TopbarProfile.vue'
 
 export default Vue.extend({
   components: {
     FamilyDropdown,
+    TopbarProfile,
   },
   data(): {
     title: string
@@ -33,6 +34,13 @@ export default Vue.extend({
       title: 'Dinner Planner',
       links: [],
     }
+  },
+  computed: {
+    familiesDropdownClasses(): string[] {
+      const classes = ['families-select']
+      if (this.$vuetify.breakpoint.mobile) classes.push('families-select-small')
+      return classes
+    },
   },
   methods: {
     getInitials(): string {
@@ -49,6 +57,10 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+.families-select-small {
+  width: 60px !important;
+}
+
 .families-select {
   width: 150px;
   margin-right: 20px;

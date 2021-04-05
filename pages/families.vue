@@ -20,7 +20,7 @@
           >
         </v-card>
       </v-col>
-      <v-col class="col-4">
+      <v-col xs="12" sm="12" md="6" lg="4">
         <v-card>
           <v-card-title>New family</v-card-title>
           <v-dialog v-model="dialog" width="500">
