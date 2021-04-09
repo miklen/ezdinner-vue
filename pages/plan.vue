@@ -1,60 +1,54 @@
 <template>
-  <v-container style="max-width: 600px">
-    <v-timeline dense clipped>
-      <div v-for="meal in meals" :key="meal.date">
-        <v-timeline-item v-if="meal.meal" class="mb-4" color="green" small>
-          <template #opposite>
-            <v-icon>mdi-pencil</v-icon>
-          </template>
+  <v-row>
+    <v-col cols="7">
+      <v-row>
+        <v-col class="text-center">
+          <h1>Dinner plan</h1>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-timeline dense>
+            <div v-for="(meal, index) in meals" :key="index">
+              <PlannedMeal :meal="meal" />
 
-          <v-row justify="space-between">
-            <v-col cols="6" v-text="meal.meal"></v-col>
-            <v-col
-              class="text-right"
-              cols="5"
-              v-text="meal.date.toFormat('EEEE')"
-            ></v-col>
-          </v-row>
-        </v-timeline-item>
-
-        <v-timeline-item v-else class="mb-4" color="grey" small>
-          <template #opposite>
-            <v-icon>mdi-pencil</v-icon>
-          </template>
-
-          <v-row justify="space-between">
-            <v-col cols="6" v-text="meal.meal"></v-col>
-            <v-col
-              class="text-right"
-              cols="5"
-              v-text="meal.date.toFormat('EEEE')"
-            ></v-col>
-          </v-row>
-        </v-timeline-item>
-
-        <v-timeline-item
-          v-if="meal.date.weekday === 1"
-          class="mb-4"
-          color="pink"
-          small
-        >
-          <v-row justify="space-between">
-            <v-col cols="7">Week {{ meal.date.weekNumber }}</v-col>
-            <v-col cols="5" class="text-right">{{
-              getWeekDatesString(meal.date)
-            }}</v-col>
-          </v-row>
-        </v-timeline-item>
-      </div>
-    </v-timeline>
-  </v-container>
+              <!-- Everytime a new week starts -->
+              <v-timeline-item
+                v-if="meal.date.weekday === 1"
+                class="mb-4"
+                color="pink"
+                small
+              >
+                <v-row justify="space-between">
+                  <v-col cols="7">Week {{ meal.date.weekNumber }}</v-col>
+                  <v-col cols="5" class="text-right">{{
+                    getWeekDatesString(meal.date)
+                  }}</v-col>
+                </v-row>
+              </v-timeline-item>
+            </div>
+          </v-timeline>
+        </v-col>
+      </v-row>
+    </v-col>
+    <v-col cols="5">
+      <TopMeals />
+    </v-col>
+  </v-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { DateTime } from 'luxon'
+import TopMeals from '~/components/Plan/TopMeals.vue'
+import PlannedMeal from '~/components/Plan/PlannedMeal.vue'
+import { Meal } from '~/types/Meal'
 
 export default Vue.extend({
+  components: {
+    TopMeals,
+    PlannedMeal,
+  },
   data: () => ({
     mealOptions: [
       'McDonalds',
@@ -77,12 +71,12 @@ export default Vue.extend({
   },
 
   computed: {
-    meals() {
-      const meals = []
+    meals(): Meal[] {
+      const meals: Meal[] = []
       for (let i = 0; i < 30; i++) {
-        const meal = {
+        const meal: Meal = {
           date: DateTime.now().minus({ days: i - 3 }),
-          meal: this.mealOptions[i % this.mealOptions.length],
+          name: this.mealOptions[i % this.mealOptions.length],
           tags: ['At home'],
         }
         meals.push(meal)
