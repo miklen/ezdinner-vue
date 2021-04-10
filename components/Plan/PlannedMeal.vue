@@ -1,7 +1,11 @@
 <template>
   <div>
     <v-timeline-item v-if="meal.name" class="mb-4" color="green" small>
-      <v-row justify="space-between" @click="expanded = !expanded">
+      <v-row
+        v-show="!expanded"
+        justify="space-between"
+        @click="expanded = !expanded"
+      >
         <v-col cols="6"
           >{{ meal.name }}
           <v-chip
@@ -19,6 +23,12 @@
           v-text="meal.date.toFormat('EEEE')"
         ></v-col>
       </v-row>
+
+      <PlannedMealDetails
+        v-show="expanded"
+        :meal="meal"
+        @cancel="expanded = false"
+      />
     </v-timeline-item>
     <v-timeline-item v-else class="mb-4" color="grey" small>
       <v-row justify="space-between" @click="expanded = !expanded">
@@ -30,7 +40,6 @@
         ></v-col>
       </v-row>
     </v-timeline-item>
-    <PlannedMealDetails v-show="expanded" :meal="meal" />
   </div>
 </template>
 

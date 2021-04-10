@@ -5,7 +5,7 @@
         <h1>Your heavy rotation</h1>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row class="left-border">
       <v-col>
         <v-simple-table>
           <template #default>
@@ -51,3 +51,11 @@ export default Vue.extend({
   methods: {},
 })
 </script>
+
+<style lang="scss" scoped>
+.left-border {
+  border-left-style: dotted;
+  border-left-width: 1px;
+  border-color: black;
+}
+</style>
