@@ -49,9 +49,9 @@ namespace EzDinner.Functions
             // Replace the Azure Function configuration with our new one
             builder.Services.AddSingleton(Configuration);
             builder.Services.RegisterMsGraph(Configuration.GetSection("AzureAdB2C"));
+            builder.Services.RegisterCosmosDb(Configuration.GetSection("CosmosDb"));
+            builder.Services.RegisterRepositories();
 
-            builder.Services.AddScoped<IFamilyMemberRepository, FamilyMemberRepository>();
-            
             ConfigureServices(builder.Services);
         }
 

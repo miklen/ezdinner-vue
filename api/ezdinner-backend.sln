@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EzDinner.Functions", "src\E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EzDinner.Core", "src\EzDinner.Core\EzDinner.Core.csproj", "{4DA65C3E-7B3F-48A6-87B7-22433147989A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EzDinner.Infrastructure", "src\EzDinner.Infrastructure\EzDinner.Infrastructure.csproj", "{E973266F-85E3-4229-9732-D6C68DA3AAE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EzDinner.Infrastructure", "src\EzDinner.Infrastructure\EzDinner.Infrastructure.csproj", "{E973266F-85E3-4229-9732-D6C68DA3AAE2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

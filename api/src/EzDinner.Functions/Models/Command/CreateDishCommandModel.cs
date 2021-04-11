@@ -4,8 +4,9 @@ using System.Text;
 
 namespace EzDinner.Functions.Models.Command
 {
-    public class CreateFamilyCommandModel
+    public class CreateDishCommandModel
     {
         public string? Name { get; set; }
+        public Guid FamilyId { get; set; }
     }
 }

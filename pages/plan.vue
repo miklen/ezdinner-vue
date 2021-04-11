@@ -10,14 +10,13 @@
         <v-col>
           <v-timeline dense>
             <div v-for="(meal, index) in meals" :key="index">
-              <PlannedMeal :meal="meal" />
-
               <!-- Everytime a new week starts -->
               <v-timeline-item
                 v-if="meal.date.weekday === 1"
                 class="mb-4"
                 color="pink"
                 small
+                hide-dot
               >
                 <v-row justify="space-between">
                   <v-col cols="7">Week {{ meal.date.weekNumber }}</v-col>
@@ -26,6 +25,8 @@
                   }}</v-col>
                 </v-row>
               </v-timeline-item>
+
+              <PlannedMeal :meal="meal" />
             </div>
           </v-timeline>
         </v-col>
@@ -81,7 +82,7 @@ export default Vue.extend({
         }
         meals.push(meal)
       }
-      return meals
+      return meals.reverse()
     },
   },
 

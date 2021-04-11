@@ -17,30 +17,27 @@ namespace EzDinner.Functions
     public class CreateFamily
     {
         private readonly ILogger<CreateFamily> _logger;
+        private readonly IFamilyRepository _familyRepository;
 
-        public CreateFamily(ILogger<CreateFamily> logger)
+        public CreateFamily(ILogger<CreateFamily> logger, IFamilyRepository familyRepository)
         {
             _logger = logger;
+            _familyRepository = familyRepository;
         }
 
-        [FunctionName("Family")]
+        [FunctionName("family")]
         [RequiredScope("backendapi")]
-        public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
-            [CosmosDB(
-                databaseName: "EzDinner",
-                collectionName: "Families",
-                ConnectionStringSetting = "CosmosDBConnectionString",
-                PartitionKey = "partitionKey",
-                CreateIfNotExists = true
-                )] IAsyncCollector<Family> cosmosDbFamilies
+        public async Task<IActionResult?> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req
             )
         {
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
 
             var newFamily = await req.GetBodyAs<CreateFamilyCommandModel>();
-            await cosmosDbFamilies.AddAsync(new Family(Guid.Parse(req.HttpContext.User.GetNameIdentifierId()), newFamily.Name));
+            if (string.IsNullOrWhiteSpace(newFamily.Name)) return new BadRequestObjectResult("Name cannot be null or empty");
+
+            await _familyRepository.SaveAsync(new Family(Guid.Parse(req.HttpContext.User.GetNameIdentifierId() ?? ""), newFamily.Name));
 
             return new OkResult();
         }

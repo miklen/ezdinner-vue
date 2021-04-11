@@ -16,7 +16,7 @@ namespace EzDinner.Infrastructure
             _graphClient = graphClient;
         }
 
-        public async Task<FamilyMember> GetFamilyMember(Guid id)
+        public async Task<FamilyMember> GetFamilyMemberAsync(Guid id)
         {
             var user = await _graphClient.Users[id.ToString()].Request().GetAsync();
             // TODO use Automapper
