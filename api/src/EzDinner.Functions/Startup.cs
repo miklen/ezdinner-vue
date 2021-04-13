@@ -22,7 +22,7 @@ namespace EzDinner.Functions
         {
         }
 
-        IConfiguration Configuration { get; set; }
+        IConfiguration? Configuration { get; set; }
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
@@ -62,7 +62,7 @@ namespace EzDinner.Functions
                sharedOptions.DefaultScheme = Microsoft.Identity.Web.Constants.Bearer;
                sharedOptions.DefaultChallengeScheme = Microsoft.Identity.Web.Constants.Bearer;
            })
-               .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAdB2C"));
+               .AddMicrosoftIdentityWebApi(Configuration!.GetSection("AzureAdB2C"));
         }
     }
 }

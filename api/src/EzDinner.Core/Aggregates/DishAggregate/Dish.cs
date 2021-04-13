@@ -4,10 +4,9 @@ using System.Text;
 
 namespace EzDinner.Core.Aggregates.DishAggregate
 {
-    public class Dish
+    public class Dish : AggregateRoot
     {
         public string Name { get; }
-        public Guid Id { get; }
         public Guid FamilyId { get; }
         public IEnumerable<Recipe> Recipes { get; }
 

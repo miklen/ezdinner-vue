@@ -4,16 +4,8 @@ using System.Text;
 
 namespace EzDinner.Core.Aggregates.FamilyAggregate
 {
-    public class Family
+    public class Family : AggregateRoot
     {
-        private Guid _id;
-
-        public Guid Id { get => _id; private set { PartitionKey = value; _id = value; } }
-
-        /// <summary>
-        /// Use the Core model as db model for now - to avoid unnessesary mapping complexity between models
-        /// </summary>
-        public Guid PartitionKey { get; private set; }
         public Guid OwnerId { get; set; }
         public string Name { get; set; }
         public List<Guid> FamilyMemberIds { get; set; }

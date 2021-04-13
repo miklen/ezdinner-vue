@@ -32,9 +32,9 @@ namespace EzDinner.Functions
             _familyRepository = familyRepository;
         }
 
-        [FunctionName("families")]
-        [RequiredScope("backendapi")] // The Azure Function will only accept tokens 1) for users, and 2) having the "access_as_user" scope for this API
-        public async Task<IActionResult?> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req)
+        [FunctionName("GetFamilies")]
+        [RequiredScope("backendapi")]
+        public async Task<IActionResult?> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "families")] HttpRequest req)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 

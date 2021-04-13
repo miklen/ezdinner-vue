@@ -107,7 +107,7 @@ export default Vue.extend({
   methods: {
     async createFamily() {
       this.alert = false
-      const result = await this.$axios.post('api/family', {
+      const result = await this.$axios.post('api/families', {
         name: this.newFamilyName,
       })
       if (result.status === 200 || result.status === 204) {

@@ -25,10 +25,10 @@ namespace EzDinner.Functions
             _familyRepository = familyRepository;
         }
 
-        [FunctionName("family")]
+        [FunctionName("CreateFamily")]
         [RequiredScope("backendapi")]
         public async Task<IActionResult?> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "families")] HttpRequest req
             )
         {
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();

@@ -13,33 +13,32 @@ using Newtonsoft.Json;
 
 namespace EzDinner.Functions
 {
-    public class CreateDish
+    public class GetDishes
     {
         private readonly ILogger<CreateDish> _logger;
         private readonly IDishRepository _dishRepository;
 
-        public CreateDish(ILogger<CreateDish> logger, IDishRepository dishRepository)
+        public GetDishes(ILogger<CreateDish> logger, IDishRepository dishRepository)
         {
             _logger = logger;
             _dishRepository = dishRepository;
         }
         
-        [FunctionName("CreateDish")]
+        [FunctionName("dishes")]
         public async Task<IActionResult?> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "dishes")] HttpRequest req
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "dishes/family/{familyId}")] HttpRequest req,
+            string familyId
             )
         {
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
 
-            var newDish = await req.GetBodyAs<CreateDishCommandModel>();
-            if (string.IsNullOrWhiteSpace(newDish.Name)) return new BadRequestObjectResult("Name cannot be null or empty");
-            if (newDish.FamilyId == Guid.Empty) return new BadRequestObjectResult("FamilyId cannot be empty");
+            // TODO: Validate that the user has access to this familyId!
+            var parsedId = Guid.Parse(familyId);
 
-            var dish = new Dish(newDish.FamilyId, newDish.Name);
-            await _dishRepository.SaveAsync(dish);
+            var dishes = await _dishRepository.GetDishesAsync(parsedId);
 
-            return new OkResult();
+            return new OkObjectResult(dishes);
         }
     }
 }

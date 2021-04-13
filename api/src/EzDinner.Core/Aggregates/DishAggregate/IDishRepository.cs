@@ -8,5 +8,6 @@ namespace EzDinner.Core.Aggregates.DishAggregate
     public interface IDishRepository
     {
         public Task SaveAsync(Dish dish);
+        public Task<IEnumerable<Dish>> GetDishesAsync(Guid familyId);
     }
 }

@@ -29,7 +29,7 @@ namespace EzDinner.Infrastructure
         public async Task<IEnumerable<Family>> GetFamiliesAsync(Guid userId)
         {
             var families = new List<Family>();
-            using (FeedIterator<Family> setIterator = _container.GetItemLinqQueryable<Family>()
+            using (var setIterator = _container.GetItemLinqQueryable<Family>()
                        .Where(b => b.OwnerId == userId)
                        .ToFeedIterator())
             {
