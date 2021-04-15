@@ -9,31 +9,31 @@
       <v-row>
         <v-col>
           <v-timeline dense>
-            <div v-for="(meal, index) in meals" :key="index">
+            <div v-for="(dinner, index) in dinners" :key="index">
               <!-- Everytime a new week starts -->
               <v-timeline-item
-                v-if="meal.date.weekday === 1"
+                v-if="dinner.date.weekday === 1"
                 class="mb-4"
                 color="pink"
                 small
                 hide-dot
               >
                 <v-row justify="space-between">
-                  <v-col cols="7">Week {{ meal.date.weekNumber }}</v-col>
+                  <v-col cols="7">Week {{ dinner.date.weekNumber }}</v-col>
                   <v-col cols="5" class="text-right">{{
-                    getWeekDatesString(meal.date)
+                    getWeekDatesString(dinner.date)
                   }}</v-col>
                 </v-row>
               </v-timeline-item>
 
-              <PlannedMeal :meal="meal" />
+              <PlannedDinner :dinner="dinner" />
             </div>
           </v-timeline>
         </v-col>
       </v-row>
     </v-col>
     <v-col cols="5">
-      <TopMeals />
+      <TopDishes />
     </v-col>
   </v-row>
 </template>
@@ -41,17 +41,17 @@
 <script lang="ts">
 import Vue from 'vue'
 import { DateTime } from 'luxon'
-import TopMeals from '~/components/Plan/TopMeals.vue'
-import PlannedMeal from '~/components/Plan/PlannedMeal.vue'
-import { Meal } from '~/types/Meal'
+import TopDishes from '~/components/Plan/TopDishes.vue'
+import PlannedDinner from '~/components/Plan/PlannedDinner.vue'
+import { Dinner } from '~/types/Dinner'
 
 export default Vue.extend({
   components: {
-    TopMeals,
-    PlannedMeal,
+    TopDishes,
+    PlannedDinner,
   },
   data: () => ({
-    mealOptions: [
+    dinnerOptions: [
       'McDonalds',
       'Steak with fries',
       'Pasta ala cabonara',
@@ -72,18 +72,29 @@ export default Vue.extend({
   },
 
   computed: {
-    meals(): Meal[] {
-      const meals: Meal[] = []
+    dinners(): Dinner[] {
+      const dinners: Dinner[] = []
       for (let i = 0; i < 30; i++) {
-        const meal: Meal = {
+        const dinner: Dinner = {
           date: DateTime.now().minus({ days: i - 3 }),
-          name: this.mealOptions[i % this.mealOptions.length],
-          tags: ['At home'],
+          description: this.dinnerOptions[i % this.dinnerOptions.length],
+          tags: [
+            {
+              value: i % 2 ? 'At home' : 'Guests',
+              color: i % 2 ? 'blue' : 'pink',
+            },
+          ],
+          menu: [],
         }
-        meals.push(meal)
+        dinners.push(dinner)
       }
-      return meals.reverse()
+      return dinners.reverse()
     },
+  },
+
+  created() {
+    // dishes are used by child components
+    this.$accessor.dishes.populateDishes()
   },
 
   methods: {

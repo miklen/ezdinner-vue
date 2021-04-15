@@ -11,7 +11,7 @@
           <template #default>
             <thead>
               <tr>
-                <th class="text-left">Meal</th>
+                <th class="text-left">Dish</th>
                 <th class="text-left">Times</th>
               </tr>
             </thead>

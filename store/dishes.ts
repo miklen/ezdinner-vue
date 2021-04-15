@@ -18,8 +18,10 @@ export const mutations = mutationTree(state, {
 export const actions = actionTree(
   { state, getters, mutations },
   {
-    async getDishes({ commit }) {
-      const result = await this.$axios.get('/api/dishes/family/{}')
+    async populateDishes({ commit, rootState }) {
+      const result = await this.$axios.get(
+        `/api/dishes/family/${rootState.activeFamilyId}`,
+      )
       commit('updateDishes', result.data)
     },
   },

@@ -1,22 +1,17 @@
 <template>
   <v-card>
     <v-card-subtitle>
-      {{ formatDate(meal.date) }}
+      {{ formatDate(dinner.date) }}
     </v-card-subtitle>
     <v-card-text>
       <v-row>
-        <v-col>
-          <v-text-field
-            v-model="mealName"
-            label="What's for dinner?"
-          ></v-text-field>
-        </v-col>
+        <v-col> </v-col>
       </v-row>
       <v-row>
         <v-col>
           <v-combobox
             v-model="tags"
-            :items="items"
+            :items="availableTags"
             :search-input.sync="search"
             hide-selected
             hint="What makes this day stand out?"
@@ -52,25 +47,28 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue'
 import { DateTime } from 'luxon'
-import { Meal } from '~/types/Meal'
+import { Tag } from '~/types/Tag'
+import { Dinner } from '~/types/Dinner'
 
 export default Vue.extend({
   props: {
-    meal: {
-      type: Object as PropType<Meal>,
+    dinner: {
+      type: Object as PropType<Dinner>,
       required: true,
     },
   },
   data() {
     return {
-      mealName: '',
+      dinnerName: '',
       search: '',
-      tags: [] as string[],
+      tags: [] as Tag[],
+      availableTags: [] as Tag[],
     }
   },
   created() {
-    this.tags = this.meal.tags
-    this.mealName = this.meal.name
+    this.tags = this.dinner.tags
+    this.availableTags = []
+    this.dinnerName = this.dinner.description
   },
   methods: {
     formatDate(date: DateTime) {

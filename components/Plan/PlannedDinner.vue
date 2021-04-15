@@ -1,32 +1,32 @@
 <template>
   <div>
-    <v-timeline-item v-if="meal.name" class="mb-4" color="green" small>
+    <v-timeline-item v-if="dinner.description" class="mb-4" color="green" small>
       <v-row
         v-show="!expanded"
         justify="space-between"
         @click="expanded = !expanded"
       >
         <v-col cols="6"
-          >{{ meal.name }}
+          >{{ dinner.description }}
           <v-chip
-            v-for="tag in meal.tags"
-            :key="tag"
+            v-for="tag in dinner.tags"
+            :key="tag.value"
             outlined
             x-small
-            color="primary"
-            >{{ tag }}</v-chip
+            :color="tag.color || 'primary'"
+            >{{ tag.value }}</v-chip
           ></v-col
         >
         <v-col
           class="text-right"
           cols="5"
-          v-text="meal.date.toFormat('EEEE')"
+          v-text="dinner.date.toFormat('EEEE')"
         ></v-col>
       </v-row>
 
       <PlannedMealDetails
         v-show="expanded"
-        :meal="meal"
+        :dinner="dinner"
         @cancel="expanded = false"
       />
     </v-timeline-item>
@@ -36,7 +36,7 @@
         <v-col
           class="text-right"
           cols="5"
-          v-text="meal.date.toFormat('EEEE')"
+          v-text="dinner.date.toFormat('EEEE')"
         ></v-col>
       </v-row>
     </v-timeline-item>
@@ -45,28 +45,28 @@
 
 <script lang="ts">
 import Vue, { PropType } from 'vue'
-import { Meal } from '~/types/Meal'
-import PlannedMealDetails from '~/components/Plan/PlannedMealDetails.vue'
+import { Dinner } from '~/types/Dinner'
+import PlannedMealDetails from '~/components/Plan/PlannedDinnerDetails.vue'
 
 export default Vue.extend({
   components: {
     PlannedMealDetails,
   },
   props: {
-    meal: {
-      type: Object as PropType<Meal>,
+    dinner: {
+      type: Object as PropType<Dinner>,
       required: true,
     },
   },
   data() {
     return {
       expanded: false,
-      mealName: '',
+      dinnerName: '',
       search: '',
     }
   },
   created() {
-    this.mealName = this.meal.name
+    this.dinnerName = this.dinner.description
   },
 })
 </script>

@@ -34,8 +34,9 @@ namespace EzDinner.Functions
             if (!authenticationStatus) return authenticationResponse;
 
             // TODO: Validate that the user has access to this familyId!
+            _logger.LogInformation("GetDishes called for familyId " + familyId);
             var parsedId = Guid.Parse(familyId);
-
+            
             var dishes = await _dishRepository.GetDishesAsync(parsedId);
 
             return new OkObjectResult(dishes);
