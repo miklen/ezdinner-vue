@@ -5,14 +5,45 @@
     </v-card-subtitle>
     <v-card-text>
       <v-row>
-        <v-col> </v-col>
+        <v-col>
+          <v-row>
+            <v-col>
+              <v-autocomplete
+                v-model="selectedDish"
+                :search-input.sync="dishSearch"
+                dense
+                filled
+                rounded
+                solo
+                label="Select a dish"
+              >
+                <template #no-data>
+                  <v-list-item>
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        No results matching "<strong>{{ dishSearch }}</strong
+                        >". Press <kbd>enter</kbd> to create a new one
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-autocomplete>
+            </v-col>
+          </v-row>
+          <v-list>
+            <v-list-item-content
+              >Nothing planned yet. Add a dish to the menu</v-list-item-content
+            >
+          </v-list>
+        </v-col>
       </v-row>
+
       <v-row>
         <v-col>
           <v-combobox
             v-model="tags"
             :items="availableTags"
-            :search-input.sync="search"
+            :search-input.sync="tagSearch"
             hide-selected
             hint="What makes this day stand out?"
             label="Add some tags"
@@ -25,7 +56,7 @@
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title>
-                    No results matching "<strong>{{ search }}</strong
+                    No results matching "<strong>{{ tagSearch }}</strong
                     >". Press <kbd>enter</kbd> to create a new one
                   </v-list-item-title>
                 </v-list-item-content>
@@ -60,9 +91,11 @@ export default Vue.extend({
   data() {
     return {
       dinnerName: '',
-      search: '',
+      tagSearch: '',
       tags: [] as Tag[],
       availableTags: [] as Tag[],
+      dishSearch: '',
+      selectedDish: '',
     }
   },
   created() {
