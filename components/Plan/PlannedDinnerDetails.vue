@@ -9,22 +9,42 @@
           <v-row>
             <v-col>
               <v-autocomplete
+                ref="dishSelector"
                 v-model="selectedDish"
+                :items="dishVariants"
                 :search-input.sync="dishSearch"
+                return-object
+                item-text="dishName"
+                item-value="dishId"
                 dense
                 filled
                 rounded
                 solo
-                label="Select a dish"
+                label="Select a dish or create one"
+                @input="addDishToMenu($event.dishId, $event.receipeId)"
               >
+                <template #item="{ item }">
+                  <template v-if="!item.receipeId">
+                    <v-list-item-content>{{
+                      item.dishName
+                    }}</v-list-item-content>
+                  </template>
+                  <template v-else>
+                    <v-list-item-content>{{
+                      item.dishName
+                    }}</v-list-item-content>
+                    <v-list-item-subtitle>
+                      {{ item.receipeId }}</v-list-item-subtitle
+                    >
+                  </template>
+                </template>
+
                 <template #no-data>
-                  <v-list-item>
-                    <v-list-item-content>
-                      <v-list-item-title>
-                        No results matching "<strong>{{ dishSearch }}</strong
-                        >". Press <kbd>enter</kbd> to create a new one
-                      </v-list-item-title>
-                    </v-list-item-content>
+                  <v-list-item v-show="!dishSearch">
+                    <span class="subheading">Enter name of dish</span>
+                  </v-list-item>
+                  <v-list-item v-show="dishSearch" @click="createDish">
+                    <span class="subheading">Create {{ dishSearch }}</span>
                   </v-list-item>
                 </template>
               </v-autocomplete>
@@ -98,6 +118,11 @@ export default Vue.extend({
       selectedDish: '',
     }
   },
+  computed: {
+    dishVariants() {
+      return this.$accessor.dishes.dishes
+    },
+  },
   created() {
     this.tags = this.dinner.tags
     this.availableTags = []
@@ -106,6 +131,26 @@ export default Vue.extend({
   methods: {
     formatDate(date: DateTime) {
       return date.toLocaleString(DateTime.DATE_HUGE)
+    },
+    async createDish() {
+      const element = this.$refs.dishSelector as HTMLElement
+      element.blur()
+      const result = await this.$axios.post('api/dishes', {
+        name: this.dishSearch,
+        familyId: this.$accessor.activeFamilyId,
+      })
+      this.dishSearch = ''
+      // repopulate dishes to add the new dish to the list
+      this.$accessor.dishes.populateDishes()
+      const dishId = result.data as string
+      this.addDishToMenu(dishId, null)
+    },
+    addDishToMenu(dishId: string, receipeId: string | null) {
+      return this.$axios.put('api/dinner/menuitem', {
+        date: this.dinner.date,
+        dishId,
+        receipeId,
+      })
     },
   },
 })

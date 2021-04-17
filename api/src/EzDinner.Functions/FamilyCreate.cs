@@ -14,18 +14,18 @@ using Newtonsoft.Json;
 
 namespace EzDinner.Functions
 {
-    public class CreateFamily
+    public class FamilyCreate
     {
-        private readonly ILogger<CreateFamily> _logger;
+        private readonly ILogger<FamilyCreate> _logger;
         private readonly IFamilyRepository _familyRepository;
 
-        public CreateFamily(ILogger<CreateFamily> logger, IFamilyRepository familyRepository)
+        public FamilyCreate(ILogger<FamilyCreate> logger, IFamilyRepository familyRepository)
         {
             _logger = logger;
             _familyRepository = familyRepository;
         }
 
-        [FunctionName("CreateFamily")]
+        [FunctionName(nameof(FamilyCreate))]
         [RequiredScope("backendapi")]
         public async Task<IActionResult?> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "families")] HttpRequest req

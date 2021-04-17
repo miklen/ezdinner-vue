@@ -10,8 +10,8 @@ export type DishesState = ReturnType<typeof state>
 export const getters = getterTree(state, {})
 
 export const mutations = mutationTree(state, {
-  updateDishes(state, Dishes: Dish[]) {
-    state.dishes = Dishes
+  updateDishes(state, dishes: Dish[]) {
+    state.dishes = dishes
   },
 })
 

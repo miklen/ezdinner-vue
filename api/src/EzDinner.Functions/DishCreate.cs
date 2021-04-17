@@ -9,22 +9,24 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.Resource;
 using Newtonsoft.Json;
 
 namespace EzDinner.Functions
 {
-    public class CreateDish
+    public class DishCreate
     {
-        private readonly ILogger<CreateDish> _logger;
+        private readonly ILogger<DishCreate> _logger;
         private readonly IDishRepository _dishRepository;
 
-        public CreateDish(ILogger<CreateDish> logger, IDishRepository dishRepository)
+        public DishCreate(ILogger<DishCreate> logger, IDishRepository dishRepository)
         {
             _logger = logger;
             _dishRepository = dishRepository;
         }
         
-        [FunctionName("CreateDish")]
+        [FunctionName(nameof(DishCreate))]
+        [RequiredScope("backendapi")]
         public async Task<IActionResult?> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "dishes")] HttpRequest req
             )
@@ -39,7 +41,7 @@ namespace EzDinner.Functions
             var dish = new Dish(newDish.FamilyId, newDish.Name);
             await _dishRepository.SaveAsync(dish);
 
-            return new OkResult();
+            return new OkObjectResult(dish.Id);
         }
     }
 }

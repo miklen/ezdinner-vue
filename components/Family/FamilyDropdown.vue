@@ -32,7 +32,7 @@ export default Vue.extend({
     this.getFamilies()
   },
   methods: {
-    getFamilies(): Promise<void> {
+    getFamilies() {
       return this.$accessor.families.getFamilies()
     },
   },

@@ -5,14 +5,15 @@ using System.Text;
 
 namespace EzDinner.Core.Aggregates.DinnerAggregate
 {
-    public class Dinner
+    public class Dinner : AggregateRoot<DateTime>
     {
-        public DateTime Date { get; set; }
+        public DateTime Date { get; }
+        public Guid FamilyId { get; set; }
         public string Description { get; set; }
-        public IEnumerable<MenuItem> Menu { get; set; }
-        public IEnumerable<Tag> Tags { get; set; }
+        public IEnumerable<MenuItem> Menu { get; }
+        public IEnumerable<Tag> Tags { get; }
 
-        public Dinner(string description, DateTime date, Guid dishId)
+        public Dinner(string description, DateTime date) : base(date)
         {
             Description = description;
             Menu = new List<MenuItem>();

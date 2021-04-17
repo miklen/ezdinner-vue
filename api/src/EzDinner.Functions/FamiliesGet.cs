@@ -19,20 +19,20 @@ using Newtonsoft.Json;
 
 namespace EzDinner.Functions
 {
-    public class GetFamilies
+    public class FamiliesGet
     {
-        private readonly ILogger<GetFamilies> _logger;
+        private readonly ILogger<FamiliesGet> _logger;
         private readonly IFamilyMemberRepository _familyMemberRepository;
         private readonly IFamilyRepository _familyRepository;
 
-        public GetFamilies(ILogger<GetFamilies> logger, IFamilyMemberRepository familyMemberRepository, IFamilyRepository familyRepository)
+        public FamiliesGet(ILogger<FamiliesGet> logger, IFamilyMemberRepository familyMemberRepository, IFamilyRepository familyRepository)
         {
             _logger = logger;
             _familyMemberRepository = familyMemberRepository;
             _familyRepository = familyRepository;
         }
 
-        [FunctionName("GetFamilies")]
+        [FunctionName(nameof(FamiliesGet))]
         [RequiredScope("backendapi")]
         public async Task<IActionResult?> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "families")] HttpRequest req)
         {

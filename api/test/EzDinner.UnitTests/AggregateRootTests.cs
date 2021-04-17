@@ -10,7 +10,7 @@ namespace EzDinner.UnitTests
         [Fact]
         public void Instance_IsInitialized_CanBeSerialized()
         {
-            var root = new AggregateRoot() { Id = Guid.NewGuid() };
+            var root = new AggregateInstance();
 
             var json = JsonSerializer.Serialize(root);
 
@@ -20,14 +20,21 @@ namespace EzDinner.UnitTests
         [Fact]
         public void Instance_IsInitialized_CanBeDeserialized()
         {
-            var root = new AggregateRoot() { Id = Guid.NewGuid() };
+            var root = new AggregateInstance();
             var json = JsonSerializer.Serialize(root);
 
-            var result = JsonSerializer.Deserialize<AggregateRoot>(json);
+            var result = JsonSerializer.Deserialize<AggregateInstance>(json);
 
             Assert.Equal(root.Id, result.Id);
             // Verifies that the lambda property can be serialized and deserialized correctly
             Assert.Equal(root.PartitionKey, result.PartitionKey);
+        }
+    }
+
+    public class AggregateInstance : AggregateRoot<Guid>
+    {
+        public AggregateInstance() : base(Guid.NewGuid())
+        {
         }
     }
 }

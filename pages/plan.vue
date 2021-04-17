@@ -90,14 +90,28 @@ export default Vue.extend({
       }
       return dinners.reverse()
     },
+    activeFamilyId(): string {
+      return this.$accessor.activeFamilyId
+    },
+  },
+
+  watch: {
+    activeFamilyId(newValue: string) {
+      if (!newValue) return
+      this.init()
+    },
   },
 
   created() {
-    // dishes are used by child components
-    this.$accessor.dishes.populateDishes()
+    this.init()
   },
 
   methods: {
+    init() {
+      // dishes are used by child components
+      if (!this.$accessor.activeFamilyId) return
+      this.$accessor.dishes.populateDishes()
+    },
     getWeekDatesString(startOfWeekDay: DateTime) {
       return `${startOfWeekDay.toLocaleString(
         DateTime.DATE_SHORT,

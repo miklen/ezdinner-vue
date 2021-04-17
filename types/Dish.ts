@@ -9,7 +9,8 @@ export declare class Recipe {
 }
 
 export declare class Dish {
+  name: string
   id: string
-  familyId: string
-  recipes: Recipe[]
+  recipeId: string
+  recipeName: string
 }

@@ -7,10 +7,10 @@ namespace EzDinner.Core.Aggregates.DishAggregate
 {
     public class Recipe
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; }
         public string Name { get; set; }
         public Uri? Url { get; set; }
-        public IEnumerable<Tag> Tags { get; set; }
+        public IEnumerable<Tag> Tags { get; }
         public string Notes { get; set; }
 
         public Recipe(string name, string notes)

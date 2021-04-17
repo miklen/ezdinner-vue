@@ -4,6 +4,9 @@ using System.Text;
 
 namespace EzDinner.Functions.Models.Query
 {
+    /// <summary>
+    /// Model to display the family. Both as cards and in dropdown.
+    /// </summary>
     public class FamilyQueryModel
     {
         public Guid Id { get; set; }
