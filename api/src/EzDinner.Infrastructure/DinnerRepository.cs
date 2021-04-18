@@ -26,37 +26,25 @@ namespace EzDinner.Infrastructure
             throw new NotImplementedException();
         }
 
-        // TODO: Fill with dates not present in database
-        public async Task<IEnumerable<Dinner>> GetAsync(Guid familyId, DateTime fromDate, DateTime toDate)
+        public async IAsyncEnumerable<Dinner> GetAsync(Guid familyId, DateTime fromDate, DateTime toDate)
         {
             using (var iterator = _container.GetItemLinqQueryable<Dinner>()
                 .Where(w => w.FamilyId == familyId && w.Date > fromDate && w.Date < toDate)
                 .ToFeedIterator())
             {
-                var dinners = new List<Dinner>();
-
                 while (iterator.HasMoreResults)
                 {
-                    foreach (var family in await iterator.ReadNextAsync())
+                    foreach (var dinner in await iterator.ReadNextAsync())
                     {
-                        dinners.Add(family);
+                        yield return dinner;
                     }
                 }
-                return dinners;
             }
         }
 
         public Task SaveAsync(Dinner dinner)
         {
             return _container.UpsertItemAsync(dinner);
-        }
-
-        private IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
-        {
-            for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
-            {
-                yield return day;
-            }
         }
     }
 }

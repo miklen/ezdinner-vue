@@ -13,11 +13,17 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
         public IEnumerable<MenuItem> Menu { get; }
         public IEnumerable<Tag> Tags { get; }
 
-        public Dinner(string description, DateTime date) : base(date)
+        public Dinner(Guid familyId, string description, DateTime date) : base(date)
         {
+            Date = date;
+            FamilyId = familyId;
             Description = description;
             Menu = new List<MenuItem>();
             Tags = new List<Tag>();
+        }
+
+        public Dinner(Guid familyId, DateTime date) : this(familyId, "", date)
+        {
         }
     }
 }

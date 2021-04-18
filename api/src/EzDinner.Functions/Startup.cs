@@ -11,6 +11,7 @@ using Microsoft.Identity.Client;
 using Microsoft.Graph;
 using EzDinner.Core.Aggregates.FamilyMemberAggregate;
 using EzDinner.Infrastructure;
+using EzDinner.Core.Aggregates.DinnerAggregate;
 
 [assembly: FunctionsStartup(typeof(EzDinner.Functions.Startup))]
 
@@ -51,6 +52,7 @@ namespace EzDinner.Functions
             builder.Services.RegisterMsGraph(Configuration.GetSection("AzureAdB2C"));
             builder.Services.RegisterCosmosDb(Configuration.GetSection("CosmosDb"));
             builder.Services.RegisterRepositories();
+            builder.Services.AddScoped<IDinnerService, DinnerService>();
 
             ConfigureServices(builder.Services);
         }
