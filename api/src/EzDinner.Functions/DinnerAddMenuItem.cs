@@ -23,7 +23,7 @@ namespace EzDinner.Functions
         
         [FunctionName(nameof(DinnerAddMenuItem))]
         [RequiredScope("backendapi")]
-        public async Task<IActionResult> Run(
+        public async Task<IActionResult?> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "dinner/menuitem")] HttpRequest req
             )
         {

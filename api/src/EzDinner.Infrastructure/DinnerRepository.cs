@@ -21,9 +21,21 @@ namespace EzDinner.Infrastructure
             _container = _client.GetContainer(configuration.GetValue<string>("CosmosDb:Database"), "Dinners");
         }
 
-        public Task<Dinner> GetAsync(Guid familyId, DateTime exactDate)
+        public async Task<Dinner?> GetAsync(Guid familyId, DateTime exactDate)
         {
-            throw new NotImplementedException();
+            using (var iterator = _container.GetItemLinqQueryable<Dinner>()
+                    .Where(w => w.FamilyId == familyId && w.Date == exactDate)
+                    .ToFeedIterator())
+            {
+                while (iterator.HasMoreResults)
+                {
+                    foreach (var dinner in await iterator.ReadNextAsync())
+                    {
+                        return dinner;
+                    }
+                }
+                return null;
+            }
         }
 
         public async IAsyncEnumerable<Dinner> GetAsync(Guid familyId, DateTime fromDate, DateTime toDate)

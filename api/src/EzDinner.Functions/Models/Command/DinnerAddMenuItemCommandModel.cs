@@ -7,6 +7,11 @@ namespace EzDinner.Functions.Models.Command
     public class DinnerAddMenuItemCommandModel
     {
         /// <summary>
+        /// The Id of the family to plan a menu item for
+        /// </summary>
+        public Guid FamilyId { get; set; }
+
+        /// <summary>
         /// Date is the unique identifier for a dinner. You can only have _one_ dinner pr. day
         /// </summary>
         public DateTime Date { get; set; }

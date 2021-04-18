@@ -5,7 +5,7 @@ using System.Text;
 
 namespace EzDinner.Core.Aggregates.DinnerAggregate
 {
-    public class Dinner : AggregateRoot<DateTime>
+    public class Dinner : AggregateRoot<Guid>
     {
         public DateTime Date { get; }
         public Guid FamilyId { get; set; }
@@ -13,7 +13,7 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
         public IEnumerable<MenuItem> Menu { get; }
         public IEnumerable<Tag> Tags { get; }
 
-        public Dinner(Guid familyId, string description, DateTime date) : base(date)
+        public Dinner(Guid familyId, string description, DateTime date) : base(Guid.NewGuid())
         {
             Date = date;
             FamilyId = familyId;

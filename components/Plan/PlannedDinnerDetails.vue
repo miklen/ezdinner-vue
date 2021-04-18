@@ -150,6 +150,7 @@ export default Vue.extend({
         date: this.dinner.date,
         dishId,
         receipeId,
+        familyId: this.$accessor.activeFamilyId,
       })
     },
   },
