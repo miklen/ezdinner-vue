@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EzDinner.Core.Aggregates.DinnerAggregate
 {
@@ -14,15 +15,12 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
             _dinnerRepository = dinnerRepository;
         }
 
-        /// <summary>
-        /// Returns a <see cref="Dinner"/> object for each day in the span between from and to.
-        /// If planned dinner objects are available in storage they are returned for the planned day. If no
-        /// planned dinner is available for a day an empty Dinner object is created and returned.
-        /// </summary>
-        /// <param name="familyId"></param>
-        /// <param name="fromDate"></param>
-        /// <param name="toDate"></param>
-        /// <returns></returns>
+        public async Task<Dinner> GetAsync(Guid familyId, DateTime exactDate)
+        {
+            var dinner = await _dinnerRepository.GetAsync(familyId, exactDate.Date);
+            return dinner ?? new Dinner(familyId, exactDate.Date);
+        }
+        
         public async IAsyncEnumerable<Dinner> GetAsync(Guid familyId, DateTime fromDate, DateTime toDate)
         {
             var previousPlannedDinner = fromDate.Date.AddDays(-1);
