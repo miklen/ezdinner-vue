@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-timeline-item v-if="dinner.description" class="mb-4" color="green" small>
+    <v-timeline-item v-if="dinner.isPlanned" class="mb-4" color="green" small>
       <v-row
         v-show="!expanded"
         justify="space-between"
@@ -39,6 +39,12 @@
           v-text="dinner.date.toFormat('EEEE')"
         ></v-col>
       </v-row>
+
+      <PlannedMealDetails
+        v-show="expanded"
+        :dinner="dinner"
+        @cancel="expanded = false"
+      />
     </v-timeline-item>
   </div>
 </template>
@@ -61,12 +67,17 @@ export default Vue.extend({
   data() {
     return {
       expanded: false,
-      dinnerName: '',
       search: '',
     }
   },
-  created() {
-    this.dinnerName = this.dinner.description
+
+  computed: {
+    dishMap(): { [key: string]: string } {
+      return this.$accessor.dishes.dishes.reduce(
+        (prev, current) => (prev[current.id] = current.name),
+        {} as { [key: string]: string },
+      )
+    },
   },
 })
 </script>

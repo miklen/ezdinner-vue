@@ -1,4 +1,5 @@
-﻿using EzDinner.Core.Aggregates.DishAggregate;
+﻿using EzDinner.Core.Aggregates.DinnerAggregate;
+using EzDinner.Core.Aggregates.DishAggregate;
 using EzDinner.Core.Aggregates.FamilyAggregate;
 using EzDinner.Core.Aggregates.FamilyMemberAggregate;
 using Microsoft.Azure.Cosmos;
@@ -44,6 +45,7 @@ namespace EzDinner.Infrastructure
             services.AddScoped<IFamilyRepository, FamilyRepository>();
             services.AddScoped<IFamilyMemberRepository, FamilyMemberRepository>();
             services.AddScoped<IDishRepository, DishRepository>();
+            services.AddScoped<IDinnerRepository, DinnerRepository>();
             return services;
         }
 

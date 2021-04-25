@@ -46,6 +46,7 @@ namespace EzDinner.Functions
                 .Build();
 
             builder.Services.AddLogging();
+            builder.Services.AddAutoMapper(typeof(Startup));
 
             // Replace the Azure Function configuration with our new one
             builder.Services.AddSingleton(Configuration);

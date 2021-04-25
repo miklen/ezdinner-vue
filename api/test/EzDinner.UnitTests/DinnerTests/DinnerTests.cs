@@ -1,5 +1,6 @@
 ﻿using AutoFixture;
 using EzDinner.Core.Aggregates.DinnerAggregate;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -80,5 +81,47 @@ namespace EzDinner.UnitTests.DinnerTests
             Assert.Single(dinner.Menu);
         }
 
+        [Fact]
+        public void NewtonsoftJson_Dinner_CanSerialize()
+        {
+            // Arrange
+            var fixture = new Fixture();
+            var dinner = fixture.Create<Dinner>();
+
+            // Act
+            var json = JsonConvert.SerializeObject(dinner);
+            var deserialized = JsonConvert.DeserializeObject<Dinner>(json);
+
+            // Assert
+            Assert.Equal(dinner.FamilyId, deserialized.FamilyId);
+            Assert.Equal(dinner.Date, deserialized.Date);
+        }
+
+        [Fact]
+        public void Dinner_HasMenuItems_IsPlannedTrue()
+        {
+            // Arrange
+            var fixture = new Fixture();
+            var dinner = fixture.Create<Dinner>();
+            
+            // Act
+            dinner.AddMenuItem(Guid.NewGuid());
+
+            // Assert
+            Assert.True(dinner.IsPlanned);
+        }
+
+        [Fact]
+        public void Dinner_HasNoMenuItems_IsPlannedFalse()
+        {
+            // Arrange
+            var fixture = new Fixture();
+            var dinner = fixture.Create<Dinner>();
+
+            // Act
+
+            // Assert
+            Assert.False(dinner.IsPlanned);
+        }
     }
 }

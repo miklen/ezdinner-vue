@@ -18,7 +18,7 @@ namespace EzDinner.Core.Aggregates
         /// </summary>
         public virtual TIdType PartitionKey => Id;
 
-        public AggregateRoot(TIdType id)
+        protected AggregateRoot(TIdType id)
         {
             Id = id;
         }

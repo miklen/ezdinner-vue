@@ -146,7 +146,7 @@ export default Vue.extend({
       this.addDishToMenu(dishId, null)
     },
     addDishToMenu(dishId: string, receipeId: string | null) {
-      return this.$axios.put('api/dinner/menuitem', {
+      return this.$axios.put('api/dinners/menuitem', {
         date: this.dinner.date,
         dishId,
         receipeId,

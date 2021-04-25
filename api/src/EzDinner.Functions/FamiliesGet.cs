@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoMapper;
 using EzDinner.Core.Aggregates.FamilyAggregate;
 using EzDinner.Core.Aggregates.FamilyMemberAggregate;
 using EzDinner.Functions.Models.Query;
@@ -24,12 +25,14 @@ namespace EzDinner.Functions
         private readonly ILogger<FamiliesGet> _logger;
         private readonly IFamilyMemberRepository _familyMemberRepository;
         private readonly IFamilyRepository _familyRepository;
+        private readonly IMapper _mapper;
 
-        public FamiliesGet(ILogger<FamiliesGet> logger, IFamilyMemberRepository familyMemberRepository, IFamilyRepository familyRepository)
+        public FamiliesGet(ILogger<FamiliesGet> logger, IMapper mapper, IFamilyMemberRepository familyMemberRepository, IFamilyRepository familyRepository)
         {
             _logger = logger;
             _familyMemberRepository = familyMemberRepository;
             _familyRepository = familyRepository;
+            _mapper = mapper;
         }
 
         [FunctionName(nameof(FamiliesGet))]
@@ -44,7 +47,7 @@ namespace EzDinner.Functions
             var userId = Guid.Parse(req.HttpContext.User.GetNameIdentifierId() ?? "");
             var families = await _familyRepository.GetFamiliesAsync(userId);
 
-            var familieyQueryModels = families.Select(familiy => new FamilyQueryModel() { Id = familiy.Id, OwnerId = familiy.OwnerId, Name = familiy.Name });
+            var familieyQueryModels = families.Select(_mapper.Map<FamilyQueryModel>);
 
             var owners = GetOwnerNames(familieyQueryModels);
             foreach (var family in familieyQueryModels)

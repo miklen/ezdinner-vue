@@ -17,6 +17,7 @@ namespace EzDinner.Functions.Models.Query
         public Guid? RecipeId { get; set; }
         public string? RecipeName { get; set; }
 
+        // TODO: Switch to AutoMapper
         public static IEnumerable<DishesQueryModel> FromDomain(Dish dish)
         {
             if (dish is null) throw new ArgumentNullException(nameof(dish));

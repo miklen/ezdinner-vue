@@ -51,20 +51,7 @@ export default Vue.extend({
     PlannedDinner,
   },
   data: () => ({
-    dinnerOptions: [
-      'McDonalds',
-      'Steak with fries',
-      'Pasta ala cabonara',
-      'Lasagne',
-      'Tortillias',
-      'Fish',
-      '',
-      'Tacos',
-      'Nachos',
-      'Pancakes',
-      '',
-      'Nudles',
-    ],
+    dinners: [] as Dinner[],
   }),
 
   head: {
@@ -72,24 +59,6 @@ export default Vue.extend({
   },
 
   computed: {
-    dinners(): Dinner[] {
-      const dinners: Dinner[] = []
-      for (let i = 0; i < 30; i++) {
-        const dinner: Dinner = {
-          date: DateTime.now().minus({ days: i - 3 }),
-          description: this.dinnerOptions[i % this.dinnerOptions.length],
-          tags: [
-            {
-              value: i % 2 ? 'At home' : 'Guests',
-              color: i % 2 ? 'blue' : 'pink',
-            },
-          ],
-          menu: [],
-        }
-        dinners.push(dinner)
-      }
-      return dinners.reverse()
-    },
     activeFamilyId(): string {
       return this.$accessor.activeFamilyId
     },
@@ -102,15 +71,29 @@ export default Vue.extend({
     },
   },
 
-  created() {
-    this.init()
+  async created() {
+    await this.init()
   },
 
   methods: {
-    init() {
+    async init() {
       // dishes are used by child components
       if (!this.$accessor.activeFamilyId) return
       this.$accessor.dishes.populateDishes()
+      await this.populateDinners()
+    },
+    async populateDinners() {
+      const to = DateTime.now().plus({ week: 1 })
+      const from = to.minus({ month: 1 })
+      const result = await this.$axios.get(
+        `api/dinners/family/${
+          this.activeFamilyId
+        }/dates/${from.toISODate()}/${to.toISODate()}`,
+      )
+      this.dinners = result.data.map((dinner: any) => {
+        dinner.date = DateTime.fromISO(dinner.date)
+        return dinner
+      })
     },
     getWeekDatesString(startOfWeekDay: DateTime) {
       return `${startOfWeekDay.toLocaleString(

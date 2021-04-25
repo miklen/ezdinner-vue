@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AutoMapper;
+using EzDinner.Core.Aggregates.FamilyAggregate;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,5 +15,13 @@ namespace EzDinner.Functions.Models.Query
         public string? Name { get; set; }
         public Guid OwnerId { get; set; }
         public string? OwnerName { get; set; }
+    }
+
+    public class FamilyMapping : Profile
+    {
+        public FamilyMapping()
+        {
+            CreateMap<Family, FamilyQueryModel>();
+        }
     }
 }

@@ -12,22 +12,22 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
         private readonly List<Tag> _tags;
 
         public DateTime Date { get; }
-        public Guid FamilyId { get; set; }
-        public string Description { get; set; }
+        public Guid FamilyId { get; private set; }
         public IEnumerable<MenuItem> Menu { get => _menu; }
         public IEnumerable<Tag> Tags { get => _tags; }
+        public bool IsPlanned => Menu.Any();
 
         public Dinner(Guid familyId, string description, DateTime date) : base(Guid.NewGuid())
         {
             Date = date;
             FamilyId = familyId;
-            Description = description;
             _menu = new List<MenuItem>();
             _tags = new List<Tag>();
         }
 
-        public Dinner(Guid familyId, DateTime date) : this(familyId, "", date)
+        public static Dinner CreateNew(Guid familyId, DateTime date)
         {
+            return new Dinner(familyId, "", date);
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
         /// </summary>
         /// <param name="dishId"></param>
         /// <param name="recipeId"></param>
-        public void AddMenuItem(Guid dishId, Guid? recipeId)
+        public void AddMenuItem(Guid dishId, Guid? recipeId = null)
         {
             var dishIsAlreadyAdded = _menu.Any(w => w.DishId == dishId && w.ReciepeId == recipeId);
             if (dishIsAlreadyAdded) return;

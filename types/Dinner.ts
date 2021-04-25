@@ -12,4 +12,5 @@ export declare class Dinner {
   date: DateTime
   menu: MenuItem[]
   tags: Tag[]
+  isPlanned: boolean
 }

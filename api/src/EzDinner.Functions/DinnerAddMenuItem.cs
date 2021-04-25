@@ -29,7 +29,7 @@ namespace EzDinner.Functions
         [FunctionName(nameof(DinnerAddMenuItem))]
         [RequiredScope("backendapi")]
         public async Task<IActionResult?> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "dinner/menuitem")] HttpRequest req
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "dinners/menuitem")] HttpRequest req
             )
         {
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
