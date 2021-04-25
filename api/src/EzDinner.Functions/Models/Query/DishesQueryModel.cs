@@ -12,8 +12,8 @@ namespace EzDinner.Functions.Models.Query
     /// </summary>
     public class DishesQueryModel
     {
-        public Guid DishId { get; set; }
-        public string? DishName { get; set; }
+        public Guid Id { get; set; }
+        public string? Name { get; set; }
         public Guid? RecipeId { get; set; }
         public string? RecipeName { get; set; }
 
@@ -21,8 +21,8 @@ namespace EzDinner.Functions.Models.Query
         public static IEnumerable<DishesQueryModel> FromDomain(Dish dish)
         {
             if (dish is null) throw new ArgumentNullException(nameof(dish));
-            if (!dish.Recipes.Any()) return new[] { new DishesQueryModel { DishId = dish.Id, DishName = dish.Name } };
-            return dish.Recipes.Select(recipe => new DishesQueryModel() { DishId = dish.Id, DishName = dish.Name, RecipeId = recipe.Id, RecipeName = recipe.Name });
+            if (!dish.Recipes.Any()) return new[] { new DishesQueryModel { Id = dish.Id, Name = dish.Name } };
+            return dish.Recipes.Select(recipe => new DishesQueryModel() { Id = dish.Id, Name = dish.Name, RecipeId = recipe.Id, RecipeName = recipe.Name });
         }
     }
 }

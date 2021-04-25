@@ -50,10 +50,10 @@
 </template>
 
 <script lang="ts">
+import { DateTime } from 'luxon'
 import Vue, { PropType } from 'vue'
 import { Dinner } from '~/types/Dinner'
 import PlannedMealDetails from '~/components/Plan/PlannedDinnerDetails.vue'
-import { DateTime } from 'luxon'
 
 export default Vue.extend({
   components: {
@@ -72,26 +72,19 @@ export default Vue.extend({
     }
   },
 
-  computed: {
-    dishMap(): { [key: string]: string } {
-      return this.$accessor.dishes.dishes.reduce(
-        (prev, current) => (prev[current.id] = current.name),
-        {} as any,
-      )
-    },
-  },
+  computed: {},
   methods: {
     getPlannedTitle(dinner: Dinner) {
       if (!dinner) return 'Dinner not found'
-      return dinner.menu.map(item => this.dishMap[item.dishId]).join()
+      return dinner.menu.map((item) => item.dishName).join()
     },
     getUnplannedTitle(date: DateTime) {
       // when unplanned dinners are in the past we're tracking
       if (date < DateTime.now()) return 'Track dinner'
       // if in the future we're planning
       return 'Plan dinner'
-    }
-  }
+    },
+  },
 })
 </script>
 

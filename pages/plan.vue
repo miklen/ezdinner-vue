@@ -43,7 +43,7 @@ import Vue from 'vue'
 import { DateTime } from 'luxon'
 import TopDishes from '~/components/Plan/TopDishes.vue'
 import PlannedDinner from '~/components/Plan/PlannedDinner.vue'
-import { Dinner } from '~/types/Dinner'
+import { Dinner, MenuItem } from '~/types/Dinner'
 
 export default Vue.extend({
   components: {
@@ -62,6 +62,12 @@ export default Vue.extend({
     activeFamilyId(): string {
       return this.$accessor.activeFamilyId
     },
+    dishMap(): { [key: string]: string } {
+      return this.$accessor.dishes.dishes.reduce((prev, current) => {
+        prev[current.id] = current.name
+        return prev
+      }, {} as { [key: string]: string })
+    },
   },
 
   watch: {
@@ -71,17 +77,18 @@ export default Vue.extend({
     },
   },
 
-  created() {
-    this.init()
+  async created() {
+    await this.init()
   },
 
   methods: {
-    init() {
+    async init() {
       // dishes are used by child components
       if (!this.$accessor.activeFamilyId) return
-      this.$accessor.dishes.populateDishes()
-      this.populateDinners()
+      await this.$accessor.dishes.populateDishes()
+      await this.populateDinners()
     },
+
     async populateDinners() {
       const to = DateTime.now().plus({ week: 1 })
       const from = to.minus({ month: 1 })
@@ -90,8 +97,15 @@ export default Vue.extend({
           this.activeFamilyId
         }/dates/${from.toISODate()}/${to.toISODate()}`,
       )
+
+      // runtime join - consider if this is done better elsewhere
       this.dinners = result.data.map((dinner: any) => {
         dinner.date = DateTime.fromISO(dinner.date)
+        dinner.menu.map((item: any) => {
+          item.dishName = this.dishMap[item.dishId]
+          // TODO: add receipeName
+          return item
+        })
         return dinner
       })
     },

@@ -14,25 +14,21 @@
                 :items="dishVariants"
                 :search-input.sync="dishSearch"
                 return-object
-                item-text="dishName"
-                item-value="dishId"
+                item-text="name"
+                item-value="id"
                 dense
                 filled
                 rounded
                 solo
                 label="Select a dish or create one"
-                @input="addDishToMenu($event.dishId, $event.receipeId)"
+                @input="addDishToMenu($event.id, $event.receipeId)"
               >
                 <template #item="{ item }">
                   <template v-if="!item.receipeId">
-                    <v-list-item-content>{{
-                      item.dishName
-                    }}</v-list-item-content>
+                    <v-list-item-content>{{ item.name }}</v-list-item-content>
                   </template>
                   <template v-else>
-                    <v-list-item-content>{{
-                      item.dishName
-                    }}</v-list-item-content>
+                    <v-list-item-content>{{ item.name }}</v-list-item-content>
                     <v-list-item-subtitle>
                       {{ item.receipeId }}</v-list-item-subtitle
                     >
@@ -51,9 +47,12 @@
             </v-col>
           </v-row>
           <v-list>
-            <v-list-item-content
-              >Nothing planned yet. Add a dish to the menu</v-list-item-content
-            >
+            <v-list-item v-for="menuItem in dinner.menu" :key="menuItem.dishId">
+              <v-list-item-title>{{ menuItem.dishName }}</v-list-item-title>
+              <v-list-item-subtitle>{{
+                menuItem.recipeName
+              }}</v-list-item-subtitle>
+            </v-list-item>
           </v-list>
         </v-col>
       </v-row>
@@ -110,7 +109,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      dinnerName: '',
       tagSearch: '',
       tags: [] as Tag[],
       availableTags: [] as Tag[],
@@ -126,7 +124,6 @@ export default Vue.extend({
   created() {
     this.tags = this.dinner.tags
     this.availableTags = []
-    this.dinnerName = this.dinner.description
   },
   methods: {
     formatDate(date: DateTime) {

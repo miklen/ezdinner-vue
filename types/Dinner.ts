@@ -3,7 +3,9 @@ import { Tag } from './Tag'
 
 export declare class MenuItem {
   dishId: string
+  dishName: string
   receipeId?: string
+  recipeName?: string
   ordering: number
 }
 
