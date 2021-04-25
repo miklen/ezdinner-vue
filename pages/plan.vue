@@ -21,7 +21,7 @@
                 <v-row justify="space-between">
                   <v-col cols="7">Week {{ dinner.date.weekNumber }}</v-col>
                   <v-col cols="5" class="text-right">{{
-                    getWeekDatesString(dinner.date)
+                    formatWeekDatesString(dinner.date)
                   }}</v-col>
                 </v-row>
               </v-timeline-item>
@@ -71,16 +71,16 @@ export default Vue.extend({
     },
   },
 
-  async created() {
-    await this.init()
+  created() {
+    this.init()
   },
 
   methods: {
-    async init() {
+    init() {
       // dishes are used by child components
       if (!this.$accessor.activeFamilyId) return
       this.$accessor.dishes.populateDishes()
-      await this.populateDinners()
+      this.populateDinners()
     },
     async populateDinners() {
       const to = DateTime.now().plus({ week: 1 })
@@ -95,7 +95,7 @@ export default Vue.extend({
         return dinner
       })
     },
-    getWeekDatesString(startOfWeekDay: DateTime) {
+    formatWeekDatesString(startOfWeekDay: DateTime) {
       return `${startOfWeekDay.toLocaleString(
         DateTime.DATE_SHORT,
       )} - ${startOfWeekDay
