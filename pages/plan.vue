@@ -20,7 +20,7 @@
               >
                 <v-row justify="space-between">
                   <v-col cols="7">Week {{ dinner.date.weekNumber }}</v-col>
-                  <v-col cols="5" class="text-right">{{
+                  <v-col cols="5" class="text-right text-caption">{{
                     formatWeekDatesString(dinner.date)
                   }}</v-col>
                 </v-row>
@@ -43,7 +43,7 @@ import Vue from 'vue'
 import { DateTime } from 'luxon'
 import TopDishes from '~/components/Plan/TopDishes.vue'
 import PlannedDinner from '~/components/Plan/PlannedDinner.vue'
-import { Dinner, MenuItem } from '~/types/Dinner'
+import { Dinner } from '~/types/Dinner'
 
 export default Vue.extend({
   components: {

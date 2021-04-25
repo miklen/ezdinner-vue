@@ -20,7 +20,7 @@
         <v-col
           class="text-right"
           cols="5"
-          v-text="dinner.date.toFormat('EEEE')"
+          v-text="formatDay(dinner.date)"
         ></v-col>
       </v-row>
 
@@ -32,12 +32,17 @@
     </v-timeline-item>
     <v-timeline-item v-else class="mb-4" color="grey" small>
       <v-row justify="space-between" @click="expanded = !expanded">
-        <v-col cols="6">Click to plan</v-col>
-        <v-col
-          class="text-right"
-          cols="5"
-          v-text="dinner.date.toFormat('EEEE')"
-        ></v-col>
+        <v-col cols="6">{{ getUnplannedTitle(dinner.date) }}</v-col>
+        <v-col class="text-right" cols="5">
+          <v-row>
+            <v-col
+              >{{ formatDay(dinner.date) }}
+              <span class="text-caption">{{
+                formatDate(dinner.date)
+              }}</span></v-col
+            >
+          </v-row>
+        </v-col>
       </v-row>
 
       <PlannedMealDetails
@@ -74,6 +79,12 @@ export default Vue.extend({
 
   computed: {},
   methods: {
+    formatDate(date: DateTime) {
+      return date.toFormat('D')
+    },
+    formatDay(date: DateTime) {
+      return date.toFormat('EEEE')
+    },
     getPlannedTitle(dinner: Dinner) {
       if (!dinner) return 'Dinner not found'
       return dinner.menu.map((item) => item.dishName).join()
