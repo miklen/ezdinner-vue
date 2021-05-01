@@ -17,31 +17,9 @@
             >{{ tag.value }}</v-chip
           ></v-col
         >
-        <v-col
-          class="text-right"
-          cols="5"
-          v-text="formatDay(dinner.date)"
-        ></v-col>
-      </v-row>
-
-      <PlannedMealDetails
-        v-show="expanded"
-        :dinner="dinner"
-        @cancel="expanded = false"
-      />
-    </v-timeline-item>
-    <v-timeline-item v-else class="mb-4" color="grey" small>
-      <v-row justify="space-between" @click="expanded = !expanded">
-        <v-col cols="6">{{ getUnplannedTitle(dinner.date) }}</v-col>
         <v-col class="text-right" cols="5">
-          <v-row>
-            <v-col
-              >{{ formatDay(dinner.date) }}
-              <span class="text-caption">{{
-                formatDate(dinner.date)
-              }}</span></v-col
-            >
-          </v-row>
+          {{ formatDay(dinner.date) }}
+          <span class="text-caption">{{ formatDate(dinner.date) }}</span>
         </v-col>
       </v-row>
 
@@ -49,6 +27,23 @@
         v-show="expanded"
         :dinner="dinner"
         @cancel="expanded = false"
+        @dinner:menuupdated="menuUpdated"
+      />
+    </v-timeline-item>
+    <v-timeline-item v-else class="mb-4" color="grey" small>
+      <v-row justify="space-between" @click="expanded = !expanded">
+        <v-col cols="6">{{ getUnplannedTitle(dinner.date) }}</v-col>
+        <v-col class="text-right" cols="5">
+          {{ formatDay(dinner.date) }}
+          <span class="text-caption">{{ formatDate(dinner.date) }}</span>
+        </v-col>
+      </v-row>
+
+      <PlannedMealDetails
+        v-show="expanded"
+        :dinner="dinner"
+        @cancel="expanded = false"
+        @dinner:menuupdated="menuUpdated"
       />
     </v-timeline-item>
   </div>
@@ -94,6 +89,9 @@ export default Vue.extend({
       if (date < DateTime.now()) return 'Track dinner'
       // if in the future we're planning
       return 'Plan dinner'
+    },
+    menuUpdated(event: any) {
+      this.$emit('dinner:menuupdated', event)
     },
   },
 })

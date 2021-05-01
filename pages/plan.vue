@@ -26,7 +26,10 @@
                 </v-row>
               </v-timeline-item>
 
-              <PlannedDinner :dinner="dinner" />
+              <PlannedDinner
+                :dinner="dinner"
+                @dinner:menuupdated="menuUpdated"
+              />
             </div>
           </v-timeline>
         </v-col>
@@ -43,16 +46,13 @@ import Vue from 'vue'
 import { DateTime } from 'luxon'
 import TopDishes from '~/components/Plan/TopDishes.vue'
 import PlannedDinner from '~/components/Plan/PlannedDinner.vue'
-import { Dinner } from '~/types/Dinner'
 
 export default Vue.extend({
   components: {
     TopDishes,
     PlannedDinner,
   },
-  data: () => ({
-    dinners: [] as Dinner[],
-  }),
+  data: () => ({}),
 
   head: {
     title: 'Plan',
@@ -62,11 +62,8 @@ export default Vue.extend({
     activeFamilyId(): string {
       return this.$accessor.activeFamilyId
     },
-    dishMap(): { [key: string]: string } {
-      return this.$accessor.dishes.dishes.reduce((prev, current) => {
-        prev[current.id] = current.name
-        return prev
-      }, {} as { [key: string]: string })
+    dinners() {
+      return this.$accessor.dinners.dinners
     },
   },
 
@@ -88,26 +85,10 @@ export default Vue.extend({
       await this.$accessor.dishes.populateDishes()
       await this.populateDinners()
     },
-
-    async populateDinners() {
+    populateDinners(): Promise<void> {
       const to = DateTime.now().plus({ week: 1 })
       const from = to.minus({ month: 1 })
-      const result = await this.$axios.get(
-        `api/dinners/family/${
-          this.activeFamilyId
-        }/dates/${from.toISODate()}/${to.toISODate()}`,
-      )
-
-      // runtime join - consider if this is done better elsewhere
-      this.dinners = result.data.map((dinner: any) => {
-        dinner.date = DateTime.fromISO(dinner.date)
-        dinner.menu.map((item: any) => {
-          item.dishName = this.dishMap[item.dishId]
-          // TODO: add receipeName
-          return item
-        })
-        return dinner
-      })
+      return this.$accessor.dinners.populateDinner({ from, to })
     },
     formatWeekDatesString(startOfWeekDay: DateTime) {
       return `${startOfWeekDay.toLocaleString(
@@ -115,6 +96,13 @@ export default Vue.extend({
       )} - ${startOfWeekDay
         .plus({ days: 7 })
         .toLocaleString(DateTime.DATE_SHORT)}`
+    },
+    /**
+     * Dinner's menu updated event handler. Currently just repopulates
+     * the entire set. Will be changed to just refresh the changed dinner later.
+     */
+    menuUpdated() {
+      this.populateDinners()
     },
   },
 })

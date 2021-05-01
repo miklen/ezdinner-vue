@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-subtitle>
+    <v-card-subtitle @click="$emit('cancel')">
       {{ formatDate(dinner.date) }}
     </v-card-subtitle>
     <v-card-text>
@@ -22,6 +22,7 @@
                 solo
                 label="Select a dish or create one"
                 @input="addDishToMenu($event.id, $event.receipeId)"
+                @keyup.enter.native="createDish"
               >
                 <template #item="{ item }">
                   <template v-if="!item.receipeId">
@@ -85,12 +86,6 @@
         </v-col>
       </v-row>
     </v-card-text>
-    <v-card-actions
-      ><v-btn outlined color="primary">SAVE</v-btn
-      ><v-btn outlined color="primary" @click="$emit('cancel')"
-        >CANCEL</v-btn
-      ></v-card-actions
-    >
   </v-card>
 </template>
 
@@ -140,15 +135,25 @@ export default Vue.extend({
       // repopulate dishes to add the new dish to the list
       this.$accessor.dishes.populateDishes()
       const dishId = result.data as string
+
       this.addDishToMenu(dishId, null)
     },
-    addDishToMenu(dishId: string, receipeId: string | null) {
-      return this.$axios.put('api/dinners/menuitem', {
+    async addDishToMenu(dishId: string, receipeId: string | null) {
+      await this.$repositories.dinners.addDishToMenu(
+        this.$accessor.activeFamilyId,
+        this.dinner.date,
+        dishId,
+        receipeId,
+      )
+      const dish = this.dishVariants.find((d) => d.id === dishId)
+      this.$emit('dinner:menuupdated', {
         date: this.dinner.date,
         dishId,
         receipeId,
-        familyId: this.$accessor.activeFamilyId,
+        dishName: dish?.name,
+        receipeName: dish?.recipeName,
       })
+      this.selectedDish = ''
     },
   },
 })

@@ -7,7 +7,14 @@ export const state = () => ({
 
 export type DishesState = ReturnType<typeof state>
 
-export const getters = getterTree(state, {})
+export const getters = getterTree(state, {
+  dishMap(state): { [key: string]: string } {
+    return state.dishes.reduce((prev, current) => {
+      prev[current.id] = current.name
+      return prev
+    }, {} as { [key: string]: string })
+  },
+})
 
 export const mutations = mutationTree(state, {
   updateDishes(state, dishes: Dish[]) {
@@ -19,10 +26,10 @@ export const actions = actionTree(
   { state, getters, mutations },
   {
     async populateDishes({ commit, rootState }) {
-      const result = await this.$axios.get(
-        `/api/dishes/family/${rootState.activeFamilyId}`,
+      const result = await this.$repositories.dishes.all(
+        rootState.activeFamilyId,
       )
-      commit('updateDishes', result.data)
+      commit('updateDishes', result)
     },
   },
 )

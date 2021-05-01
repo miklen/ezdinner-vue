@@ -21,6 +21,13 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
             return dinner ?? Dinner.CreateNew(familyId, exactDate.Date);
         }
         
+        /// <summary>
+        /// Precondition: The list returned from the repository _must_ be ordered by date ascending for the interpolation to work
+        /// </summary>
+        /// <param name="familyId"></param>
+        /// <param name="fromDate"></param>
+        /// <param name="toDate"></param>
+        /// <returns></returns>
         public async IAsyncEnumerable<Dinner> GetAsync(Guid familyId, DateTime fromDate, DateTime toDate)
         {
             var previousPlannedDinner = fromDate.Date.AddDays(-1);

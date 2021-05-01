@@ -6,6 +6,7 @@ import {
 } from 'typed-vuex'
 import * as families from './families'
 import * as dishes from './dishes'
+import * as dinners from './dinners'
 
 // Typings:
 // https://typed-vuex.roe.dev/
@@ -42,5 +43,6 @@ export const accessorType = getAccessorType({
     // The key (submodule) needs to match the Nuxt namespace (e.g. ~/store/submodule.ts)
     families,
     dishes,
+    dinners,
   },
 })

@@ -42,6 +42,7 @@ namespace EzDinner.Infrastructure
         {
             using (var iterator = _container.GetItemLinqQueryable<Dinner>()
                 .Where(w => w.FamilyId == familyId && w.Date > fromDate && w.Date < toDate)
+                .OrderBy(w => w.Date)
                 .ToFeedIterator())
             {
                 while (iterator.HasMoreResults)

@@ -1,16 +1,12 @@
 <template>
   <v-row>
-    <v-spacer></v-spacer>
-    <v-col class="col-4">
-      <v-card>
-        <v-card-title>Welcome</v-card-title>
-        <v-card-text
-          >Get started by creating a family. Add family members to participate
-          in planning. And begin tracking and planning your meals.
-        </v-card-text>
-      </v-card>
+    <v-col class="text-center">
+      <h1>Welcome</h1>
+      <span>
+        Get started by creating a family. Add family members to participate in
+        planning. And begin tracking and planning your meals.
+      </span>
     </v-col>
-    <v-spacer></v-spacer>
   </v-row>
 </template>
 
