@@ -1,9 +1,10 @@
 <template>
   <v-select
+    v-model="selectedFamily"
     dense
     :items="families"
     item-text="name"
-    return-object
+    item-value="id"
     label="Family"
     solo
     single-line
@@ -12,19 +13,26 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Family } from '~/types/Family'
 
 export default Vue.extend({
   computed: {
-    families(): Family[] {
+    families() {
       return this.$accessor.families.families
+    },
+    selectedFamily: {
+      get() {
+        return this.$accessor.activeFamilyId
+      },
+      set(value: string) {
+        this.$accessor.setActiveFamilyId(value)
+      },
     },
   },
   mounted() {
     this.getFamilies()
   },
   methods: {
-    getFamilies(): Promise<void> {
+    getFamilies() {
       return this.$accessor.families.getFamilies()
     },
   },

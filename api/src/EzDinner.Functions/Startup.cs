@@ -11,6 +11,7 @@ using Microsoft.Identity.Client;
 using Microsoft.Graph;
 using EzDinner.Core.Aggregates.FamilyMemberAggregate;
 using EzDinner.Infrastructure;
+using EzDinner.Core.Aggregates.DinnerAggregate;
 
 [assembly: FunctionsStartup(typeof(EzDinner.Functions.Startup))]
 
@@ -22,7 +23,7 @@ namespace EzDinner.Functions
         {
         }
 
-        IConfiguration Configuration { get; set; }
+        IConfiguration? Configuration { get; set; }
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
@@ -45,13 +46,15 @@ namespace EzDinner.Functions
                 .Build();
 
             builder.Services.AddLogging();
+            builder.Services.AddAutoMapper(typeof(Startup));
 
             // Replace the Azure Function configuration with our new one
             builder.Services.AddSingleton(Configuration);
             builder.Services.RegisterMsGraph(Configuration.GetSection("AzureAdB2C"));
+            builder.Services.RegisterCosmosDb(Configuration.GetSection("CosmosDb"));
+            builder.Services.RegisterRepositories();
+            builder.Services.AddScoped<IDinnerService, DinnerService>();
 
-            builder.Services.AddScoped<IFamilyMemberRepository, FamilyMemberRepository>();
-            
             ConfigureServices(builder.Services);
         }
 
@@ -62,7 +65,7 @@ namespace EzDinner.Functions
                sharedOptions.DefaultScheme = Microsoft.Identity.Web.Constants.Bearer;
                sharedOptions.DefaultChallengeScheme = Microsoft.Identity.Web.Constants.Bearer;
            })
-               .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAdB2C"));
+               .AddMicrosoftIdentityWebApi(Configuration!.GetSection("AzureAdB2C"));
         }
     }
 }

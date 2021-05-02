@@ -36,7 +36,11 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['~/plugins/msal-plugin.ts', '~/plugins/axios-auth.ts'],
+  plugins: [
+    '~/plugins/msal-plugin.ts',
+    '~/plugins/axios-auth.ts',
+    '~/plugins/repository-plugin.ts',
+  ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,

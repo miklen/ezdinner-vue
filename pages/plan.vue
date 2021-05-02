@@ -1,109 +1,82 @@
 <template>
-  <v-container style="max-width: 600px">
-    <v-timeline dense clipped>
-      <v-timeline-item fill-dot class="white--text mb-12" color="orange" large>
-        <template #icon>
-          <span>JL</span>
-        </template>
-        <v-text-field
-          v-model="input"
-          hide-details
-          flat
-          label="Leave a comment..."
-          solo
-          @keydown.enter="comment"
-        >
-          <template #append>
-            <v-btn class="mx-0" depressed @click="comment">Post</v-btn>
-          </template>
-        </v-text-field>
-      </v-timeline-item>
-
-      <v-slide-x-transition group>
-        <v-timeline-item
-          v-for="event in timeline"
-          :key="event.id"
-          class="mb-4"
-          color="pink"
-          small
-        >
-          <v-row justify="space-between">
-            <v-col cols="7" v-text="event.text"></v-col>
-            <v-col class="text-right" cols="5" v-text="event.time"></v-col>
-          </v-row>
-        </v-timeline-item>
-      </v-slide-x-transition>
-
-      <v-timeline-item class="mb-6" hide-dot>
-        <span>TODAY</span>
-      </v-timeline-item>
-
-      <v-timeline-item
-        class="mb-4"
-        color="grey"
-        icon-color="grey lighten-2"
-        small
-      >
-        <v-row justify="space-between">
-          <v-col cols="7">This order was archived.</v-col>
-          <v-col class="text-right" cols="5">15:26 EDT</v-col>
-        </v-row>
-      </v-timeline-item>
-
-      <v-timeline-item class="mb-4" small>
-        <v-row justify="space-between">
-          <v-col cols="7">
-            <v-chip class="white--text ml-0" color="purple" label small
-              >APP</v-chip
-            >Digital Downloads fulfilled 1 item.
-          </v-col>
-          <v-col class="text-right" cols="5">15:25 EDT</v-col>
-        </v-row>
-      </v-timeline-item>
-
-      <v-timeline-item class="mb-4" color="grey" small>
-        <v-row justify="space-between">
-          <v-col cols="7"
-            >Order confirmation email was sent to John Leider
-            (john@vuetifyjs.com).</v-col
+  <v-row>
+    <v-col cols="7">
+      <v-row>
+        <v-col class="text-center">
+          <h1>Dinner plan</h1>
+        </v-col>
+        <v-col>
+          <v-menu
+            v-model="showDatePicker"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
           >
-          <v-col class="text-right" cols="5">15:25 EDT</v-col>
-        </v-row>
-      </v-timeline-item>
+            <template #activator="{ on, attrs }">
+              <v-text-field
+                v-model="dateRangeText"
+                label="Select date range"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="dateRange" show-week range></v-date-picker>
+          </v-menu>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-timeline dense>
+            <div v-for="(dinner, index) in dinners" :key="index">
+              <PlannedDinner
+                :dinner="dinner"
+                @dinner:menuupdated="menuUpdated"
+              />
 
-      <v-timeline-item class="mb-4" hide-dot>
-        <v-btn class="mx-0">Resend Email</v-btn>
-      </v-timeline-item>
-
-      <v-timeline-item class="mb-4" color="grey" small>
-        <v-row justify="space-between">
-          <v-col cols="7"
-            >A $15.00 USD payment was processed on PayPal Express
-            Checkout</v-col
-          >
-          <v-col class="text-right" cols="5">15:25 EDT</v-col>
-        </v-row>
-      </v-timeline-item>
-
-      <v-timeline-item color="grey" small>
-        <v-row justify="space-between">
-          <v-col cols="7"
-            >John Leider placed this order on Online Store (checkout
-            #1937432132572).</v-col
-          >
-          <v-col class="text-right" cols="5">15:25 EDT</v-col>
-        </v-row>
-      </v-timeline-item>
-    </v-timeline>
-  </v-container>
+              <!-- Everytime a new week starts -->
+              <v-timeline-item
+                v-if="dinner.date.weekday === 1"
+                class="mb-4"
+                color="pink"
+                small
+                hide-dot
+              >
+                <v-row justify="space-between">
+                  <v-col cols="7">Week {{ dinner.date.weekNumber }}</v-col>
+                  <v-col cols="5" class="text-right text-caption">{{
+                    formatWeekDatesString(dinner.date)
+                  }}</v-col>
+                </v-row>
+              </v-timeline-item>
+            </div>
+          </v-timeline>
+        </v-col>
+      </v-row>
+    </v-col>
+    <v-col cols="5">
+      <TopDishes />
+    </v-col>
+  </v-row>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+import { DateTime } from 'luxon'
+import TopDishes from '~/components/Plan/TopDishes.vue'
+import PlannedDinner from '~/components/Plan/PlannedDinner.vue'
+
+export default Vue.extend({
+  components: {
+    TopDishes,
+    PlannedDinner,
+  },
   data: () => ({
-    events: [],
-    input: null,
-    nonce: 0,
+    showDatePicker: false,
+    dateRange: [] as string[],
   }),
 
   head: {
@@ -111,31 +84,63 @@ export default {
   },
 
   computed: {
-    timeline() {
-      return this.events.slice().reverse()
+    dateRangeText() {
+      return this.dateRange
+        .map((d) => DateTime.fromISO(d).toLocaleString(DateTime.DATE_SHORT))
+        .join(' ~ ')
     },
+    activeFamilyId(): string {
+      return this.$accessor.activeFamilyId
+    },
+    dinners() {
+      return [...this.$accessor.dinners.dinners].reverse()
+    },
+  },
+
+  watch: {
+    activeFamilyId(newValue: string) {
+      if (!newValue) return
+      this.init()
+    },
+    dateRange(newValue) {
+      if (newValue.length !== 2) return
+      this.populateDinners()
+    },
+  },
+
+  async created() {
+    await this.init()
   },
 
   methods: {
-    comment() {
-      const time = new Date().toTimeString()
-      this.events.push({
-        id: this.nonce++,
-        text: this.input,
-        time: time.replace(
-          /:\d{2}\sGMT-\d{4}\s\((.*)\)/,
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          (match, contents, offset) => {
-            return ` ${contents
-              .split(' ')
-              .map((v) => v.charAt(0))
-              .join('')}`
-          },
-        ),
-      })
-
-      this.input = null
+    async init() {
+      // dishes are used by child components
+      if (!this.$accessor.activeFamilyId) return
+      await this.$accessor.dishes.populateDishes()
+      const to = DateTime.now().plus({ week: 1 })
+      const from = to.minus({ month: 1 })
+      // setting dateRange triggers the watcher which populates dinners
+      this.dateRange = [from.toISO(), to.toISO()]
+    },
+    populateDinners(): Promise<void> {
+      const from = DateTime.fromISO(this.dateRange[0])
+      const to = DateTime.fromISO(this.dateRange[1])
+      return this.$accessor.dinners.populateDinner({ from, to })
+    },
+    formatWeekDatesString(startOfWeekDay: DateTime) {
+      return `${startOfWeekDay.toLocaleString(
+        DateTime.DATE_SHORT,
+      )} - ${startOfWeekDay
+        .plus({ days: 7 })
+        .toLocaleString(DateTime.DATE_SHORT)}`
+    },
+    /**
+     * Dinner's menu updated event handler. Currently just repopulates
+     * the entire set. Will be changed to just refresh the changed dinner later.
+     */
+    menuUpdated() {
+      this.populateDinners()
     },
   },
-}
+})
 </script>

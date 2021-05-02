@@ -1,7 +1,14 @@
 <template>
   <v-container>
     <v-row>
-      <v-col v-for="family in families" :key="family.id" class="col-4">
+      <v-col
+        v-for="family in families"
+        :key="family.id"
+        xs="12"
+        sm="12"
+        md="6"
+        lg="4"
+      >
         <v-card>
           <v-card-title>{{ family.name }}</v-card-title>
           <v-card-subtitle>Family members</v-card-subtitle>
@@ -100,7 +107,7 @@ export default Vue.extend({
   methods: {
     async createFamily() {
       this.alert = false
-      const result = await this.$axios.post('api/family', {
+      const result = await this.$axios.post('api/families', {
         name: this.newFamilyName,
       })
       if (result.status === 200 || result.status === 204) {
