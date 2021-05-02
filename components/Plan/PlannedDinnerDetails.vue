@@ -16,11 +16,9 @@
                 return-object
                 item-text="name"
                 item-value="id"
-                dense
-                filled
-                rounded
-                solo
-                label="Select a dish or create one"
+                outlined
+                label="Add dish to menu"
+                placeholder="Start typing to search"
                 @input="addDishToMenu($event.id, $event.receipeId)"
                 @keyup.enter.native="createDish"
               >

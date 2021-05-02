@@ -5,11 +5,38 @@
         <v-col class="text-center">
           <h1>Dinner plan</h1>
         </v-col>
+        <v-col>
+          <v-menu
+            v-model="showDatePicker"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
+            <template #activator="{ on, attrs }">
+              <v-text-field
+                v-model="dateRangeText"
+                label="Select date range"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="dateRange" show-week range></v-date-picker>
+          </v-menu>
+        </v-col>
       </v-row>
       <v-row>
         <v-col>
           <v-timeline dense>
             <div v-for="(dinner, index) in dinners" :key="index">
+              <PlannedDinner
+                :dinner="dinner"
+                @dinner:menuupdated="menuUpdated"
+              />
+
               <!-- Everytime a new week starts -->
               <v-timeline-item
                 v-if="dinner.date.weekday === 1"
@@ -25,11 +52,6 @@
                   }}</v-col>
                 </v-row>
               </v-timeline-item>
-
-              <PlannedDinner
-                :dinner="dinner"
-                @dinner:menuupdated="menuUpdated"
-              />
             </div>
           </v-timeline>
         </v-col>
@@ -52,18 +74,26 @@ export default Vue.extend({
     TopDishes,
     PlannedDinner,
   },
-  data: () => ({}),
+  data: () => ({
+    showDatePicker: false,
+    dateRange: [] as string[],
+  }),
 
   head: {
     title: 'Plan',
   },
 
   computed: {
+    dateRangeText() {
+      return this.dateRange
+        .map((d) => DateTime.fromISO(d).toLocaleString(DateTime.DATE_SHORT))
+        .join(' ~ ')
+    },
     activeFamilyId(): string {
       return this.$accessor.activeFamilyId
     },
     dinners() {
-      return this.$accessor.dinners.dinners
+      return [...this.$accessor.dinners.dinners].reverse()
     },
   },
 
@@ -71,6 +101,10 @@ export default Vue.extend({
     activeFamilyId(newValue: string) {
       if (!newValue) return
       this.init()
+    },
+    dateRange(newValue) {
+      if (newValue.length !== 2) return
+      this.populateDinners()
     },
   },
 
@@ -83,11 +117,14 @@ export default Vue.extend({
       // dishes are used by child components
       if (!this.$accessor.activeFamilyId) return
       await this.$accessor.dishes.populateDishes()
-      await this.populateDinners()
-    },
-    populateDinners(): Promise<void> {
       const to = DateTime.now().plus({ week: 1 })
       const from = to.minus({ month: 1 })
+      // setting dateRange triggers the watcher which populates dinners
+      this.dateRange = [from.toISO(), to.toISO()]
+    },
+    populateDinners(): Promise<void> {
+      const from = DateTime.fromISO(this.dateRange[0])
+      const to = DateTime.fromISO(this.dateRange[1])
       return this.$accessor.dinners.populateDinner({ from, to })
     },
     formatWeekDatesString(startOfWeekDay: DateTime) {

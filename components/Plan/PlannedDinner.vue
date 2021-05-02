@@ -1,13 +1,13 @@
 <template>
   <div>
-    <v-timeline-item v-if="dinner.isPlanned" class="mb-4" color="green" small>
+    <v-timeline-item class="mb-4" :color="getDotColor(dinner)" small>
       <v-row
         v-show="!expanded"
         justify="space-between"
         @click="expanded = !expanded"
       >
         <v-col cols="6"
-          >{{ getPlannedTitle(dinner) }}
+          >{{ getTitle(dinner) }}
           <v-chip
             v-for="tag in dinner.tags"
             :key="tag.value"
@@ -17,22 +17,6 @@
             >{{ tag.value }}</v-chip
           ></v-col
         >
-        <v-col class="text-right" cols="5">
-          {{ formatDay(dinner.date) }}
-          <span class="text-caption">{{ formatDate(dinner.date) }}</span>
-        </v-col>
-      </v-row>
-
-      <PlannedMealDetails
-        v-show="expanded"
-        :dinner="dinner"
-        @cancel="expanded = false"
-        @dinner:menuupdated="menuUpdated"
-      />
-    </v-timeline-item>
-    <v-timeline-item v-else class="mb-4" color="grey" small>
-      <v-row justify="space-between" @click="expanded = !expanded">
-        <v-col cols="6">{{ getUnplannedTitle(dinner.date) }}</v-col>
         <v-col class="text-right" cols="5">
           {{ formatDay(dinner.date) }}
           <span class="text-caption">{{ formatDate(dinner.date) }}</span>
@@ -80,8 +64,15 @@ export default Vue.extend({
     formatDay(date: DateTime) {
       return date.toFormat('EEEE')
     },
+    getDotColor(dinner: Dinner) {
+      return dinner.isPlanned ? 'green' : 'grey'
+    },
+    getTitle(dinner: Dinner) {
+      if (!dinner) return 'Dinner not found - weird.'
+      if (!dinner.isPlanned) return this.getUnplannedTitle(dinner.date)
+      return this.getPlannedTitle(dinner)
+    },
     getPlannedTitle(dinner: Dinner) {
-      if (!dinner) return 'Dinner not found'
       return dinner.menu.map((item) => item.dishName).join()
     },
     getUnplannedTitle(date: DateTime) {
