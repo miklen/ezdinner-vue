@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EzDinner.Functions.Models.Command
 {
-    public class DinnerAddMenuItemCommandModel
+    public class DinnerAddRemoveMenuItemCommandModel
     {
         /// <summary>
         /// The Id of the family to plan a menu item for

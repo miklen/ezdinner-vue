@@ -27,12 +27,26 @@ export default class DinnerRepository {
     familyId: string,
     date: DateTime,
     dishId: string,
-    receipeId: string | null,
+    recipeId: string | null,
   ) {
     return this.$axios.put('api/dinners/menuitem', {
       date,
       dishId,
-      receipeId,
+      recipeId,
+      familyId,
+    })
+  }
+
+  removeDishFromMenu(
+    familyId: string,
+    date: DateTime,
+    dishId: string,
+    recipeId: string | null,
+  ) {
+    return this.$axios.put('api/dinners/menuitem/remove', {
+      date,
+      dishId,
+      recipeId,
       familyId,
     })
   }

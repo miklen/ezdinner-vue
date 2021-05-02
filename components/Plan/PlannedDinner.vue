@@ -4,6 +4,7 @@
       <v-row
         v-show="!expanded"
         justify="space-between"
+        :class="getTimelineTextStyle(dinner)"
         @click="expanded = !expanded"
       >
         <v-col cols="6"
@@ -58,6 +59,11 @@ export default Vue.extend({
 
   computed: {},
   methods: {
+    getTimelineTextStyle(dinner: Dinner) {
+      if (dinner.date.hasSame(DateTime.local(), 'day'))
+        return 'font-weight-bold'
+      return ''
+    },
     formatDate(date: DateTime) {
       return date.toFormat('D')
     },
