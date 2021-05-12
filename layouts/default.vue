@@ -1,15 +1,16 @@
 <template>
   <v-app id="ezdinner">
-    <Topbar />
+    <TopbarLarge v-if="!$vuetify.breakpoint.smAndDown" />
+    <TopbarSmall v-else :links="links" />
 
     <v-main class="grey lighten-3">
       <v-container>
         <v-row>
-          <v-col cols="2">
+          <v-col v-if="!$vuetify.breakpoint.smAndDown" cols="2">
             <v-sheet rounded="lg" elevation="1">
               <v-list color="transparent  ">
                 <v-list-item
-                  v-for="(item, i) in items"
+                  v-for="(item, i) in links"
                   :key="i"
                   :to="item.to"
                   router
@@ -41,12 +42,14 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import Topbar from '@/components/Topbar.vue'
+import TopbarLarge from '~/components/TopbarLarge.vue'
+import TopbarSmall from '~/components/TopbarSmall.vue'
 
 export default Vue.extend({
   name: 'Default',
   components: {
-    Topbar,
+    TopbarLarge,
+    TopbarSmall,
   },
   middleware: ['auth'],
   data() {
@@ -54,7 +57,7 @@ export default Vue.extend({
       clipped: true,
       drawer: true,
       fixed: true,
-      items: [
+      links: [
         {
           icon: 'mdi-home',
           title: 'Home',

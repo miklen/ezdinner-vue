@@ -1,17 +1,7 @@
 <template>
   <v-menu v-model="menu" offset-y left>
     <template #activator="{ on, attrs }">
-      <v-btn
-        v-if="!$msal.isAuthenticated"
-        color="primary"
-        large
-        @click="clickSignIn"
-      >
-        <span class="text--darken-1 font-weight-bold"> SIGN IN </span>
-      </v-btn>
-
       <v-avatar
-        v-else
         class="white--text"
         color="primary"
         size="36"
@@ -32,6 +22,8 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
+      <v-divider></v-divider>
+      <FamilyListItems />
 
       <v-divider></v-divider>
 
@@ -52,7 +44,12 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import FamilyListItems from './Family/FamilyListItems.vue'
+
 export default Vue.extend({
+  components: {
+    FamilyListItems,
+  },
   data: () => ({
     menu: false as boolean,
   }),
