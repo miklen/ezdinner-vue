@@ -74,6 +74,7 @@ export default Vue.extend({
   },
   mounted() {
     this.getFamilies()
+    this.$axios.get('api/test')
   },
   methods: {
     clickSignOut() {

@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Microsoft.Identity.Web;
 
 namespace EzDinner.Functions
 {
@@ -17,6 +18,9 @@ namespace EzDinner.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "test")] HttpRequest req,
             ILogger log)
         {
+
+            var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
+            if (!authenticationStatus) return authenticationResponse;
 
             return new OkObjectResult("Test OK");
         }
