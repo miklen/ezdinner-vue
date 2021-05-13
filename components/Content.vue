@@ -8,7 +8,7 @@
       </v-sheet>
     </v-col>
 
-    <v-col v-if="split" sm="12" md="4">
+    <v-col v-if="split" md="4" cols="12">
       <v-sheet min-height="10vh" rounded="lg" elevation="1">
         <v-container>
           <slot name="support"></slot>

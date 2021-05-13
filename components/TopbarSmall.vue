@@ -4,7 +4,7 @@
       <v-img src="/android-chrome-192x192.png"></v-img>
     </v-avatar>
 
-    <v-tabs centered class="ml-n9" color="grey darken-1">
+    <v-tabs centered class="ml-n4" color="grey darken-1">
       <v-tab v-for="link in links" :key="link.to" :to="link.to" router exact>
         {{ link.title }}
       </v-tab>
