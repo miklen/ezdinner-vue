@@ -43,25 +43,19 @@ namespace EzDinner.Functions
 
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
-            try
+
+            var userId = Guid.Parse(req.HttpContext.User.GetNameIdentifierId() ?? "");
+            var families = await _familyRepository.GetFamiliesAsync(userId);
+
+            var familieyQueryModels = families.Select(_mapper.Map<FamilyQueryModel>);
+
+            var owners = GetOwnerNames(familieyQueryModels);
+            foreach (var family in familieyQueryModels)
             {
-                var userId = Guid.Parse(req.HttpContext.User.GetNameIdentifierId() ?? "");
-                var families = await _familyRepository.GetFamiliesAsync(userId);
-
-                var familieyQueryModels = families.Select(_mapper.Map<FamilyQueryModel>);
-
-                var owners = GetOwnerNames(familieyQueryModels);
-                foreach (var family in familieyQueryModels)
-                {
-                    family.OwnerName = owners[family.OwnerId];
-                }
-
-                return new OkObjectResult(families);
-            } catch(Exception e)
-            {
-                _logger.LogError(e, "Get Families Failed");
-                throw;
+                family.OwnerName = owners[family.OwnerId];
             }
+
+            return new OkObjectResult(families);
         }
 
 
