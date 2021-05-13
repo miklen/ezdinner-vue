@@ -28,11 +28,7 @@
           </v-col>
 
           <v-col>
-            <v-sheet min-height="70vh" rounded="lg" elevation="1">
-              <v-container>
-                <Nuxt />
-              </v-container>
-            </v-sheet>
+            <Nuxt />
           </v-col>
         </v-row>
       </v-container>
@@ -76,6 +72,9 @@ export default Vue.extend({
       ],
     }
   },
+  mounted() {
+    this.getFamilies()
+  },
   methods: {
     clickSignOut() {
       this.$msal.signOut()
@@ -83,6 +82,9 @@ export default Vue.extend({
     showMenu(item: any) {
       if (!item.requireAuth) return true
       return this.$msal.isAuthenticated
+    },
+    getFamilies() {
+      return this.$accessor.families.getFamilies()
     },
   },
 })

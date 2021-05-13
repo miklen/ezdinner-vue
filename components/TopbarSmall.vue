@@ -5,7 +5,7 @@
     </v-avatar>
 
     <v-tabs centered class="ml-n9" color="grey darken-1">
-      <v-tab v-for="link in links" :key="link.to" :to="link.to">
+      <v-tab v-for="link in links" :key="link.to" :to="link.to" router exact>
         {{ link.title }}
       </v-tab>
     </v-tabs>

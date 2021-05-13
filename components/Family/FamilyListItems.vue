@@ -31,13 +31,5 @@ export default Vue.extend({
       return this.$accessor.activeFamilyId
     },
   },
-  mounted() {
-    this.getFamilies()
-  },
-  methods: {
-    getFamilies() {
-      return this.$accessor.families.getFamilies()
-    },
-  },
 })
 </script>

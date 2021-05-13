@@ -1,11 +1,11 @@
 <template>
-  <v-container>
+  <span>
     <v-row>
       <v-col class="text-center">
-        <h1>Your heavy rotation</h1>
+        <h1>In rotation</h1>
       </v-col>
     </v-row>
-    <v-row class="left-border">
+    <v-row>
       <v-col>
         <v-simple-table>
           <template #default>
@@ -25,7 +25,7 @@
         </v-simple-table>
       </v-col>
     </v-row>
-  </v-container>
+  </span>
 </template>
 
 <script lang="ts">
@@ -51,11 +51,3 @@ export default Vue.extend({
   methods: {},
 })
 </script>
-
-<style lang="scss" scoped>
-.left-border {
-  border-left-style: dotted;
-  border-left-width: 1px;
-  border-color: black;
-}
-</style>

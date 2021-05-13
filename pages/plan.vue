@@ -1,76 +1,73 @@
 <template>
-  <v-row>
-    <v-col cols="7">
-      <v-row>
-        <v-col class="text-center">
-          <h1>Dinner plan</h1>
-        </v-col>
-        <v-col>
-          <v-menu
-            v-model="showDatePicker"
-            :close-on-content-click="false"
-            :nudge-right="40"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-          >
-            <template #activator="{ on, attrs }">
-              <v-text-field
-                v-model="dateRangeText"
-                label="Select date range"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              ></v-text-field>
-            </template>
-            <v-date-picker v-model="dateRange" show-week range></v-date-picker>
-          </v-menu>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <v-timeline dense>
-            <div v-for="(dinner, index) in dinners" :key="index">
-              <PlannedDinner
-                :dinner="dinner"
-                @dinner:menuupdated="menuUpdated"
-              />
+  <Content split>
+    <v-row>
+      <v-col class="text-center">
+        <h1>Dinner plan</h1>
+      </v-col>
+      <v-col>
+        <v-menu
+          v-model="showDatePicker"
+          :close-on-content-click="false"
+          :nudge-right="40"
+          transition="scale-transition"
+          offset-y
+          min-width="auto"
+        >
+          <template #activator="{ on, attrs }">
+            <v-text-field
+              v-model="dateRangeText"
+              label="Select date range"
+              prepend-icon="mdi-calendar"
+              readonly
+              v-bind="attrs"
+              v-on="on"
+            ></v-text-field>
+          </template>
+          <v-date-picker v-model="dateRange" show-week range></v-date-picker>
+        </v-menu>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-timeline dense>
+          <div v-for="(dinner, index) in dinners" :key="index">
+            <PlannedDinner :dinner="dinner" @dinner:menuupdated="menuUpdated" />
 
-              <!-- Everytime a new week starts -->
-              <v-timeline-item
-                v-if="dinner.date.weekday === 1"
-                class="mb-4"
-                color="pink"
-                small
-                hide-dot
-              >
-                <v-row justify="space-between">
-                  <v-col cols="7">Week {{ dinner.date.weekNumber }}</v-col>
-                  <v-col cols="5" class="text-right text-caption">{{
-                    formatWeekDatesString(dinner.date)
-                  }}</v-col>
-                </v-row>
-              </v-timeline-item>
-            </div>
-          </v-timeline>
-        </v-col>
-      </v-row>
-    </v-col>
-    <v-col cols="5">
+            <!-- Everytime a new week starts -->
+            <v-timeline-item
+              v-if="dinner.date.weekday === 1"
+              class="mb-4"
+              color="pink"
+              small
+              hide-dot
+            >
+              <v-row justify="space-between">
+                <v-col cols="7">Week {{ dinner.date.weekNumber }}</v-col>
+                <v-col cols="5" class="text-right text-caption">{{
+                  formatWeekDatesString(dinner.date)
+                }}</v-col>
+              </v-row>
+            </v-timeline-item>
+          </div>
+        </v-timeline>
+      </v-col>
+    </v-row>
+    <template #support>
       <TopDishes />
-    </v-col>
-  </v-row>
+    </template>
+  </Content>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { DateTime } from 'luxon'
+import Content from '~/components/Content.vue'
 import TopDishes from '~/components/Plan/TopDishes.vue'
 import PlannedDinner from '~/components/Plan/PlannedDinner.vue'
 
 export default Vue.extend({
   components: {
+    Content,
     TopDishes,
     PlannedDinner,
   },
