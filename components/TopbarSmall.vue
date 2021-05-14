@@ -1,19 +1,52 @@
 <template>
-  <v-app-bar app color="white" elevation="1">
-    <v-avatar>
-      <v-img src="/android-chrome-192x192.png"></v-img>
-    </v-avatar>
+  <span>
+    <v-app-bar app color="white" elevation="1">
+      <v-avatar>
+        <v-img src="/android-chrome-192x192.png"></v-img>
+      </v-avatar>
 
-    <v-tabs centered class="ml-n4" color="grey darken-1">
-      <v-tab v-for="link in links" :key="link.to" :to="link.to" router exact>
-        {{ link.title }}
-      </v-tab>
-    </v-tabs>
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-    <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
 
-    <TopbarProfile />
-  </v-app-bar>
+      <TopbarProfile />
+    </v-app-bar>
+
+    <v-navigation-drawer v-model="drawer" fixed temporary>
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title class="title"
+            ><v-avatar>
+              <v-img src="/android-chrome-192x192.png"></v-img>
+            </v-avatar>
+            {{ title }}
+          </v-list-item-title>
+        </v-list-item-content>
+        <v-list-item-action @click="drawer = !drawer">
+          <v-icon>mdi-chevron-left</v-icon>
+        </v-list-item-action>
+      </v-list-item>
+
+      <v-divider></v-divider>
+
+      <v-list color="transparent">
+        <v-list-item
+          v-for="(item, i) in links"
+          :key="i"
+          :to="item.to"
+          router
+          exact
+        >
+          <v-list-item-action>
+            <v-icon>{{ item.icon }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title v-text="item.title" />
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+  </span>
 </template>
 
 <script lang="ts">
@@ -30,11 +63,10 @@ export default Vue.extend({
       required: true,
     },
   },
-  data(): {
-    title: string
-  } {
+  data() {
     return {
       title: 'Dinner Planner',
+      drawer: false,
     }
   },
 })

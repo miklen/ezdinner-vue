@@ -4,11 +4,11 @@
     <TopbarSmall v-else :links="links" />
 
     <v-main class="grey lighten-3">
-      <v-container>
+      <v-container :fluid="$vuetify.breakpoint.mdOnly">
         <v-row>
           <v-col v-if="!$vuetify.breakpoint.smAndDown" cols="2">
             <v-sheet rounded="lg" elevation="1">
-              <v-list color="transparent  ">
+              <v-list color="transparent">
                 <v-list-item
                   v-for="(item, i) in links"
                   :key="i"

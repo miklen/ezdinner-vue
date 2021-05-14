@@ -1,6 +1,6 @@
 <template>
   <v-app-bar app color="white" elevation="1">
-    <v-container class="py-0 fill-height">
+    <v-container :fluid="$vuetify.breakpoint.mdOnly" class="py-0 fill-height">
       <v-avatar>
         <v-img src="/android-chrome-192x192.png"></v-img>
       </v-avatar>
