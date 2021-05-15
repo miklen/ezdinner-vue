@@ -33,7 +33,6 @@ namespace EzDinner.Infrastructure
                        .Where(b => b.OwnerId == userId)
                        .ToFeedIterator())
             {
-                //Asynchronous query execution
                 while (setIterator.HasMoreResults)
                 {
                     foreach (var family in await setIterator.ReadNextAsync())
@@ -43,6 +42,23 @@ namespace EzDinner.Infrastructure
                 }
             }
             return families;
+        }
+
+        public async Task<Family?> GetFamily(Guid familyId)
+        {
+            using (var setIterator = _container.GetItemLinqQueryable<Family>()
+                        .Where(b => b.Id == familyId)
+                       .ToFeedIterator())
+            {
+                while (setIterator.HasMoreResults)
+                {
+                    foreach (var family in await setIterator.ReadNextAsync())
+                    {
+                        return family;
+                    }
+                }
+                return null;
+            }
         }
     }
 }

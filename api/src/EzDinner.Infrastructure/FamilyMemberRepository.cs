@@ -2,6 +2,7 @@
 using Microsoft.Graph;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,6 +24,19 @@ namespace EzDinner.Infrastructure
             return new FamilyMember()
             {
                 Id = id,
+                GivenName = user.GivenName,
+                FamilyName = user.Surname
+            };
+        }
+
+        public async Task<FamilyMember?> GetFamilyMemberAsync(string email)
+        {
+            var userPage = await _graphClient.Users.Request().Filter($"eq(mail,'{email}')").GetAsync();
+            var user = userPage.FirstOrDefault();
+            if (user is null) return null;
+            return new FamilyMember()
+            {
+                Id = Guid.Parse(user.Id),
                 GivenName = user.GivenName,
                 FamilyName = user.Surname
             };

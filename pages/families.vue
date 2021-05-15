@@ -19,15 +19,68 @@
             <v-col>{{ familyMember }}</v-col>
           </v-row>
         </v-card-text>
-        <v-card-actions
-          ><v-btn text color="primary">Add family member</v-btn></v-card-actions
-        >
+
+        <v-dialog v-model="inviteFamilyMemberDialog" width="500">
+          <template #activator="{ on, attrs }">
+            <v-card-actions
+              ><v-btn
+                text
+                color="primary"
+                v-bind="attrs"
+                v-on="on"
+                @click="openInviteFamilyMemberDialog(family.id)"
+                >Invite family member</v-btn
+              ></v-card-actions
+            >
+          </template>
+
+          <v-card>
+            <v-card-title class="headline grey lighten-2">
+              Invite family member
+            </v-card-title>
+            <v-card-text>
+              <v-text-field
+                v-model="inviteFamilyMemberEmail"
+                placeholder="Family member email address"
+              ></v-text-field>
+              <v-alert
+                v-model="alert"
+                dismissible
+                color="error"
+                border="left"
+                elevation="2"
+                colored-border
+                icon="mdi-alert-decagram"
+              >
+                An error occured
+              </v-alert>
+            </v-card-text>
+
+            <v-divider></v-divider>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" text @click="inviteFamilyMember">
+                Invite
+              </v-btn>
+              <v-btn
+                color="primary"
+                text
+                @click="inviteFamilyMemberDialog = false"
+              >
+                Cancel
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-card>
     </v-col>
     <v-col xs="12" sm="12" md="6" lg="4">
       <v-card>
-        <v-card-title>New family</v-card-title>
-        <v-dialog v-model="dialog" width="500">
+        <v-card-title>Create family</v-card-title>
+
+        <!-- Refactor to component -->
+        <v-dialog v-model="newFamilyDialog" width="500">
           <template #activator="{ on, attrs }">
             <v-card-actions
               ><v-btn text color="primary" v-bind="attrs" v-on="on"
@@ -63,7 +116,7 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="primary" text @click="createFamily"> Create </v-btn>
-              <v-btn color="primary" text @click="dialog = false">
+              <v-btn color="primary" text @click="newFamilyDialog = false">
                 Cancel
               </v-btn>
             </v-card-actions>
@@ -81,9 +134,11 @@ import { Family } from '~/types/Family'
 export default Vue.extend({
   data() {
     return {
-      dialog: false as boolean,
-      newFamilyName: '' as string,
-      alert: false as boolean,
+      inviteFamilyMemberFamilyId: '',
+      inviteFamilyMemberDialog: false,
+      newFamilyDialog: false,
+      newFamilyName: '',
+      alert: false,
     }
   },
 
@@ -100,6 +155,11 @@ export default Vue.extend({
     },
   },
   methods: {
+    openInviteFamilyMemberDialog(familyId: string) {
+      this.inviteFamilyMemberFamilyId = familyId
+      this.inviteFamilyMemberDialog = true
+    },
+    async inviteFamilyMember() {},
     async createFamily() {
       this.alert = false
       const result = await this.$axios.post('api/families', {
@@ -108,7 +168,7 @@ export default Vue.extend({
       if (result.status === 200 || result.status === 204) {
         this.$accessor.families.getFamilies()
         this.newFamilyName = ''
-        this.dialog = false
+        this.newFamilyDialog = false
         return
       }
       this.alert = true

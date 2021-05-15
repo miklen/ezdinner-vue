@@ -33,6 +33,13 @@
         </v-row>
       </v-container>
     </v-main>
+    <v-overlay :value="loading">
+      <v-progress-circular
+        :size="50"
+        color="primary"
+        indeterminate
+      ></v-progress-circular
+    ></v-overlay>
   </v-app>
 </template>
 
@@ -50,9 +57,7 @@ export default Vue.extend({
   middleware: ['auth'],
   data() {
     return {
-      clipped: true,
-      drawer: true,
-      fixed: true,
+      loading: true,
       links: [
         {
           icon: 'mdi-home',
@@ -72,8 +77,9 @@ export default Vue.extend({
       ],
     }
   },
-  mounted() {
-    this.getFamilies()
+  async mounted() {
+    await this.getFamilies()
+    this.loading = false
   },
   methods: {
     clickSignOut() {

@@ -14,7 +14,7 @@ namespace EzDinner.Functions
     public static class TestGet
     {
         [FunctionName("TestGet")]
-        public static async Task<IActionResult> Run(
+        public static async Task<IActionResult?> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "test")] HttpRequest req,
             ILogger log)
         {

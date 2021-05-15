@@ -8,5 +8,6 @@ namespace EzDinner.Core.Aggregates.FamilyMemberAggregate
     public interface IFamilyMemberRepository
     {
         Task<FamilyMember> GetFamilyMemberAsync(Guid id);
+        Task<FamilyMember?> GetFamilyMemberAsync(string email);
     }
 }

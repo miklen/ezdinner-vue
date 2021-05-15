@@ -15,7 +15,7 @@ namespace EzDinner.Functions.Models.Query
         }
         
         public DateTime Date { get; set; }
-        public IEnumerable<MenuItemQueryModel> Menu { get; set; }
+        public IEnumerable<MenuItemQueryModel>? Menu { get; set; }
         public bool IsPlanned { get; set; }
     }
 
