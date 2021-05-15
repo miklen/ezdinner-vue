@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EzDinner.Functions.Models.Command
 {
-    public class AddFamilyMemberCommandModel
+    public class InviteFamilyMemberCommandModel
     {
         public string? Email { get; set; }
     }
