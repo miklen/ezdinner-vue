@@ -8,26 +8,92 @@
       md="6"
       lg="4"
     >
-      <v-card>
+      <v-card rounded="lg">
         <v-card-title>{{ family.name }}</v-card-title>
         <v-card-subtitle>Family members</v-card-subtitle>
-        <v-card-text>
-          <v-row v-for="familyMember in familyMembers" :key="familyMember">
-            <v-col class="col-1">
-              <v-icon>mdi-account</v-icon>
-            </v-col>
-            <v-col>{{ familyMember }}</v-col>
-          </v-row>
-        </v-card-text>
-        <v-card-actions
-          ><v-btn text color="primary">Add family member</v-btn></v-card-actions
-        >
+
+        <v-list>
+          <v-list-item
+            v-for="familyMember in family.familyMembers"
+            :key="familyMember.id"
+          >
+            <v-list-item-avatar
+              ><v-icon>mdi-account</v-icon></v-list-item-avatar
+            >
+            <v-list-item-subtitle>{{ familyMember.name }}</v-list-item-subtitle>
+          </v-list-item>
+        </v-list>
+
+        <v-dialog v-model="inviteFamilyMemberDialog" width="500">
+          <template #activator="{ on, attrs }">
+            <v-card-actions
+              ><v-btn
+                text
+                color="primary"
+                v-bind="attrs"
+                v-on="on"
+                @click="openInviteFamilyMemberDialog(family.id)"
+                >Invite family member</v-btn
+              ></v-card-actions
+            >
+          </template>
+
+          <v-card>
+            <v-card-title class="headline grey lighten-2">
+              Invite family member
+            </v-card-title>
+            <v-card-text>
+              <v-text-field
+                v-model="inviteFamilyMemberEmail"
+                placeholder="Family member email address"
+                @keyup.enter="inviteFamilyMember"
+              ></v-text-field>
+              <v-alert
+                v-model="notFoundAlert"
+                dismissible
+                type="warning"
+                border="left"
+                elevation="2"
+                colored-border
+              >
+                User not found
+              </v-alert>
+              <v-alert
+                v-model="alert"
+                dismissible
+                color="error"
+                border="left"
+                elevation="2"
+                colored-border
+                icon="mdi-alert-decagram"
+              >
+                An error occured
+              </v-alert>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" text @click="inviteFamilyMember">
+                Invite
+              </v-btn>
+              <v-btn
+                color="primary"
+                text
+                @click="inviteFamilyMemberDialog = false"
+              >
+                Cancel
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-card>
     </v-col>
     <v-col xs="12" sm="12" md="6" lg="4">
-      <v-card>
-        <v-card-title>New family</v-card-title>
-        <v-dialog v-model="dialog" width="500">
+      <v-card rounded="lg">
+        <v-card-title>Create family</v-card-title>
+
+        <!-- Refactor to component -->
+        <v-dialog v-model="newFamilyDialog" width="500">
           <template #activator="{ on, attrs }">
             <v-card-actions
               ><v-btn text color="primary" v-bind="attrs" v-on="on"
@@ -44,6 +110,7 @@
               <v-text-field
                 v-model="newFamilyName"
                 placeholder="Family name"
+                @keyup.enter="createFamily"
               ></v-text-field>
               <v-alert
                 v-model="alert"
@@ -58,12 +125,10 @@
               </v-alert>
             </v-card-text>
 
-            <v-divider></v-divider>
-
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="primary" text @click="createFamily"> Create </v-btn>
-              <v-btn color="primary" text @click="dialog = false">
+              <v-btn color="primary" text @click="newFamilyDialog = false">
                 Cancel
               </v-btn>
             </v-card-actions>
@@ -81,9 +146,14 @@ import { Family } from '~/types/Family'
 export default Vue.extend({
   data() {
     return {
-      dialog: false as boolean,
-      newFamilyName: '' as string,
-      alert: false as boolean,
+      notFoundAlert: false,
+      inviteFamilyMemberEmail: '',
+      inviteFamilyMemberFamilyId: '',
+      inviteFamilyMemberDialog: false,
+      newFamilyDialog: false,
+      newFamilyName: '',
+      alert: false,
+      families: [] as Family[],
     }
   },
 
@@ -91,27 +161,53 @@ export default Vue.extend({
     title: 'Family',
   },
 
-  computed: {
-    families(): Family[] {
-      return this.$accessor.families.families
-    },
-    familyMembers(): string[] {
-      return ['Mikkel Nygaard', 'Linda Nygaard']
-    },
+  async created() {
+    this.families = await this.$repositories.families.all()
   },
+
   methods: {
+    openInviteFamilyMemberDialog(familyId: string) {
+      this.inviteFamilyMemberFamilyId = familyId
+      this.inviteFamilyMemberDialog = true
+    },
+    async inviteFamilyMember() {
+      this.notFoundAlert = false
+      this.alert = false
+      try {
+        const invited = await this.$repositories.families.inviteFamilyMember(
+          this.inviteFamilyMemberFamilyId,
+          this.inviteFamilyMemberEmail,
+        )
+
+        if (!invited) {
+          this.notFoundAlert = true
+          return
+        }
+
+        this.inviteFamilyMemberDialog = false
+        this.inviteFamilyMemberEmail = ''
+        this.families = await this.$repositories.families.all()
+      } catch (e) {
+        this.alert = true
+      }
+    },
     async createFamily() {
       this.alert = false
-      const result = await this.$axios.post('api/families', {
-        name: this.newFamilyName,
-      })
-      if (result.status === 200 || result.status === 204) {
-        this.$accessor.families.getFamilies()
-        this.newFamilyName = ''
-        this.dialog = false
-        return
+      try {
+        const result = await this.$repositories.families.createFamily(
+          this.newFamilyName,
+        )
+        if (result) {
+          this.$accessor.families.getFamilySelectors()
+          this.families = await this.$repositories.families.all()
+          this.newFamilyName = ''
+          this.newFamilyDialog = false
+          return
+        }
+        this.alert = true
+      } catch (e) {
+        this.alert = true
       }
-      this.alert = true
     },
   },
 })

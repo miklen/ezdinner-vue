@@ -6,9 +6,11 @@ namespace EzDinner.Core.Aggregates.FamilyAggregate
 {
     public class Family : AggregateRoot<Guid>
     {
+        private readonly List<Guid> _familyMemberIds;
+
         public Guid OwnerId { get; }
         public string Name { get; set; }
-        public List<Guid> FamilyMemberIds { get; }
+        public IEnumerable<Guid> FamilyMemberIds => _familyMemberIds;
 
         public Family(Guid ownerId, string name) : base(Guid.NewGuid())
         {
@@ -17,7 +19,27 @@ namespace EzDinner.Core.Aggregates.FamilyAggregate
 
             OwnerId = ownerId;
             Name = name;
-            FamilyMemberIds = new List<Guid>();
+            _familyMemberIds = new List<Guid>();
+        }
+
+        /// <summary>
+        /// For now an invitation directly adds a family member to the family.
+        /// TODO: Add add invitation state, so that you cannot force familyMembers to join
+        /// </summary>
+        /// <param name="familyMemberId"></param>
+        public void InviteFamilyMember(Guid familyMemberId)
+        {
+            if (_familyMemberIds.Contains(familyMemberId)) return;
+            _familyMemberIds.Add(familyMemberId);
+        }
+
+        /// <summary>
+        /// Remove a family member from family
+        /// </summary>
+        /// <param name="familyMemberId"></param>
+        public void RemoveFamilyMember(Guid familyMemberId)
+        {
+            _familyMemberIds.Remove(familyMemberId);
         }
     }
 }

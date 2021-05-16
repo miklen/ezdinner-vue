@@ -1,7 +1,7 @@
 ﻿using EzDinner.Core.Aggregates.DinnerAggregate;
 using EzDinner.Core.Aggregates.DishAggregate;
 using EzDinner.Core.Aggregates.FamilyAggregate;
-using EzDinner.Core.Aggregates.FamilyMemberAggregate;
+using EzDinner.Core.Aggregates.UserAggregate;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Fluent;
 using Microsoft.Extensions.Configuration;
@@ -43,7 +43,7 @@ namespace EzDinner.Infrastructure
         public static IServiceCollection RegisterRepositories(this IServiceCollection services)
         {
             services.AddScoped<IFamilyRepository, FamilyRepository>();
-            services.AddScoped<IFamilyMemberRepository, FamilyMemberRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IDishRepository, DishRepository>();
             services.AddScoped<IDinnerRepository, DinnerRepository>();
             return services;

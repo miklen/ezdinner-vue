@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Graph.Auth;
 using Microsoft.Identity.Client;
 using Microsoft.Graph;
-using EzDinner.Core.Aggregates.FamilyMemberAggregate;
+using EzDinner.Core.Aggregates.UserAggregate;
 using EzDinner.Infrastructure;
 using EzDinner.Core.Aggregates.DinnerAggregate;
 

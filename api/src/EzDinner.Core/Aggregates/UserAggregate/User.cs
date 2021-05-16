@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EzDinner.Core.Aggregates.FamilyMemberAggregate
+namespace EzDinner.Core.Aggregates.UserAggregate
 {
-    public class FamilyMember
+    public class User
     {
         public Guid Id { get; set; }
         public string? GivenName { get; set; }
