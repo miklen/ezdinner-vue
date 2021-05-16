@@ -1,28 +1,28 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
-import { Family } from '@/types/Family'
+import { FamilySelect } from '~/types/FamilySelect'
 
 export const state = () => ({
-  families: [] as Family[],
+  familySelectors: [] as FamilySelect[],
 })
 
-export type FamiliesState = ReturnType<typeof state>
+export type familySelectorsState = ReturnType<typeof state>
 
 export const getters = getterTree(state, {})
 
 export const mutations = mutationTree(state, {
-  updateFamilies(state, families: Family[]) {
-    state.families = families
+  updateFamilySelectors(state, familySelectors: FamilySelect[]) {
+    state.familySelectors = familySelectors
   },
 })
 
 export const actions = actionTree(
   { state, getters, mutations },
   {
-    async getFamilies({ commit, state, rootState }) {
-      const result = await this.$axios.get('/api/families')
-      commit('updateFamilies', result.data)
-      if (!rootState.activeFamilyId && state.families.length > 0) {
-        this.app.$accessor.setActiveFamilyId(state.families[0].id)
+    async getFamilySelectors({ commit, state, rootState }) {
+      const result = await this.$repositories.families.familySelectors()
+      commit('updateFamilySelectors', result)
+      if (!rootState.activeFamilyId && state.familySelectors.length > 0) {
+        this.app.$accessor.setActiveFamilyId(state.familySelectors[0].id)
       }
       // explicit return null to satisfy typings
       return null

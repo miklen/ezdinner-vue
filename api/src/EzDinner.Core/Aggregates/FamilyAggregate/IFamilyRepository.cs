@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace EzDinner.Core.Aggregates.FamilyAggregate
 {
-    public interface IFamilyRepository
-    {
-        public Task<IEnumerable<Family>> GetFamiliesAsync(Guid userId);
+  public interface IFamilyRepository
+  {
+    public Task<IEnumerable<Family>> getFamilySelectorsAsync(Guid userId);
 
-        public Task<Family?> GetFamily(Guid familyId);
-        public Task SaveAsync(Family family);
-    }
+    public Task<Family?> GetFamily(Guid familyId);
+    public Task SaveAsync(Family family);
+  }
 }

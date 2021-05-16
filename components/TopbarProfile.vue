@@ -1,6 +1,6 @@
 <template>
   <span>
-    <span> Family {{ familyName }} </span>
+    <span> {{ familyName }} </span>
     <v-menu v-model="menu" offset-y left>
       <template #activator="{ on, attrs }">
         <v-avatar
@@ -64,7 +64,7 @@ export default Vue.extend({
     },
     familyName() {
       return (
-        this.$accessor.families.families.find(
+        this.$accessor.families.familySelectors.find(
           (i) => i.id === this.$accessor.activeFamilyId,
         )?.name ?? ''
       )

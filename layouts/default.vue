@@ -78,7 +78,7 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    await this.getFamilies()
+    await this.getFamilySelectors()
     this.loading = false
   },
   methods: {
@@ -89,8 +89,8 @@ export default Vue.extend({
       if (!item.requireAuth) return true
       return this.$msal.isAuthenticated
     },
-    getFamilies() {
-      return this.$accessor.families.getFamilies()
+    getFamilySelectors() {
+      return this.$accessor.families.getFamilySelectors()
     },
   },
 })

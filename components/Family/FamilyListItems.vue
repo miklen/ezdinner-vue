@@ -25,7 +25,7 @@ import Vue from 'vue'
 export default Vue.extend({
   computed: {
     families() {
-      return this.$accessor.families.families
+      return this.$accessor.families.familySelectors
     },
     selectedFamily() {
       return this.$accessor.activeFamilyId

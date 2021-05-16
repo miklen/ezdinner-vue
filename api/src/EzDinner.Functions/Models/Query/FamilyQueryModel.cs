@@ -13,8 +13,21 @@ namespace EzDinner.Functions.Models.Query
     {
         public Guid Id { get; set; }
         public string? Name { get; set; }
-        public Guid OwnerId { get; set; }
-        public string? OwnerName { get; set; }
+        public List<FamilyMemberQueryModel> FamilyMembers { get; set; } = new List<FamilyMemberQueryModel>();
+    }
+
+    public class FamilyMemberQueryModel
+    {
+        public Guid Id { get; set; }
+        public string? Name { get; set; }
+        public bool IsOwner { get; set; }
+
+        public FamilyMemberQueryModel(Guid id, string name, bool isOwner = false)
+        {
+            Id = id;
+            Name = name;
+            IsOwner = isOwner;
+        }
     }
 
     public class FamilyMapping : Profile

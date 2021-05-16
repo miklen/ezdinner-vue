@@ -8,17 +8,21 @@
       md="6"
       lg="4"
     >
-      <v-card>
+      <v-card rounded="lg">
         <v-card-title>{{ family.name }}</v-card-title>
         <v-card-subtitle>Family members</v-card-subtitle>
-        <v-card-text>
-          <v-row v-for="familyMember in familyMembers" :key="familyMember">
-            <v-col class="col-1">
-              <v-icon>mdi-account</v-icon>
-            </v-col>
-            <v-col>{{ familyMember }}</v-col>
-          </v-row>
-        </v-card-text>
+
+        <v-list>
+          <v-list-item
+            v-for="familyMember in family.familyMembers"
+            :key="familyMember.id"
+          >
+            <v-list-item-avatar
+              ><v-icon>mdi-account</v-icon></v-list-item-avatar
+            >
+            <v-list-item-subtitle>{{ familyMember.name }}</v-list-item-subtitle>
+          </v-list-item>
+        </v-list>
 
         <v-dialog v-model="inviteFamilyMemberDialog" width="500">
           <template #activator="{ on, attrs }">
@@ -42,6 +46,7 @@
               <v-text-field
                 v-model="inviteFamilyMemberEmail"
                 placeholder="Family member email address"
+                @keyup.enter="inviteFamilyMember"
               ></v-text-field>
               <v-alert
                 v-model="notFoundAlert"
@@ -51,7 +56,7 @@
                 elevation="2"
                 colored-border
               >
-                An error occured
+                User not found
               </v-alert>
               <v-alert
                 v-model="alert"
@@ -84,7 +89,7 @@
       </v-card>
     </v-col>
     <v-col xs="12" sm="12" md="6" lg="4">
-      <v-card>
+      <v-card rounded="lg">
         <v-card-title>Create family</v-card-title>
 
         <!-- Refactor to component -->
@@ -105,6 +110,7 @@
               <v-text-field
                 v-model="newFamilyName"
                 placeholder="Family name"
+                @keyup.enter="createFamily"
               ></v-text-field>
               <v-alert
                 v-model="alert"
@@ -147,6 +153,7 @@ export default Vue.extend({
       newFamilyDialog: false,
       newFamilyName: '',
       alert: false,
+      families: [] as Family[],
     }
   },
 
@@ -154,43 +161,51 @@ export default Vue.extend({
     title: 'Family',
   },
 
-  computed: {
-    families(): Family[] {
-      return this.$accessor.families.families
-    },
-    familyMembers(): string[] {
-      return ['Mikkel Nygaard', 'Linda Nygaard']
-    },
+  async created() {
+    this.families = await this.$repositories.families.all()
   },
+
   methods: {
     openInviteFamilyMemberDialog(familyId: string) {
       this.inviteFamilyMemberFamilyId = familyId
       this.inviteFamilyMemberDialog = true
     },
     async inviteFamilyMember() {
-      const invited = await this.$repositories.families.inviteFamilyMember(
-        this.inviteFamilyMemberFamilyId,
-        this.inviteFamilyMemberEmail,
-      )
-      if (!invited) {
-        this.notFoundAlert = true
-        return
-      }
+      this.notFoundAlert = false
+      this.alert = false
+      try {
+        const invited = await this.$repositories.families.inviteFamilyMember(
+          this.inviteFamilyMemberFamilyId,
+          this.inviteFamilyMemberEmail,
+        )
 
-      // refresh
+        if (!invited) {
+          this.notFoundAlert = true
+          return
+        }
+
+        this.families = await this.$repositories.families.all()
+      } catch (e) {
+        this.alert = true
+      }
     },
     async createFamily() {
       this.alert = false
-      const result = await this.$axios.post('api/families', {
-        name: this.newFamilyName,
-      })
-      if (result.status === 200 || result.status === 204) {
-        this.$accessor.families.getFamilies()
-        this.newFamilyName = ''
-        this.newFamilyDialog = false
-        return
+      try {
+        const result = await this.$repositories.families.createFamily(
+          this.newFamilyName,
+        )
+        if (result) {
+          this.$accessor.families.getFamilySelectors()
+          this.families = await this.$repositories.families.all()
+          this.newFamilyName = ''
+          this.newFamilyDialog = false
+          return
+        }
+        this.alert = true
+      } catch (e) {
+        this.alert = true
       }
-      this.alert = true
     },
   },
 })
