@@ -56,6 +56,7 @@ namespace EzDinner.Functions
             if (family is null) return new BadRequestObjectResult("NOT_FOUND_FAMILY");
 
             family.InviteFamilyMember(user.Id);
+            await _familyRepository.SaveAsync(family);
             return new OkResult();
         }
     }

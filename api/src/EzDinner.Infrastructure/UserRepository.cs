@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace EzDinner.Infrastructure
 {
-    public class FamilyMemberRepository : IUserRepository
+    public class UserRepository : IUserRepository
     {
         private readonly GraphServiceClient _graphClient;
 
-        public FamilyMemberRepository(GraphServiceClient graphClient)
+        public UserRepository(GraphServiceClient graphClient)
         {
             _graphClient = graphClient;
         }

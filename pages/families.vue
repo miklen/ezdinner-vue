@@ -184,6 +184,8 @@ export default Vue.extend({
           return
         }
 
+        this.inviteFamilyMemberDialog = false
+        this.inviteFamilyMemberEmail = ''
         this.families = await this.$repositories.families.all()
       } catch (e) {
         this.alert = true

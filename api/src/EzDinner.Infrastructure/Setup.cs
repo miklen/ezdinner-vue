@@ -43,7 +43,7 @@ namespace EzDinner.Infrastructure
         public static IServiceCollection RegisterRepositories(this IServiceCollection services)
         {
             services.AddScoped<IFamilyRepository, FamilyRepository>();
-            services.AddScoped<IUserRepository, FamilyMemberRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IDishRepository, DishRepository>();
             services.AddScoped<IDinnerRepository, DinnerRepository>();
             return services;
