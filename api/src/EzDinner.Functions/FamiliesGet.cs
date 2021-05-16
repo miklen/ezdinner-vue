@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
 using EzDinner.Core.Aggregates.FamilyAggregate;
-using EzDinner.Core.Aggregates.FamilyMemberAggregate;
+using EzDinner.Core.Aggregates.UserAggregate;
 using EzDinner.Functions.Models.Query;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,14 +23,14 @@ namespace EzDinner.Functions
     public class FamiliesGet
     {
         private readonly ILogger<FamiliesGet> _logger;
-        private readonly IFamilyMemberRepository _familyMemberRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IFamilyRepository _familyRepository;
         private readonly IMapper _mapper;
 
-        public FamiliesGet(ILogger<FamiliesGet> logger, IMapper mapper, IFamilyMemberRepository familyMemberRepository, IFamilyRepository familyRepository)
+        public FamiliesGet(ILogger<FamiliesGet> logger, IMapper mapper, IUserRepository userRepository, IFamilyRepository familyRepository)
         {
             _logger = logger;
-            _familyMemberRepository = familyMemberRepository;
+            _userRepository = userRepository;
             _familyRepository = familyRepository;
             _mapper = mapper;
         }
@@ -63,10 +63,10 @@ namespace EzDinner.Functions
         {
             // N+1 microservice problem... TODO solve by saving necessary information closer to usage or get list of users in one request
             var ownerIds = families.Select(s => s.OwnerId).Distinct();
-            var tasks = new List<Task<FamilyMember>>();
+            var tasks = new List<Task<User>>();
             foreach (var ownerId in ownerIds)
             {
-                tasks.Add(_familyMemberRepository.GetFamilyMemberAsync(ownerId));
+                tasks.Add(_userRepository.GetUser(ownerId));
             }
             Task.WaitAll(tasks.ToArray());
             var owners = tasks.ToDictionary(k => k.Result.Id, v => v.Result.FullName);

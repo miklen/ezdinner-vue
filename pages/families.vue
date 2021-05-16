@@ -44,6 +44,16 @@
                 placeholder="Family member email address"
               ></v-text-field>
               <v-alert
+                v-model="notFoundAlert"
+                dismissible
+                type="warning"
+                border="left"
+                elevation="2"
+                colored-border
+              >
+                An error occured
+              </v-alert>
+              <v-alert
                 v-model="alert"
                 dismissible
                 color="error"
@@ -55,8 +65,6 @@
                 An error occured
               </v-alert>
             </v-card-text>
-
-            <v-divider></v-divider>
 
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -111,8 +119,6 @@
               </v-alert>
             </v-card-text>
 
-            <v-divider></v-divider>
-
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="primary" text @click="createFamily"> Create </v-btn>
@@ -134,6 +140,8 @@ import { Family } from '~/types/Family'
 export default Vue.extend({
   data() {
     return {
+      notFoundAlert: false,
+      inviteFamilyMemberEmail: '',
       inviteFamilyMemberFamilyId: '',
       inviteFamilyMemberDialog: false,
       newFamilyDialog: false,
@@ -159,7 +167,18 @@ export default Vue.extend({
       this.inviteFamilyMemberFamilyId = familyId
       this.inviteFamilyMemberDialog = true
     },
-    async inviteFamilyMember() {},
+    async inviteFamilyMember() {
+      const invited = await this.$repositories.families.inviteFamilyMember(
+        this.inviteFamilyMemberFamilyId,
+        this.inviteFamilyMemberEmail,
+      )
+      if (!invited) {
+        this.notFoundAlert = true
+        return
+      }
+
+      // refresh
+    },
     async createFamily() {
       this.alert = false
       const result = await this.$axios.post('api/families', {
