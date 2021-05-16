@@ -31,7 +31,7 @@ namespace EzDinner.Infrastructure
 
         public async Task<Core.Aggregates.UserAggregate.User?> GetUser(string email)
         {
-            var userPage = await _graphClient.Users.Request().Filter($"eq(mail,'{email}')").GetAsync();
+            var userPage = await _graphClient.Users.Request().Filter($"mail eq '{email}'").GetAsync();
             var user = userPage.FirstOrDefault();
             if (user is null) return null;
             return new Core.Aggregates.UserAggregate.User()
