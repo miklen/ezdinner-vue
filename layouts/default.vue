@@ -8,20 +8,22 @@
         <v-row>
           <v-col v-if="!$vuetify.breakpoint.smAndDown" cols="2">
             <v-list nav color="transparent">
-              <v-list-item
-                v-for="(item, i) in links"
-                :key="i"
-                :to="item.to"
-                router
-                exact
-              >
-                <v-list-item-action>
-                  <v-icon>{{ item.icon }}</v-icon>
-                </v-list-item-action>
-                <v-list-item-content>
-                  <v-list-item-title v-text="item.title" />
-                </v-list-item-content>
-              </v-list-item>
+              <v-list-item-group color="primary">
+                <v-list-item
+                  v-for="(item, i) in links"
+                  :key="i"
+                  :to="item.to"
+                  router
+                  exact
+                >
+                  <v-list-item-action>
+                    <v-icon>{{ item.icon }}</v-icon>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title v-text="item.title" />
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list-item-group>
             </v-list>
           </v-col>
 
