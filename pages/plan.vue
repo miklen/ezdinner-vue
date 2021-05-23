@@ -31,7 +31,13 @@
       <v-col>
         <v-timeline dense>
           <div v-for="(dinner, index) in dinners" :key="index">
-            <PlannedDinner :dinner="dinner" @dinner:menuupdated="menuUpdated" />
+            <PlannedDinner
+              :dinner="dinner"
+              :selected="selectedDinnerDate === dinner.date"
+              @dinner:clicked="selectedDinnerDate = dinner.date"
+              @dinner:menuupdated="menuUpdated"
+              @dinner:close="selectedDinnerDate = null"
+            />
 
             <!-- Everytime a new week starts -->
             <v-timeline-item
@@ -74,6 +80,7 @@ export default Vue.extend({
   data: () => ({
     showDatePicker: false,
     dateRange: [] as string[],
+    selectedDinnerDate: null as DateTime | null,
   }),
 
   head: {

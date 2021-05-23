@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-subtitle @click="$emit('cancel')">
+    <v-card-subtitle @click="$emit('dinner:close')">
       {{ formatDate(dinner.date) }}
     </v-card-subtitle>
     <v-card-text>

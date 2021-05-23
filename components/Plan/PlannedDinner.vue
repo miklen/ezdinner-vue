@@ -2,10 +2,10 @@
   <div>
     <v-timeline-item class="mb-4" :color="getDotColor(dinner)" small>
       <v-row
-        v-show="!expanded"
+        v-show="!selected"
         justify="space-between"
         :class="getTimelineTextStyle(dinner)"
-        @click="expanded = !expanded"
+        @click="$emit('dinner:clicked')"
       >
         <v-col cols="6"
           >{{ getTitle(dinner) }}
@@ -25,9 +25,9 @@
       </v-row>
 
       <PlannedMealDetails
-        v-show="expanded"
+        v-show="selected"
         :dinner="dinner"
-        @cancel="expanded = false"
+        @dinner:close="$emit('dinner:close')"
         @dinner:menuupdated="menuUpdated"
       />
     </v-timeline-item>
@@ -47,6 +47,10 @@ export default Vue.extend({
   props: {
     dinner: {
       type: Object as PropType<Dinner>,
+      required: true,
+    },
+    selected: {
+      type: Boolean,
       required: true,
     },
   },
