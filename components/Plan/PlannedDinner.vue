@@ -3,6 +3,7 @@
     <v-timeline-item class="mb-4" :color="getDotColor(dinner)" small>
       <v-row
         v-show="!selected"
+        style="cursor: pointer"
         justify="space-between"
         :class="getTimelineTextStyle(dinner)"
         @click="$emit('dinner:clicked')"
@@ -83,7 +84,7 @@ export default Vue.extend({
       return this.getPlannedTitle(dinner)
     },
     getPlannedTitle(dinner: Dinner) {
-      return dinner.menu.map((item) => item.dishName).join()
+      return dinner.menu.map((item) => item.dishName).join(', ')
     },
     getUnplannedTitle(date: DateTime) {
       // when unplanned dinners are in the past we're tracking

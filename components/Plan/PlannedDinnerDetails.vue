@@ -1,7 +1,10 @@
 <template>
   <v-card>
-    <v-card-subtitle @click="$emit('dinner:close')">
-      {{ formatDate(dinner.date) }}
+    <v-card-subtitle style="cursor: pointer" @click="$emit('dinner:close')">
+      <v-row>
+        <v-col>{{ formatDate(dinner.date) }}</v-col>
+        <v-col cols="1"><v-icon>mdi-close-circle-outline</v-icon></v-col>
+      </v-row>
     </v-card-subtitle>
     <v-card-text>
       <v-row>
