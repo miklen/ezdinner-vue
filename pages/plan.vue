@@ -33,7 +33,7 @@
           <div v-for="(dinner, index) in dinners" :key="index">
             <PlannedDinner
               :dinner="dinner"
-              :selected="selectedDinnerDate === dinner.date"
+              :selected="isDinnerDateSelected(dinner, selectedDinnerDate)"
               @dinner:clicked="selectedDinnerDate = dinner.date"
               @dinner:menuupdated="menuUpdated"
               @dinner:close="selectedDinnerDate = null"
@@ -70,6 +70,7 @@ import { DateTime } from 'luxon'
 import Content from '~/components/Content.vue'
 import TopDishes from '~/components/Plan/TopDishes.vue'
 import PlannedDinner from '~/components/Plan/PlannedDinner.vue'
+import { Dinner } from '~/types/Dinner'
 
 export default Vue.extend({
   components: {
@@ -125,6 +126,10 @@ export default Vue.extend({
       const from = to.minus({ month: 1 })
       // setting dateRange triggers the watcher which populates dinners
       this.dateRange = [from.toISO(), to.toISO()]
+    },
+    isDinnerDateSelected(dinner: Dinner, selectedDate: DateTime | null) {
+      if (!dinner?.date || !selectedDate) return false
+      return dinner.date.equals(selectedDate)
     },
     populateDinners(): Promise<void> {
       const from = DateTime.fromISO(this.dateRange[0])
