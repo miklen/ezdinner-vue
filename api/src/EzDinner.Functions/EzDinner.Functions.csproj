@@ -20,6 +20,7 @@
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EzDinner.Authorization.Core\EzDinner.Authorization.csproj" />
     <ProjectReference Include="..\EzDinner.Core\EzDinner.Core.csproj" />
     <ProjectReference Include="..\EzDinner.Infrastructure\EzDinner.Infrastructure.csproj" />
   </ItemGroup>
@@ -37,9 +38,6 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Authorization\rbac_with_domains.conf" />
   </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1development_1json__JsonSchema="https://json.schemastore.org/appsettings.json" /></VisualStudio></ProjectExtensions>
 </Project>

@@ -9,6 +9,7 @@ using EzDinner.Core.Aggregates.DinnerAggregate;
 using NetCasbin;
 using System.Reflection;
 using System.IO;
+using EzDinner.Authorization;
 
 [assembly: FunctionsStartup(typeof(EzDinner.Functions.Startup))]
 
@@ -47,9 +48,8 @@ namespace EzDinner.Functions
 
         private void ConfigureServices(IServiceCollection services)
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resource = assembly.GetManifestResourceStream($"{nameof(EzDinner.Functions.Authorization)}.rbac_with_domains.conf");
-
+            var assembly = Assembly.GetAssembly(typeof(Resources))!;
+            var resource = assembly.GetManifestResourceStream($"{nameof(EzDinner.Authorization)}.rbac_with_domains.conf");
 
             services.AddAuthentication(sharedOptions =>
             {
@@ -57,7 +57,6 @@ namespace EzDinner.Functions
                 sharedOptions.DefaultChallengeScheme = Microsoft.Identity.Web.Constants.Bearer;
             })
                .AddMicrosoftIdentityWebApi(Configuration!.GetSection("AzureAdB2C"));
-
 
             services
              .AddSingleton(Configuration) // Replace the Azure Function configuration with our new one
@@ -68,8 +67,8 @@ namespace EzDinner.Functions
              .RegisterCasbin(Configuration.GetSection("CosmosDb"))
              .AddSingleton(s => new Enforcer(new StreamReader(resource!).ReadToEnd(), s.GetRequiredService<CasbinCosmosAdapter>()))
              .RegisterRepositories()
-             .AddScoped<IDinnerService, DinnerService>();
-
+             .AddScoped<IDinnerService, DinnerService>()
+             .AddSingleton<IPermissionService, PermissionService>();
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EzDinner.Functions.Authorization
+namespace EzDinner.Authorization
 {
     public static class Roles
     {

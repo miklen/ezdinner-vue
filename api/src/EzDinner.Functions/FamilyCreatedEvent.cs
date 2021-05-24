@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EzDinner.Authorization;
 using EzDinner.Core.Aggregates.FamilyAggregate;
-using EzDinner.Functions.Authorization;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
@@ -15,14 +15,37 @@ namespace EzDinner.Functions
     public class FamilyCreatedEvent
     {
         private readonly ILogger<FamilyCreatedEvent> _logger;
-        private readonly Enforcer _enforcer;
+        private readonly IPermissionService _permissionService;
 
-        public FamilyCreatedEvent(ILogger<FamilyCreatedEvent> logger, Enforcer enforcer)
+        public FamilyCreatedEvent(ILogger<FamilyCreatedEvent> logger, IPermissionService permissionService)
         {
             _logger = logger;
-            _enforcer = enforcer;
+            _permissionService = permissionService;
         }
-        
+
+        /// <summary>
+        /// Policy (entries in permission database):
+        /// p, admin, domain1, data1, read
+        /// p, admin, domain1, data1, write
+        /// p, admin, domain2, data2, read
+        /// p, admin, domain2, data2, write
+        /// p, owner, domain2
+
+        /// g, alice, admin, domain1
+        /// g, bob, admin, domain2
+        /// g, mikkel, owner, domain2
+        /// 
+        /// Enforcement results:
+        /// alice, domain1, data2, read == false
+        /// alice, domain2, data3, read == false
+        /// mikkel, domain2, data2, write == true
+        /// mikkel, domain2, data3, write == true
+        /// mikkel, domain1, data1, write == false
+        /// bob, domain2, data3, write == false
+        /// bob, domain2, data2, write == true
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         [FunctionName(nameof(FamilyCreatedEvent))]
         public async Task Run([CosmosDBTrigger(
             databaseName: "EzDinner",
@@ -38,37 +61,10 @@ namespace EzDinner.Functions
                 foreach(var document in input)
                 {
                     var family = JsonConvert.DeserializeObject<Family>(document.ToString());
-                    if (!IsCreatedAction(family)) continue;
-
-                    await CreateOwnerRoleForFamily(family);
-                    await AssignOwnerRoleToCreator(family);
+                    await _permissionService.CreateOwnerRole(family.Id);
+                    await _permissionService.AssignRoleToUser(family.OwnerId, Roles.Owner, family.Id);
                 }
             }
         }   
-
-        private Task CreateOwnerRoleForFamily(Family family)
-        {
-            if (!_enforcer.HasGroupingPolicy(Roles.Owner, family.Id.ToString()))
-            {
-                // Assign Owner role to the user who created the family
-                return _enforcer.AddPolicyAsync(Roles.Owner, family.Id.ToString());
-            }
-            return Task.CompletedTask;
-        }
-        
-        private Task AssignOwnerRoleToCreator(Family family)
-        {
-            if (!_enforcer.HasGroupingPolicy(family.OwnerId.ToString(), Roles.Owner, family.Id.ToString()))
-            {
-                // Create Owner role for the created famiy
-                return _enforcer.AddGroupingPolicyAsync(family.OwnerId.ToString(), Roles.Owner, family.Id.ToString());
-            }
-            return Task.CompletedTask;
-        }
-
-        private static bool IsCreatedAction(Family family)
-        {
-            return family.CreatedDate.Equals(family.UpdatedDate);
-        }
     }
 }
