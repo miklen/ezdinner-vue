@@ -52,7 +52,7 @@ namespace EzDinner.Functions
         private async Task<List<FamilyQueryModel>> GetFamilies(HttpRequest req)
         {
             var userId = Guid.Parse(req.HttpContext.User.GetNameIdentifierId() ?? "");
-            var families = await _familyRepository.getFamilySelectorsAsync(userId);
+            var families = await _familyRepository.GetFamilySelectorsAsync(userId);
 
             var familyMembers = GetUserNames(families);
             var familyResult = new List<FamilyQueryModel>();

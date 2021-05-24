@@ -1,17 +1,14 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Identity.Web;
+﻿using Microsoft.Identity.Web;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.Graph.Auth;
-using Microsoft.Identity.Client;
-using Microsoft.Graph;
-using EzDinner.Core.Aggregates.UserAggregate;
 using EzDinner.Infrastructure;
 using EzDinner.Core.Aggregates.DinnerAggregate;
+using NetCasbin;
+using System.Reflection;
+using System.IO;
 
 [assembly: FunctionsStartup(typeof(EzDinner.Functions.Startup))]
 
@@ -29,7 +26,7 @@ namespace EzDinner.Functions
         {
             // Get the azure function application directory. 'C:\whatever' for local and 'd:\home\whatever' for Azure
             var executionContextOptions = builder.Services.BuildServiceProvider()
-                .GetService<IOptions<ExecutionContextOptions>>().Value;
+                .GetRequiredService<IOptions<ExecutionContextOptions>>().Value;
 
             var currentDirectory = executionContextOptions.AppDirectory;
 
@@ -45,27 +42,34 @@ namespace EzDinner.Functions
                 .AddJsonFile("appsettings.development.json", optional: true, reloadOnChange: true) // add local development variables if present - file is not committed to git so won't be present for prod
                 .Build();
 
-            builder.Services.AddLogging();
-            builder.Services.AddAutoMapper(typeof(Startup));
-
-            // Replace the Azure Function configuration with our new one
-            builder.Services.AddSingleton(Configuration);
-            builder.Services.RegisterMsGraph(Configuration.GetSection("AzureAdB2C"));
-            builder.Services.RegisterCosmosDb(Configuration.GetSection("CosmosDb"));
-            builder.Services.RegisterRepositories();
-            builder.Services.AddScoped<IDinnerService, DinnerService>();
-
             ConfigureServices(builder.Services);
         }
 
         private void ConfigureServices(IServiceCollection services)
         {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resource = assembly.GetManifestResourceStream($"{nameof(EzDinner.Functions.Authorization)}.rbac_with_domains.conf");
+
+
             services.AddAuthentication(sharedOptions =>
-           {
-               sharedOptions.DefaultScheme = Microsoft.Identity.Web.Constants.Bearer;
-               sharedOptions.DefaultChallengeScheme = Microsoft.Identity.Web.Constants.Bearer;
-           })
+            {
+                sharedOptions.DefaultScheme = Microsoft.Identity.Web.Constants.Bearer;
+                sharedOptions.DefaultChallengeScheme = Microsoft.Identity.Web.Constants.Bearer;
+            })
                .AddMicrosoftIdentityWebApi(Configuration!.GetSection("AzureAdB2C"));
+
+
+            services
+             .AddSingleton(Configuration) // Replace the Azure Function configuration with our new one
+             .AddLogging()
+             .AddAutoMapper(typeof(Startup))
+             .RegisterMsGraph(Configuration.GetSection("AzureAdB2C"))
+             .RegisterCosmosDb(Configuration.GetSection("CosmosDb"))
+             .RegisterCasbin(Configuration.GetSection("CosmosDb"))
+             .AddSingleton(s => new Enforcer(new StreamReader(resource!).ReadToEnd(), s.GetRequiredService<CasbinCosmosAdapater>()))
+             .RegisterRepositories()
+             .AddScoped<IDinnerService, DinnerService>();
+
         }
     }
 }

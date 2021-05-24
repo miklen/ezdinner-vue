@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EzDinner.Infrastructure", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EzDinner.UnitTests", "test\EzDinner.UnitTests\EzDinner.UnitTests.csproj", "{758701A5-8279-470F-9FD3-AB540229769F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EzDinner.IntegrationTests", "tests\EzDinner.IntegrationTests\EzDinner.IntegrationTests.csproj", "{B9DD68F0-1B71-4E2A-A1BD-21A6063D7EE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EzDinner.IntegrationTests", "tests\EzDinner.IntegrationTests\EzDinner.IntegrationTests.csproj", "{B9DD68F0-1B71-4E2A-A1BD-21A6063D7EE5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

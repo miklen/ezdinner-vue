@@ -27,6 +27,7 @@ namespace EzDinner.IntegrationTests
             services.AddSingleton(configuration);
             services.RegisterMsGraph(configuration.GetSection("AzureAdB2C"));
             services.RegisterCosmosDb(configuration.GetSection("CosmosDb"));
+            services.RegisterCasbin(configuration.GetSection("CosmosDb"));
             services.RegisterRepositories();
 
             Provider = services.BuildServiceProvider();

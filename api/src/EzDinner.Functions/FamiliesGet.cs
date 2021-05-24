@@ -45,7 +45,7 @@ namespace EzDinner.Functions
       if (!authenticationStatus) return authenticationResponse;
 
       var userId = Guid.Parse(req.HttpContext.User.GetNameIdentifierId() ?? "");
-      var families = await _familyRepository.getFamilySelectorsAsync(userId);
+      var families = await _familyRepository.GetFamilySelectorsAsync(userId);
 
       var familieyQueryModels = families.Select(_mapper.Map<FamilySelectQueryModel>);
       return new OkObjectResult(families);

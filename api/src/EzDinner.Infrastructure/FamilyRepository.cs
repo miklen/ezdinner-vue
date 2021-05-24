@@ -26,7 +26,7 @@ namespace EzDinner.Infrastructure
       return _container.UpsertItemAsync(family);
     }
 
-    public async Task<IEnumerable<Family>> getFamilySelectorsAsync(Guid userId)
+    public async Task<IEnumerable<Family>> GetFamilySelectorsAsync(Guid userId)
     {
       var families = new List<Family>();
       using (var setIterator = _container.GetItemLinqQueryable<Family>()

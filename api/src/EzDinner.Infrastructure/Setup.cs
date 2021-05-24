@@ -1,17 +1,17 @@
-﻿using EzDinner.Core.Aggregates.DinnerAggregate;
+﻿using Casbin.Adapter.EFCore;
+using EzDinner.Core.Aggregates.DinnerAggregate;
 using EzDinner.Core.Aggregates.DishAggregate;
 using EzDinner.Core.Aggregates.FamilyAggregate;
 using EzDinner.Core.Aggregates.UserAggregate;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Fluent;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 using Microsoft.Graph.Auth;
 using Microsoft.Identity.Client;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace EzDinner.Infrastructure
 {
@@ -37,6 +37,20 @@ namespace EzDinner.Infrastructure
             services.AddSingleton(_ => new CosmosClientBuilder(section.GetValue<string>("ConnectionString"))
                 .WithSerializerOptions(new CosmosSerializationOptions { PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase })
                 .Build());
+            return services;
+        }
+
+
+        public static IServiceCollection RegisterCasbin(this IServiceCollection services, IConfigurationSection section)
+        {
+            var connStrParts = section.GetValue<string>("ConnectionString").Split(';');
+            var accountEndpoint = connStrParts[0].Substring(connStrParts[0].IndexOf('=')+1);
+            var accountKey = connStrParts[1].Substring(connStrParts[1].IndexOf('=') + 1);
+            var options = new DbContextOptionsBuilder<CasbinDbContext<Guid>>()
+              .UseCosmos(accountEndpoint, accountKey, section.GetValue<string>("Database"))
+              .Options;
+            services.AddSingleton(_ => new CasbinDbContext<Guid>(options));
+            services.AddSingleton(s => new CasbinCosmosAdapater(s.GetRequiredService<CasbinDbContext<Guid>>()));
             return services;
         }
 
