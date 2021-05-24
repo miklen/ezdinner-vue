@@ -6,9 +6,9 @@ using System.Text;
 
 namespace EzDinner.Infrastructure
 {
-    public class CasbinCosmosAdapater : EFCoreAdapter<Guid>
+    public class CasbinCosmosAdapter : EFCoreAdapter<Guid>
     {
-        public CasbinCosmosAdapater(CasbinDbContext<Guid> casbinDbContext)
+        public CasbinCosmosAdapter(CasbinDbContext<Guid> casbinDbContext)
             : base(casbinDbContext)
         {
         }

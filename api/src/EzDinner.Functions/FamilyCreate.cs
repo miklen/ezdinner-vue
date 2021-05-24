@@ -37,7 +37,7 @@ namespace EzDinner.Functions
             var newFamily = await req.GetBodyAs<CreateFamilyCommandModel>();
             if (string.IsNullOrWhiteSpace(newFamily.Name)) return new BadRequestObjectResult("Name cannot be null or empty");
 
-            await _familyRepository.SaveAsync(new Family(Guid.Parse(req.HttpContext.User.GetNameIdentifierId() ?? ""), newFamily.Name));
+            await _familyRepository.SaveAsync(Family.CreateNew(Guid.Parse(req.HttpContext.User.GetNameIdentifierId() ?? ""), newFamily.Name));
 
             return new OkResult();
         }

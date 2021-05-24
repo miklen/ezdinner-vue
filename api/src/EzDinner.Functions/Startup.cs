@@ -66,7 +66,7 @@ namespace EzDinner.Functions
              .RegisterMsGraph(Configuration.GetSection("AzureAdB2C"))
              .RegisterCosmosDb(Configuration.GetSection("CosmosDb"))
              .RegisterCasbin(Configuration.GetSection("CosmosDb"))
-             .AddSingleton(s => new Enforcer(new StreamReader(resource!).ReadToEnd(), s.GetRequiredService<CasbinCosmosAdapater>()))
+             .AddSingleton(s => new Enforcer(new StreamReader(resource!).ReadToEnd(), s.GetRequiredService<CasbinCosmosAdapter>()))
              .RegisterRepositories()
              .AddScoped<IDinnerService, DinnerService>();
 

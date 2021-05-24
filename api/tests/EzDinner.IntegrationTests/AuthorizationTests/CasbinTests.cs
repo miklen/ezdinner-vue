@@ -1,4 +1,5 @@
-﻿using EzDinner.Infrastructure;
+﻿using Casbin.Adapter.EFCore;
+using EzDinner.Infrastructure;
 using NetCasbin;
 using NetCasbin.Model;
 using System;
@@ -11,10 +12,14 @@ namespace EzDinner.IntegrationTests.AuthorizationTests
 {
     public class CasbinTests : IClassFixture<StartupFixture>
     {
+        private Model _model;
+        private IServiceProvider _provider;
         private Enforcer _enforcer;
+        private Enforcer Enforcer => _enforcer ??= new Enforcer(_model, (CasbinCosmosAdapter)_provider.GetService(typeof(CasbinCosmosAdapter)));
 
         public CasbinTests(StartupFixture startupFixture)
         {
+            _provider = startupFixture.Provider;
             var modelString = 
 @"[request_definition]
 r = sub, dom, obj, act
@@ -31,9 +36,14 @@ e = some(where (p.eft == allow))
 [matchers]
 m = (g(r.sub, p.sub, r.dom) && r.dom == p.dom && r.obj == p.obj && r.act == p.act) || (g(r.sub, p.sub, r.dom) && p.sub == ""Owner"")
 ";
+            _model = Model.CreateDefaultFromText(modelString);
+        }
 
-            var model = Model.CreateDefaultFromText(modelString);
-            _enforcer = new Enforcer(model, (CasbinCosmosAdapater)startupFixture.Provider.GetService(typeof(CasbinCosmosAdapater)));
+        [Fact]
+        public void Context_NoDatabase_CanCreate()
+        {
+            var context = (CasbinDbContext<Guid>)_provider.GetService(typeof(CasbinDbContext<Guid>));
+            context.Database.EnsureCreated();
         }
         
         [Fact]
@@ -45,14 +55,14 @@ m = (g(r.sub, p.sub, r.dom) && r.dom == p.dom && r.obj == p.obj && r.act == p.ac
             try
             {
                 // Act
-                await _enforcer.AddPolicyAsync(role, id);
+                await Enforcer.AddPolicyAsync(role, id);
 
                 // Assert
-                var exists = _enforcer.HasPolicy(role, id);
+                var exists = Enforcer.HasPolicy(role, id);
                 Assert.True(exists);
             } finally
             {
-                await _enforcer.RemovePolicyAsync(role, id);
+                await Enforcer.RemovePolicyAsync(role, id);
             }
         }
     }
