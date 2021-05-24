@@ -22,30 +22,7 @@ namespace EzDinner.Functions
             _logger = logger;
             _permissionService = permissionService;
         }
-
-        /// <summary>
-        /// Policy (entries in permission database):
-        /// p, admin, domain1, data1, read
-        /// p, admin, domain1, data1, write
-        /// p, admin, domain2, data2, read
-        /// p, admin, domain2, data2, write
-        /// p, owner, domain2
-
-        /// g, alice, admin, domain1
-        /// g, bob, admin, domain2
-        /// g, mikkel, owner, domain2
-        /// 
-        /// Enforcement results:
-        /// alice, domain1, data2, read == false
-        /// alice, domain2, data3, read == false
-        /// mikkel, domain2, data2, write == true
-        /// mikkel, domain2, data3, write == true
-        /// mikkel, domain1, data1, write == false
-        /// bob, domain2, data3, write == false
-        /// bob, domain2, data2, write == true
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
+      
         [FunctionName(nameof(FamilyCreatedEvent))]
         public async Task Run([CosmosDBTrigger(
             databaseName: "EzDinner",

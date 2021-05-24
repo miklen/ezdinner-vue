@@ -46,11 +46,11 @@ namespace EzDinner.Infrastructure
             var connStrParts = section.GetValue<string>("ConnectionString").Split(';');
             var accountEndpoint = connStrParts[0].Substring(connStrParts[0].IndexOf('=') + 1);
             var accountKey = connStrParts[1].Substring(connStrParts[1].IndexOf('=') + 1);
-            var options = new DbContextOptionsBuilder<CasbinDbContext<Guid>>()
+            var options = new DbContextOptionsBuilder<CasbinDbContext<string>>()
               .UseCosmos(accountEndpoint, accountKey, databaseName: section.GetValue<string>("Database"))
               .Options;
-            services.AddSingleton(_ => new CasbinDbContext<Guid>(options));
-            services.AddSingleton(s => new CasbinCosmosAdapter(s.GetRequiredService<CasbinDbContext<Guid>>()));
+            services.AddSingleton(_ => new CasbinDbContext<string>(options, new CasbinEntityConfiguration()));
+            services.AddSingleton(s => new CasbinCosmosAdapter(s.GetRequiredService<CasbinDbContext<string>>()));
             return services;
         }
 

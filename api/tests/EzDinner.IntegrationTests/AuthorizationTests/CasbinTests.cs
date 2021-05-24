@@ -47,7 +47,7 @@ m = g(r.sub, p.sub, r.dom) && r.dom == p.dom && (r.obj == p.obj || p.obj == ""*"
         [Fact]
         public void Context_NoDatabase_CanCreate()
         {
-            var context = (CasbinDbContext<Guid>)_provider.GetService(typeof(CasbinDbContext<Guid>));
+            var context = (CasbinDbContext<string>)_provider.GetService(typeof(CasbinDbContext<string>));
             context.Database.EnsureCreated();
         }
 
