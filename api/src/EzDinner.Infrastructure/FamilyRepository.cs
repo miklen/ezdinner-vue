@@ -10,55 +10,53 @@ using System.Threading.Tasks;
 
 namespace EzDinner.Infrastructure
 {
-  public class FamilyRepository : IFamilyRepository
-  {
-    private readonly CosmosClient _client;
-    private readonly Container _container;
-
-    public FamilyRepository(CosmosClient client, IConfiguration configuration)
+    public class FamilyRepository : IFamilyRepository
     {
-      _client = client;
-      _container = _client.GetContainer(configuration.GetValue<string>("CosmosDb:Database"), "Families");
-    }
+        private readonly CosmosClient _client;
+        private readonly Container _container;
 
-    public Task SaveAsync(Family family)
-    {
-      return _container.UpsertItemAsync(family);
-    }
-
-    public async Task<IEnumerable<Family>> GetFamilySelectorsAsync(Guid userId)
-    {
-      var families = new List<Family>();
-      using (var setIterator = _container.GetItemLinqQueryable<Family>()
-                 .Where(b => b.OwnerId == userId || b.FamilyMemberIds.Contains(userId))
-                 .ToFeedIterator())
-      {
-        while (setIterator.HasMoreResults)
+        public FamilyRepository(CosmosClient client, IConfiguration configuration)
         {
-          foreach (var family in await setIterator.ReadNextAsync())
-          {
-            families.Add(family);
-          }
+            _client = client;
+            _container = _client.GetContainer(configuration.GetValue<string>("CosmosDb:Database"), "Families");
         }
-      }
-      return families;
-    }
 
-    public async Task<Family?> GetFamily(Guid familyId)
-    {
-      using (var setIterator = _container.GetItemLinqQueryable<Family>()
-                  .Where(b => b.Id == familyId)
-                 .ToFeedIterator())
-      {
-        while (setIterator.HasMoreResults)
+        public Task SaveAsync(Family family)
         {
-          foreach (var family in await setIterator.ReadNextAsync())
-          {
-            return family;
-          }
+            return _container.UpsertItemAsync(family);
         }
-        return null;
-      }
+
+        public async Task<IEnumerable<Family>> GetFamilySelectorsAsync(Guid userId)
+        {
+            var sql = $"SELECT * FROM c WHERE c.ownerId = '{userId}' OR ARRAY_CONTAINS(c.familyMemberIds, '{userId}')";
+            var queryDefinition = new QueryDefinition(sql);
+            var queryResultSetIterator = _container.GetItemQueryIterator<Family>(queryDefinition);
+
+            var families = new List<Family>();
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                foreach (var family in await queryResultSetIterator.ReadNextAsync())
+                {
+                    families.Add(family);
+                }
+            }
+            return families;
+        }
+
+        public async Task<Family?> GetFamily(Guid familyId)
+        {
+            var sql = $"SELECT * FROM c WHERE c.id = '{familyId}' OR ARRAY_CONTAINS(c.familyMemberIds, '{familyId}')";
+            var queryDefinition = new QueryDefinition(sql);
+            var queryResultSetIterator = _container.GetItemQueryIterator<Family>(queryDefinition);
+
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                foreach (var family in await queryResultSetIterator.ReadNextAsync())
+                {
+                    return family;
+                }
+            }
+            return null;
+        }
     }
-  }
 }

@@ -25,8 +25,8 @@ namespace EzDinner.Infrastructure
                .WithClientSecret(adConfig.GetValue<string>("ClientSecret"))
                .Build();
 
-            ClientCredentialProvider authProvider = new ClientCredentialProvider(confidentialClientApplication);
-            GraphServiceClient graphClient = new GraphServiceClient(authProvider);
+            var authProvider = new ClientCredentialProvider(confidentialClientApplication);
+            var graphClient = new GraphServiceClient(authProvider);
 
             services.AddSingleton(graphClient);
             return services;

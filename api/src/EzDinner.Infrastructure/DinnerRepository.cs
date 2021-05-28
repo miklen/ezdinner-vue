@@ -21,36 +21,46 @@ namespace EzDinner.Infrastructure
             _container = _client.GetContainer(configuration.GetValue<string>("CosmosDb:Database"), "Dinners");
         }
 
+        public Task DeleteAsync(Dinner dinner)
+        {
+            return _container.DeleteItemAsync<Dinner>(dinner.Id.ToString(), new PartitionKey(dinner.PartitionKey.ToString()));
+        }
+
+        /// <summary>
+        /// The serialization of DateTime is important when querying. Since CosmosDb stores datetimes as strings
+        /// The format of the SQL query must match exactly the serialization format.
+        /// 
+        /// </summary>
+        /// <param name="familyId"></param>
+        /// <param name="exactDate"></param>
+        /// <returns></returns>
         public async Task<Dinner?> GetAsync(Guid familyId, DateTime exactDate)
         {
-            using (var iterator = _container.GetItemLinqQueryable<Dinner>()
-                    .Where(w => w.FamilyId == familyId && w.Date == exactDate)
-                    .ToFeedIterator())
+            var sql = $"SELECT * FROM c WHERE c.familyId = '{familyId}' AND c.date = '{exactDate.Date:yyyy-MM-ddTHH:mm:sszzz}'";
+            var queryDefinition = new QueryDefinition(sql);
+            var queryResultSetIterator = _container.GetItemQueryIterator<Dinner>(queryDefinition);
+
+            while (queryResultSetIterator.HasMoreResults)
             {
-                while (iterator.HasMoreResults)
+                foreach (var dinner in await queryResultSetIterator.ReadNextAsync())
                 {
-                    foreach (var dinner in await iterator.ReadNextAsync())
-                    {
-                        return dinner;
-                    }
+                    return dinner;
                 }
-                return null;
             }
+            return null;
         }
 
         public async IAsyncEnumerable<Dinner> GetAsync(Guid familyId, DateTime fromDate, DateTime toDate)
         {
-            using (var iterator = _container.GetItemLinqQueryable<Dinner>()
-                .Where(w => w.FamilyId == familyId && w.Date > fromDate && w.Date < toDate)
-                .OrderBy(w => w.Date)
-                .ToFeedIterator())
+            var sql = $"SELECT * FROM c WHERE c.familyId = '{familyId}' AND c.date > '{fromDate:yyyy-MM-ddTHH:mm:sszzz}' and c.date < '{toDate:yyyy-MM-ddTHH:mm:sszzz}' ORDER BY c.date";
+            var queryDefinition = new QueryDefinition(sql);
+            var queryResultSetIterator = _container.GetItemQueryIterator<Dinner>(queryDefinition);
+
+            while (queryResultSetIterator.HasMoreResults)
             {
-                while (iterator.HasMoreResults)
+                foreach (var dinner in await queryResultSetIterator.ReadNextAsync())
                 {
-                    foreach (var dinner in await iterator.ReadNextAsync())
-                    {
-                        yield return dinner;
-                    }
+                    yield return dinner;
                 }
             }
         }

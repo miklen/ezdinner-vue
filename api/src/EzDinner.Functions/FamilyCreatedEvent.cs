@@ -1,13 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EzDinner.Authorization;
 using EzDinner.Core.Aggregates.FamilyAggregate;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
-using NetCasbin;
 using Newtonsoft.Json;
 
 namespace EzDinner.Functions
@@ -28,7 +25,8 @@ namespace EzDinner.Functions
             databaseName: "EzDinner",
             collectionName: "Families",
             ConnectionStringSetting = "CosmosDb:ConnectionString",
-            LeaseCollectionName = "FamiliesLeases")] IReadOnlyList<Document> input)
+            LeaseCollectionName = "FamiliesLeases",
+            CreateLeaseCollectionIfNotExists = true)] IReadOnlyList<Document> input)
         {
             if (input != null && input.Count > 0)
             {

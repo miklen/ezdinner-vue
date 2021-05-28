@@ -1,4 +1,5 @@
 ﻿using Casbin.Adapter.EFCore;
+using EzDinner.Authorization;
 using EzDinner.Infrastructure;
 using NetCasbin;
 using NetCasbin.Model;
@@ -15,7 +16,9 @@ namespace EzDinner.IntegrationTests.AuthorizationTests
         private Model _model;
         private IServiceProvider _provider;
         private Enforcer _enforcer;
-        private Enforcer Enforcer => _enforcer ??= new Enforcer(_model, (CasbinCosmosAdapter)_provider.GetService(typeof(CasbinCosmosAdapter)));
+        private IPermissionService _permissionService;
+        private Enforcer Enforcer => _enforcer ??= new Enforcer(PermissionService.GetRbacWithDomainsModel(), (CasbinCosmosAdapter)_provider.GetService(typeof(CasbinCosmosAdapter)));
+        private IPermissionService Permissions => _permissionService ??= new PermissionService(Enforcer);
 
         public CasbinTests(StartupFixture startupFixture)
         {
@@ -25,23 +28,6 @@ namespace EzDinner.IntegrationTests.AuthorizationTests
 
         private void CreateModel()
         {
-            var modelString =
-@"[request_definition]
-r = sub, dom, obj, act
-
-[policy_definition]
-p = sub, dom, obj, act
-
-[role_definition]
-g = _, _, _
-
-[policy_effect]
-e = some(where (p.eft == allow))
-
-[matchers]
-m = g(r.sub, p.sub, r.dom) && r.dom == p.dom && (r.obj == p.obj || p.obj == ""*"") && (r.act == p.act || p.act == ""*"")
-";
-            _model = Model.CreateDefaultFromText(modelString);
         }
 
         [Fact]
@@ -49,6 +35,13 @@ m = g(r.sub, p.sub, r.dom) && r.dom == p.dom && (r.obj == p.obj || p.obj == ""*"
         {
             var context = (CasbinDbContext<string>)_provider.GetService(typeof(CasbinDbContext<string>));
             context.Database.EnsureCreated();
+        }
+
+        [Fact]
+        public async Task Enforcer_NoRoles_CanEnforce()
+        {
+            // Arrange
+            Enforcer.Enforce(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "Test", "Test");
         }
 
         [Fact]
@@ -70,8 +63,6 @@ m = g(r.sub, p.sub, r.dom) && r.dom == p.dom && (r.obj == p.obj || p.obj == ""*"
                 await Enforcer.RemovePolicyAsync(roleDefinitionPolicy);
             }
         }
-
-
 
         [Fact]
         public async Task Enforcer_NoUsersInRole_CanAddUserToRole()
@@ -150,11 +141,32 @@ m = g(r.sub, p.sub, r.dom) && r.dom == p.dom && (r.obj == p.obj || p.obj == ""*"
         }
 
 
+        [Fact]
+        public async Task PermissionService_User_CanAddRoles()
+        {
+            // Arrange
+            var domainId = Guid.NewGuid();
+            var roleDefinitionPolicy = CreateOwnerRolePolicy(domainId);
+            try
+            {
+                await Permissions.CreateOwnerRole(domainId);
+
+                // Act
+                var exists = Enforcer.HasPolicy(roleDefinitionPolicy);
+
+            } finally
+            {
+                await Enforcer.RemovePolicyAsync(roleDefinitionPolicy);
+            }
+
+        }
+
         private static string[] CreateRoleAssignmentPolicy(Guid userId, Guid domainId, string role)
         {
             var rolePolicy = new[] { userId.ToString(), role, domainId.ToString() };
             return rolePolicy;
         }
+       
         private static string[] CreateOwnerRolePolicy(Guid domainId)
         {
             var role = "Owner";

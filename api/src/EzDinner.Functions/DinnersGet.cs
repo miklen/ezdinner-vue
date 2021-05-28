@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using EzDinner.Authorization;
 using EzDinner.Core.Aggregates.DinnerAggregate;
 using EzDinner.Core.Aggregates.DishAggregate;
 using EzDinner.Functions.Models.Command;
@@ -15,6 +16,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
+using NetCasbin;
 using Newtonsoft.Json;
 
 namespace EzDinner.Functions
@@ -24,12 +26,14 @@ namespace EzDinner.Functions
         private readonly ILogger<DishCreate> _logger;
         private readonly IMapper _mapper;
         private readonly IDinnerService _dinnerService;
+        private readonly Enforcer _enforcer;
 
-        public DinnersGet(ILogger<DishCreate> logger, IMapper mapper, IDinnerService dinnerService)
+        public DinnersGet(ILogger<DishCreate> logger, IMapper mapper, IDinnerService dinnerService, Enforcer enforcer)
         {
             _logger = logger;
             _mapper = mapper;
             _dinnerService = dinnerService;
+            _enforcer = enforcer;
         }
         
         [FunctionName(nameof(DinnersGet))]
@@ -43,6 +47,7 @@ namespace EzDinner.Functions
         {
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
+            if (!_enforcer.Enforce(req.HttpContext.User.GetNameIdentifierId(), familyId, Resources.Dinner, Actions.Read)) return new UnauthorizedResult();
 
             var parsedId = Guid.Parse(familyId);
             var dinners = _dinnerService.GetAsync(parsedId, fromDate, toDate).Select(_mapper.Map<DinnersQueryModel>);

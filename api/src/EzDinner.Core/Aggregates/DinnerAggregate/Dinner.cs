@@ -19,16 +19,12 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
 
         public Dinner(Guid familyId, DateTime date) : base(Guid.NewGuid())
         {
-            Date = date;
+            Date = date.Date;
             FamilyId = familyId;
             _menu = new List<MenuItem>();
             _tags = new List<Tag>();
         }
 
-        public static Dinner CreateNew(Guid familyId, DateTime date)
-        {
-            return new Dinner(familyId, date);
-        }
 
         /// <summary>
         /// Appends an item to the menu. A menu item does not need to have a receipe specified.
