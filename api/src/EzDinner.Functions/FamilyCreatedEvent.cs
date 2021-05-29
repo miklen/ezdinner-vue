@@ -33,7 +33,7 @@ namespace EzDinner.Functions
             {
                 _logger.LogInformation("Documents modified " + input.Count);
                 _logger.LogInformation("First document Id " + input[0].Id);
-                var updatePermissionsCommand = new UpdatePermissionsCommand(_authz);
+                var updatePermissionsCommand = new UpdateAuthorizationPoliciesCommand(_authz);
 
                 foreach (var document in input)
                 {

@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace EzDinner.Application.Commands
 {
-    public class UpdatePermissionsCommand
+    public class UpdateAuthorizationPoliciesCommand
     {
         private readonly IAuthzService _authz;
 
-        public UpdatePermissionsCommand(IAuthzService authz)
+        public UpdateAuthorizationPoliciesCommand(IAuthzService authz)
         {
             _authz = authz;
         }

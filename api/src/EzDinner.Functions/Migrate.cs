@@ -14,21 +14,23 @@ using System.Collections.Generic;
 using EzDinner.Application.Commands;
 using EzDinner.Authorization.Core;
 using Casbin.Adapter.EFCore;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace EzDinner.Functions
 {
     public class Migrate
     {
         private readonly ILogger<Migrate> _logger;
-        private readonly IAuthzService _authz;
+        private readonly IServiceProvider _provider;
         private readonly CosmosClient _cosmosClient;
         private readonly CasbinDbContext<string> _casbinContext;
         private readonly IConfiguration _configuration;
 
-        public Migrate(ILogger<Migrate> logger, IAuthzService authz, CosmosClient cosmosClient, CasbinDbContext<string> casbinContext, IConfiguration configuration)
+        public Migrate(ILogger<Migrate> logger, IServiceProvider provider, CosmosClient cosmosClient, CasbinDbContext<string> casbinContext, IConfiguration configuration)
         {
             _logger = logger;
-            _authz = authz;
+            _provider = provider;
             _cosmosClient = cosmosClient;
             _casbinContext = casbinContext;
             _configuration = configuration;
@@ -39,20 +41,28 @@ namespace EzDinner.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "migrate")] HttpRequest req)
         {
             _logger.LogInformation("Migration started");
+            _logger.LogInformation("Creating EzDinner database and repository collections");
             var database = await EnsureDatabaseAndCollectionsCreated(_configuration);
+            _logger.LogInformation("Creating CasbinRules collection");
             await _casbinContext.Database.EnsureCreatedAsync();
+            _logger.LogInformation("Updating family roles and permissions");
             await UpdateFamiliesPermissions(database);
-
+            _logger.LogInformation("Migration done");
             return new OkResult();
         }
 
         private async Task UpdateFamiliesPermissions(Database database)
         {
             var families = await GetFamilies(database);
-            var updatePermissionsCommand = new UpdatePermissionsCommand(_authz);
+            
+            // We cannot inject the AuthzService in the ctor, as the Casbin Enforcer tries to load policies in it's ctor and the CasbinRules container may not exist yet.
+            // This will cause the function to fail on startup never reaching the Db.EnsureCreated line that would have created the container for the Enforcer to work.
+            // Therefore we load it using the provider here after the container has been created.
+            var authz = _provider.GetService<IAuthzService>();
+            var updateAuthorizationPoliciesCommand = new UpdateAuthorizationPoliciesCommand(authz);
             foreach (var family in families)
             {
-                await updatePermissionsCommand.Handle(family);
+                await updateAuthorizationPoliciesCommand.Handle(family);
             }
         }
 

@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 
 namespace EzDinner.Infrastructure
 {
+    /// <summary>
+    /// DO NOT try to inject IAuthzService or IAuthzRepository before the CasbinRules collection has been created!
+    /// The Encforcer that this implementation depends on loads from the database in it's ctor
+    /// and crashes everything if the collection doesn't exist.
+    /// </summary>
     public class AuthzRepository : IAuthzRepository
     {
         private readonly Enforcer _enforcer;
