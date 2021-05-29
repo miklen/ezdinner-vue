@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EzDinner.Authorization.Core\EzDinner.Authorization.Core.csproj" />
     <ProjectReference Include="..\EzDinner.Core\EzDinner.Core.csproj" />
   </ItemGroup>
 

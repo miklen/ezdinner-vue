@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using EzDinner.Authorization;
+using EzDinner.Application.Commands;
+using EzDinner.Authorization.Core;
 using EzDinner.Core.Aggregates.FamilyAggregate;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.WebJobs;
@@ -12,12 +13,12 @@ namespace EzDinner.Functions
     public class FamilyCreatedEvent
     {
         private readonly ILogger<FamilyCreatedEvent> _logger;
-        private readonly IAuthzService _permissionService;
+        private readonly IAuthzService _authz;
 
-        public FamilyCreatedEvent(ILogger<FamilyCreatedEvent> logger, IAuthzService permissionService)
+        public FamilyCreatedEvent(ILogger<FamilyCreatedEvent> logger, IAuthzService authz)
         {
             _logger = logger;
-            _permissionService = permissionService;
+            _authz = authz;
         }
       
         [FunctionName(nameof(FamilyCreatedEvent))]
@@ -32,20 +33,13 @@ namespace EzDinner.Functions
             {
                 _logger.LogInformation("Documents modified " + input.Count);
                 _logger.LogInformation("First document Id " + input[0].Id);
+                var updatePermissionsCommand = new UpdatePermissionsCommand(_authz);
 
-                foreach(var document in input)
+                foreach (var document in input)
                 {
                     var family = JsonConvert.DeserializeObject<Family>(document.ToString());
                     // Ensure roles exists
-                    await _permissionService.CreateOwnerRolePermissionsAsync(family.Id);
-                    await _permissionService.CreateFamilyMemberRolePermissionsAsync(family.Id);
-                    
-                    // Ensure owner and members are assigned to their roles
-                    await _permissionService.AssignRoleToUserAsync(family.OwnerId, Roles.Owner, family.Id);
-                    foreach(var familyMemberId in family.FamilyMemberIds)
-                    {
-                        await _permissionService.AssignRoleToUserAsync(familyMemberId, Roles.FamilyMember, family.Id);
-                    }
+                    await updatePermissionsCommand.Handle(family);
                 }
             }
         }   

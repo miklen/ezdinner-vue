@@ -1,4 +1,5 @@
 ﻿using Casbin.Adapter.EFCore;
+using EzDinner.Authorization.Core;
 using EzDinner.Core.Aggregates.DinnerAggregate;
 using EzDinner.Core.Aggregates.DishAggregate;
 using EzDinner.Core.Aggregates.FamilyAggregate;
@@ -11,7 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 using Microsoft.Graph.Auth;
 using Microsoft.Identity.Client;
-using System;
+using NetCasbin;
+using NetCasbin.Model;
 
 namespace EzDinner.Infrastructure
 {
@@ -51,6 +53,7 @@ namespace EzDinner.Infrastructure
               .Options;
             services.AddSingleton(_ => new CasbinDbContext<string>(options, new CasbinEntityConfiguration()));
             services.AddSingleton(s => new CasbinCosmosAdapter(s.GetRequiredService<CasbinDbContext<string>>()));
+            services.AddSingleton(s => new Enforcer(AuthzRepository.GetRbacWithDomainsModel(), s.GetRequiredService<CasbinCosmosAdapter>()));
             return services;
         }
 
@@ -60,6 +63,7 @@ namespace EzDinner.Infrastructure
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IDishRepository, DishRepository>();
             services.AddScoped<IDinnerRepository, DinnerRepository>();
+            services.AddSingleton<IAuthzRepository, AuthzRepository>();
             return services;
         }
 

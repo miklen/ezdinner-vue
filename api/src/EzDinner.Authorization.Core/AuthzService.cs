@@ -1,13 +1,9 @@
-﻿using NetCasbin;
-using NetCasbin.Model;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace EzDinner.Authorization
+namespace EzDinner.Authorization.Core
 {
     /// <summary>
     /// Casbin implementation of IPermissionService. Implements an RBAC with domain solution
@@ -52,54 +48,50 @@ namespace EzDinner.Authorization
     /// </summary>
     public class AuthzService : IAuthzService
     {
-        private readonly Enforcer _enforcer;
+        private readonly IAuthzRepository _authzRepository;
 
-        public AuthzService(Enforcer enforcer)
+        public AuthzService(IAuthzRepository authzRepository)
         {
-            _enforcer = enforcer;
+            _authzRepository = authzRepository;
         }
 
         public Task AssignRoleToUserAsync(Guid userId, string role, Guid familyId)
         {
-            if (!_enforcer.HasRoleForUser(userId.ToString(), role, familyId.ToString()))
+            if (!_authzRepository.UserHasRole(userId, familyId, role))
             {
-                return _enforcer.AddRoleForUserAsync(userId.ToString(), role, familyId.ToString());
+                return _authzRepository.AssignRoleToUser(userId, familyId, role);
             }
             return Task.CompletedTask;
         }
 
         public Task CreateOwnerRolePermissionsAsync(Guid familyId)
         {
-            if (!_enforcer.HasPolicy(Roles.Owner, familyId.ToString(), Resources.All, Actions.All))
+            if (!_authzRepository.RoleHasPolicy(Roles.Owner, familyId, Resources.All, Actions.All))
             {
-                return _enforcer.AddPolicyAsync(Roles.Owner, familyId.ToString(), Resources.All, Actions.All);
+                return _authzRepository.AssignPolicyToRole(Roles.Owner, familyId, Resources.All, Actions.All);
             }
             return Task.CompletedTask;
         }
 
-        public Task CreateFamilyMemberRolePermissionsAsync(Guid familyId)
+        public async Task CreateFamilyMemberRolePermissionsAsync(Guid familyId)
         {
-            var policies = new List<List<string>>
+            // TODO: Refactor to satisfy open/close principle. More policies will be added over time.
+            if (!_authzRepository.RoleHasPolicy(Roles.FamilyMember, familyId, Resources.Dinner, Actions.All))
             {
-                new List<string> { Roles.FamilyMember, familyId.ToString(), Resources.Dinner, Actions.All },
-                new List<string> { Roles.FamilyMember, familyId.ToString(), Resources.Dish, Actions.All }
-            };
-
-            foreach (var policy in policies)
-            {
-                if (!_enforcer.HasPolicy(policy))
-                {
-                    return _enforcer.AddPolicyAsync(policy);
-                }
+                await _authzRepository.AssignPolicyToRole(Roles.FamilyMember, familyId, Resources.Dinner, Actions.All);
             }
-            return Task.CompletedTask;
+
+            if (!_authzRepository.RoleHasPolicy(Roles.FamilyMember, familyId, Resources.Dish, Actions.All))
+            {
+                await _authzRepository.AssignPolicyToRole(Roles.FamilyMember, familyId, Resources.Dish, Actions.All);
+            }
         }
 
         public bool Authorize(Guid userId, Guid familyId, string resource, string action)
         {
             return Authorize(userId.ToString(), familyId.ToString(), resource, action);
         }
-        
+
         public bool Authorize(string userId, Guid familyId, string resource, string action)
         {
             return Authorize(userId, familyId.ToString(), resource, action);
@@ -107,15 +99,7 @@ namespace EzDinner.Authorization
 
         public bool Authorize(string userId, string familyId, string resource, string action)
         {
-            return _enforcer.Enforce(userId, familyId, resource, action);
-        }
-
-        public static Model GetRbacWithDomainsModel()
-        {
-            var assembly = Assembly.GetAssembly(typeof(Resources))!;
-            var resource = assembly.GetManifestResourceStream($"EzDinner.Authorization.rbac_with_domains.conf");
-            var modelString = new StreamReader(resource!).ReadToEnd();
-            return Model.CreateDefaultFromText(modelString);
+            return _authzRepository.VerifyUserPermission(userId, familyId, resource, action);
         }
     }
 }

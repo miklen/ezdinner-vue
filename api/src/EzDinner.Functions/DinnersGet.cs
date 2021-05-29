@@ -1,13 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using EzDinner.Authorization;
+using EzDinner.Authorization.Core;
 using EzDinner.Core.Aggregates.DinnerAggregate;
-using EzDinner.Core.Aggregates.DishAggregate;
-using EzDinner.Functions.Models.Command;
 using EzDinner.Functions.Models.Query;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,8 +12,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
-using NetCasbin;
-using Newtonsoft.Json;
 
 namespace EzDinner.Functions
 {

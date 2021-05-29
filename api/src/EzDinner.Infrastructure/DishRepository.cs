@@ -14,11 +14,12 @@ namespace EzDinner.Infrastructure
     {
         private readonly CosmosClient _client;
         private readonly Container _container;
+        public const string CONTAINER = "Dishes";
 
         public DishRepository(CosmosClient client, IConfiguration configuration)
         {
             _client = client;
-            _container = _client.GetContainer(configuration.GetValue<string>("CosmosDb:Database"), "Dishes");
+            _container = _client.GetContainer(configuration.GetValue<string>("CosmosDb:Database"), CONTAINER);
         }
 
         public async Task<IEnumerable<Dish>> GetDishesAsync(Guid familyId)

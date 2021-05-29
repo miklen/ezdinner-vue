@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EzDinner.Authorization
+namespace EzDinner.Authorization.Core
 {
     public static class Resources
     {

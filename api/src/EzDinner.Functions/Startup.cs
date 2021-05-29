@@ -6,11 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using EzDinner.Infrastructure;
 using EzDinner.Core.Aggregates.DinnerAggregate;
-using NetCasbin;
-using System.Reflection;
-using System.IO;
-using EzDinner.Authorization;
-using NetCasbin.Model;
+using EzDinner.Authorization.Core;
 
 [assembly: FunctionsStartup(typeof(EzDinner.Functions.Startup))]
 
@@ -63,7 +59,6 @@ namespace EzDinner.Functions
              .RegisterMsGraph(Configuration.GetSection("AzureAdB2C"))
              .RegisterCosmosDb(Configuration.GetSection("CosmosDb"))
              .RegisterCasbin(Configuration.GetSection("CosmosDb"))
-             .AddSingleton(s => new Enforcer(AuthzService.GetRbacWithDomainsModel(), s.GetRequiredService<CasbinCosmosAdapter>()))
              .RegisterRepositories()
              .AddScoped<IDinnerService, DinnerService>()
              .AddSingleton<IAuthzService, AuthzService>();

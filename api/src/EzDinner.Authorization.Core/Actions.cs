@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace EzDinner.Authorization
-{ 
+namespace EzDinner.Authorization.Core
+{
     public static class Actions
     {
         public static readonly string Create = nameof(Create);

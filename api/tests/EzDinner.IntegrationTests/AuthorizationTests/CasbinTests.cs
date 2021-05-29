@@ -1,11 +1,9 @@
 ﻿using Casbin.Adapter.EFCore;
-using EzDinner.Authorization;
+using EzDinner.Authorization.Core;
 using EzDinner.Infrastructure;
 using NetCasbin;
 using NetCasbin.Model;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -13,21 +11,15 @@ namespace EzDinner.IntegrationTests.AuthorizationTests
 {
     public class CasbinTests : IClassFixture<StartupFixture>
     {
-        private Model _model;
         private IServiceProvider _provider;
         private Enforcer _enforcer;
-        private IAuthzService _permissionService;
-        private Enforcer Enforcer => _enforcer ??= new Enforcer(AuthzService.GetRbacWithDomainsModel(), (CasbinCosmosAdapter)_provider.GetService(typeof(CasbinCosmosAdapter)));
-        private IAuthzService Permissions => _permissionService ??= new AuthzService(Enforcer);
+        private IAuthzService _authz;
+        private Enforcer Enforcer => _enforcer ??= new Enforcer(AuthzRepository.GetRbacWithDomainsModel(), (CasbinCosmosAdapter)_provider.GetService(typeof(CasbinCosmosAdapter)));
+        private IAuthzService Authz => _authz ??= new AuthzService(new AuthzRepository(Enforcer));
 
         public CasbinTests(StartupFixture startupFixture)
         {
             _provider = startupFixture.Provider;
-            CreateModel();
-        }
-
-        private void CreateModel()
-        {
         }
 
         [Fact]
@@ -149,7 +141,7 @@ namespace EzDinner.IntegrationTests.AuthorizationTests
             var roleDefinitionPolicy = CreateOwnerRolePolicy(domainId);
             try
             {
-                await Permissions.CreateOwnerRolePermissionsAsync(domainId);
+                await Authz.CreateOwnerRolePermissionsAsync(domainId);
 
                 // Act
                 var exists = Enforcer.HasPolicy(roleDefinitionPolicy);

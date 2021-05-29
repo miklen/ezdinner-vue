@@ -1,7 +1,6 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
-using EzDinner.Authorization;
+using EzDinner.Authorization.Core;
 using EzDinner.Core.Aggregates.DishAggregate;
 using EzDinner.Functions.Models.Command;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +10,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
-using Newtonsoft.Json;
 
 namespace EzDinner.Functions
 {

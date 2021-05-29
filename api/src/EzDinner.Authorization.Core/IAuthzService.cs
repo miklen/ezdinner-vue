@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EzDinner.Authorization
+namespace EzDinner.Authorization.Core
 {
     public interface IAuthzService
     {

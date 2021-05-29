@@ -14,11 +14,12 @@ namespace EzDinner.Infrastructure
     {
         private readonly CosmosClient _client;
         private readonly Container _container;
+        public const string CONTAINER = "Dinners";
 
         public DinnerRepository(CosmosClient client, IConfiguration configuration)
         {
             _client = client;
-            _container = _client.GetContainer(configuration.GetValue<string>("CosmosDb:Database"), "Dinners");
+            _container = _client.GetContainer(configuration.GetValue<string>("CosmosDb:Database"), CONTAINER);
         }
 
         public Task DeleteAsync(Dinner dinner)

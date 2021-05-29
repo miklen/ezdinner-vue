@@ -20,7 +20,8 @@
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EzDinner.Authorization.Core\EzDinner.Authorization.csproj" />
+    <ProjectReference Include="..\EzDinner.Application\EzDinner.Application.csproj" />
+    <ProjectReference Include="..\EzDinner.Authorization.Core\EzDinner.Authorization.Core.csproj" />
     <ProjectReference Include="..\EzDinner.Core\EzDinner.Core.csproj" />
     <ProjectReference Include="..\EzDinner.Infrastructure\EzDinner.Infrastructure.csproj" />
   </ItemGroup>
