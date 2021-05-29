@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="fkh4uabb.xae~" />
     <None Remove="rbac_with_domains.conf" />
   </ItemGroup>
 

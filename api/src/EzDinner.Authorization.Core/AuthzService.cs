@@ -50,40 +50,64 @@ namespace EzDinner.Authorization
     /// bar, domain2, data1, write = false
     /// bar, domain2, data2, read = true
     /// </summary>
-    public class PermissionService : IPermissionService
+    public class AuthzService : IAuthzService
     {
         private readonly Enforcer _enforcer;
 
-        public PermissionService(Enforcer enforcer)
+        public AuthzService(Enforcer enforcer)
         {
             _enforcer = enforcer;
         }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="role">A role defined in <see cref="Roles"/></param>
-        /// <param name="familyId"></param>
-        /// <returns></returns>
-        public Task AssignRoleToUser(Guid userId, string role, Guid familyId)
+
+        public Task AssignRoleToUserAsync(Guid userId, string role, Guid familyId)
         {
             if (!_enforcer.HasRoleForUser(userId.ToString(), role, familyId.ToString()))
             {
-                // Create Owner role for the created famiy
                 return _enforcer.AddRoleForUserAsync(userId.ToString(), role, familyId.ToString());
             }
             return Task.CompletedTask;
         }
 
-        public Task CreateOwnerRole(Guid familyId)
+        public Task CreateOwnerRolePermissionsAsync(Guid familyId)
         {
             if (!_enforcer.HasPolicy(Roles.Owner, familyId.ToString(), Resources.All, Actions.All))
             {
-                // Assign Owner role to the user who created the family
                 return _enforcer.AddPolicyAsync(Roles.Owner, familyId.ToString(), Resources.All, Actions.All);
             }
             return Task.CompletedTask;
+        }
+
+        public Task CreateFamilyMemberRolePermissionsAsync(Guid familyId)
+        {
+            var policies = new List<List<string>>
+            {
+                new List<string> { Roles.FamilyMember, familyId.ToString(), Resources.Dinner, Actions.All },
+                new List<string> { Roles.FamilyMember, familyId.ToString(), Resources.Dish, Actions.All }
+            };
+
+            foreach (var policy in policies)
+            {
+                if (!_enforcer.HasPolicy(policy))
+                {
+                    return _enforcer.AddPolicyAsync(policy);
+                }
+            }
+            return Task.CompletedTask;
+        }
+
+        public bool Authorize(Guid userId, Guid familyId, string resource, string action)
+        {
+            return Authorize(userId.ToString(), familyId.ToString(), resource, action);
+        }
+        
+        public bool Authorize(string userId, Guid familyId, string resource, string action)
+        {
+            return Authorize(userId, familyId.ToString(), resource, action);
+        }
+
+        public bool Authorize(string userId, string familyId, string resource, string action)
+        {
+            return _enforcer.Enforce(userId, familyId, resource, action);
         }
 
         public static Model GetRbacWithDomainsModel()

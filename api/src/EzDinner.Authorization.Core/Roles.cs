@@ -7,6 +7,6 @@ namespace EzDinner.Authorization
     public static class Roles
     {
         public static readonly string Owner = nameof(Owner);
-        public static readonly string Contributor = nameof(Contributor);
+        public static readonly string FamilyMember = nameof(FamilyMember);
     }
 }

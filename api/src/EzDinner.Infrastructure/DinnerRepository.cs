@@ -30,6 +30,8 @@ namespace EzDinner.Infrastructure
         /// The serialization of DateTime is important when querying. Since CosmosDb stores datetimes as strings
         /// The format of the SQL query must match exactly the serialization format.
         /// 
+        /// TODO: Store datetimes as UTC as that's what CosmosDb supports. https://docs.microsoft.com/en-us/azure/cosmos-db/working-with-dates
+        /// 
         /// </summary>
         /// <param name="familyId"></param>
         /// <param name="exactDate"></param>

@@ -12,9 +12,9 @@ namespace EzDinner.Functions
     public class FamilyCreatedEvent
     {
         private readonly ILogger<FamilyCreatedEvent> _logger;
-        private readonly IPermissionService _permissionService;
+        private readonly IAuthzService _permissionService;
 
-        public FamilyCreatedEvent(ILogger<FamilyCreatedEvent> logger, IPermissionService permissionService)
+        public FamilyCreatedEvent(ILogger<FamilyCreatedEvent> logger, IAuthzService permissionService)
         {
             _logger = logger;
             _permissionService = permissionService;
@@ -36,8 +36,16 @@ namespace EzDinner.Functions
                 foreach(var document in input)
                 {
                     var family = JsonConvert.DeserializeObject<Family>(document.ToString());
-                    await _permissionService.CreateOwnerRole(family.Id);
-                    await _permissionService.AssignRoleToUser(family.OwnerId, Roles.Owner, family.Id);
+                    // Ensure roles exists
+                    await _permissionService.CreateOwnerRolePermissionsAsync(family.Id);
+                    await _permissionService.CreateFamilyMemberRolePermissionsAsync(family.Id);
+                    
+                    // Ensure owner and members are assigned to their roles
+                    await _permissionService.AssignRoleToUserAsync(family.OwnerId, Roles.Owner, family.Id);
+                    foreach(var familyMemberId in family.FamilyMemberIds)
+                    {
+                        await _permissionService.AssignRoleToUserAsync(familyMemberId, Roles.FamilyMember, family.Id);
+                    }
                 }
             }
         }   

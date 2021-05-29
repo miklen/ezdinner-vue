@@ -16,9 +16,9 @@ namespace EzDinner.IntegrationTests.AuthorizationTests
         private Model _model;
         private IServiceProvider _provider;
         private Enforcer _enforcer;
-        private IPermissionService _permissionService;
-        private Enforcer Enforcer => _enforcer ??= new Enforcer(PermissionService.GetRbacWithDomainsModel(), (CasbinCosmosAdapter)_provider.GetService(typeof(CasbinCosmosAdapter)));
-        private IPermissionService Permissions => _permissionService ??= new PermissionService(Enforcer);
+        private IAuthzService _permissionService;
+        private Enforcer Enforcer => _enforcer ??= new Enforcer(AuthzService.GetRbacWithDomainsModel(), (CasbinCosmosAdapter)_provider.GetService(typeof(CasbinCosmosAdapter)));
+        private IAuthzService Permissions => _permissionService ??= new AuthzService(Enforcer);
 
         public CasbinTests(StartupFixture startupFixture)
         {
@@ -38,7 +38,7 @@ namespace EzDinner.IntegrationTests.AuthorizationTests
         }
 
         [Fact]
-        public async Task Enforcer_NoRoles_CanEnforce()
+        public void Enforcer_NoRoles_CanEnforce()
         {
             // Arrange
             Enforcer.Enforce(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), "Test", "Test");
@@ -149,7 +149,7 @@ namespace EzDinner.IntegrationTests.AuthorizationTests
             var roleDefinitionPolicy = CreateOwnerRolePolicy(domainId);
             try
             {
-                await Permissions.CreateOwnerRole(domainId);
+                await Permissions.CreateOwnerRolePermissionsAsync(domainId);
 
                 // Act
                 var exists = Enforcer.HasPolicy(roleDefinitionPolicy);

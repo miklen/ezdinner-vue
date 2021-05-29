@@ -56,8 +56,6 @@ namespace EzDinner.Functions
             })
                .AddMicrosoftIdentityWebApi(Configuration!.GetSection("AzureAdB2C"));
 
-
-
             services
              .AddSingleton(Configuration) // Replace the Azure Function configuration with our new one
              .AddLogging()
@@ -65,10 +63,10 @@ namespace EzDinner.Functions
              .RegisterMsGraph(Configuration.GetSection("AzureAdB2C"))
              .RegisterCosmosDb(Configuration.GetSection("CosmosDb"))
              .RegisterCasbin(Configuration.GetSection("CosmosDb"))
-             .AddSingleton(s => new Enforcer(PermissionService.GetRbacWithDomainsModel(), s.GetRequiredService<CasbinCosmosAdapter>()))
+             .AddSingleton(s => new Enforcer(AuthzService.GetRbacWithDomainsModel(), s.GetRequiredService<CasbinCosmosAdapter>()))
              .RegisterRepositories()
              .AddScoped<IDinnerService, DinnerService>()
-             .AddSingleton<IPermissionService, PermissionService>();
+             .AddSingleton<IAuthzService, AuthzService>();
         }
     }
 }

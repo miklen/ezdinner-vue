@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using EzDinner.Authorization;
 using EzDinner.Core.Aggregates.DishAggregate;
 using EzDinner.Functions.Models.Command;
 using Microsoft.AspNetCore.Http;
@@ -18,11 +19,13 @@ namespace EzDinner.Functions
     {
         private readonly ILogger<DishCreate> _logger;
         private readonly IDishRepository _dishRepository;
+        private readonly IAuthzService _authz;
 
-        public DishCreate(ILogger<DishCreate> logger, IDishRepository dishRepository)
+        public DishCreate(ILogger<DishCreate> logger, IDishRepository dishRepository, IAuthzService authz)
         {
             _logger = logger;
             _dishRepository = dishRepository;
+            _authz = authz;
         }
         
         [FunctionName(nameof(DishCreate))]
@@ -33,10 +36,11 @@ namespace EzDinner.Functions
         {
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
-
             var newDish = await req.GetBodyAs<CreateDishCommandModel>();
-            if (string.IsNullOrWhiteSpace(newDish.Name)) return new BadRequestObjectResult("Name cannot be null or empty");
-            if (newDish.FamilyId == Guid.Empty) return new BadRequestObjectResult("FamilyId cannot be empty");
+            if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId(), newDish.FamilyId, Resources.Dish, Actions.Create)) return new UnauthorizedResult();
+           
+            if (string.IsNullOrWhiteSpace(newDish.Name)) return new BadRequestObjectResult("MISSING_NAME");
+            if (newDish.FamilyId == Guid.Empty) return new BadRequestObjectResult("MISSING_FAMILYID");
 
             var dish = new Dish(newDish.FamilyId, newDish.Name);
             await _dishRepository.SaveAsync(dish);

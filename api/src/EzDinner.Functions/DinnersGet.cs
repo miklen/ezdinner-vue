@@ -26,16 +26,16 @@ namespace EzDinner.Functions
         private readonly ILogger<DishCreate> _logger;
         private readonly IMapper _mapper;
         private readonly IDinnerService _dinnerService;
-        private readonly Enforcer _enforcer;
+        private readonly IAuthzService _authz;
 
-        public DinnersGet(ILogger<DishCreate> logger, IMapper mapper, IDinnerService dinnerService, Enforcer enforcer)
+        public DinnersGet(ILogger<DishCreate> logger, IMapper mapper, IDinnerService dinnerService, IAuthzService authz)
         {
             _logger = logger;
             _mapper = mapper;
             _dinnerService = dinnerService;
-            _enforcer = enforcer;
+            _authz = authz;
         }
-        
+
         [FunctionName(nameof(DinnersGet))]
         [RequiredScope("backendapi")]
         public async Task<IActionResult?> Run(
@@ -47,7 +47,7 @@ namespace EzDinner.Functions
         {
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
-            if (!_enforcer.Enforce(req.HttpContext.User.GetNameIdentifierId(), familyId, Resources.Dinner, Actions.Read)) return new UnauthorizedResult();
+            if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId(), familyId, Resources.Dinner, Actions.Read)) return new UnauthorizedResult();
 
             var parsedId = Guid.Parse(familyId);
             var dinners = _dinnerService.GetAsync(parsedId, fromDate, toDate).Select(_mapper.Map<DinnersQueryModel>);
