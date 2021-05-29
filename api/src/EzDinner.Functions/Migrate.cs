@@ -13,6 +13,7 @@ using EzDinner.Core.Aggregates.FamilyAggregate;
 using System.Collections.Generic;
 using EzDinner.Application.Commands;
 using EzDinner.Authorization.Core;
+using Casbin.Adapter.EFCore;
 
 namespace EzDinner.Functions
 {
@@ -21,13 +22,15 @@ namespace EzDinner.Functions
         private readonly ILogger<Migrate> _logger;
         private readonly IAuthzService _authz;
         private readonly CosmosClient _cosmosClient;
+        private readonly CasbinDbContext<string> _casbinContext;
         private readonly IConfiguration _configuration;
 
-        public Migrate(ILogger<Migrate> logger, IAuthzService authz, CosmosClient cosmosClient, IConfiguration configuration)
+        public Migrate(ILogger<Migrate> logger, IAuthzService authz, CosmosClient cosmosClient, CasbinDbContext<string> casbinContext, IConfiguration configuration)
         {
             _logger = logger;
             _authz = authz;
             _cosmosClient = cosmosClient;
+            _casbinContext = casbinContext;
             _configuration = configuration;
         }
         
@@ -37,6 +40,7 @@ namespace EzDinner.Functions
         {
             _logger.LogInformation("Migration started");
             var database = await EnsureDatabaseAndCollectionsCreated(_configuration);
+            await _casbinContext.Database.EnsureCreatedAsync();
             await UpdateFamiliesPermissions(database);
 
             return new OkResult();
