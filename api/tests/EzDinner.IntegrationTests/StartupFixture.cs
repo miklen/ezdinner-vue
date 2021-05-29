@@ -24,9 +24,10 @@ namespace EzDinner.IntegrationTests
             .AddJsonFile("appsettings.development.json", optional: true, reloadOnChange: true) // add local development variables if present - file is not committed to git so won't be present for prod
             .Build();
 
-            services.AddSingleton(configuration);
+            services.AddSingleton<IConfiguration>(configuration);
             services.RegisterMsGraph(configuration.GetSection("AzureAdB2C"));
             services.RegisterCosmosDb(configuration.GetSection("CosmosDb"));
+            services.RegisterCasbin(configuration.GetSection("CosmosDb"));
             services.RegisterRepositories();
 
             Provider = services.BuildServiceProvider();

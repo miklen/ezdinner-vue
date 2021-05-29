@@ -14,30 +14,29 @@ namespace EzDinner.Infrastructure
     {
         private readonly CosmosClient _client;
         private readonly Container _container;
+        public const string CONTAINER = "Dishes";
 
         public DishRepository(CosmosClient client, IConfiguration configuration)
         {
             _client = client;
-            _container = _client.GetContainer(configuration.GetValue<string>("CosmosDb:Database"), "Dishes");
+            _container = _client.GetContainer(configuration.GetValue<string>("CosmosDb:Database"), CONTAINER);
         }
 
         public async Task<IEnumerable<Dish>> GetDishesAsync(Guid familyId)
         {
-            using (var iterator = _container.GetItemLinqQueryable<Dish>()
-                .Where(w => w.FamilyId == familyId)
-                .ToFeedIterator())
+            var sql = $"SELECT * FROM c WHERE c.familyId = '{familyId}'";
+            var queryDefinition = new QueryDefinition(sql);
+            var queryResultSetIterator = _container.GetItemQueryIterator<Dish>(queryDefinition);
+            var dishes = new List<Dish>();
+
+            while (queryResultSetIterator.HasMoreResults)
             {
-                var dishes = new List<Dish>();
-                
-                while (iterator.HasMoreResults)
+                foreach (var family in await queryResultSetIterator.ReadNextAsync())
                 {
-                    foreach (var family in await iterator.ReadNextAsync())
-                    {
-                        dishes.Add(family);
-                    }
+                    dishes.Add(family);
                 }
-                return dishes;
             }
+            return dishes;
         }
 
         public Task SaveAsync(Dish dish)

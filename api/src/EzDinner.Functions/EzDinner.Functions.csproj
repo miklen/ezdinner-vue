@@ -3,12 +3,16 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
     <Nullable>enable</Nullable>
+    <UserSecretsId>37e774c1-a07d-44ec-8c7a-d247dd30c82d</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+    <PackageReference Include="Casbin.NET" Version="1.8.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.CosmosDB" Version="3.0.10" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.15" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.15" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.15" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.15" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.12" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
@@ -16,6 +20,8 @@
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EzDinner.Application\EzDinner.Application.csproj" />
+    <ProjectReference Include="..\EzDinner.Authorization.Core\EzDinner.Authorization.Core.csproj" />
     <ProjectReference Include="..\EzDinner.Core\EzDinner.Core.csproj" />
     <ProjectReference Include="..\EzDinner.Infrastructure\EzDinner.Infrastructure.csproj" />
   </ItemGroup>

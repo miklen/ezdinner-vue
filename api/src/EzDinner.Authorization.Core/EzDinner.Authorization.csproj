@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="fkh4uabb.xae~" />
+    <None Remove="rbac_with_domains.conf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="rbac_with_domains.conf" />
+  </ItemGroup>
+
+</Project>

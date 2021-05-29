@@ -87,14 +87,17 @@ namespace EzDinner.UnitTests.DinnerTests
             // Arrange
             var fixture = new Fixture();
             var dinner = fixture.Create<Dinner>();
+            dinner.AddMenuItem(Guid.NewGuid());
 
             // Act
             var json = JsonConvert.SerializeObject(dinner);
             var deserialized = JsonConvert.DeserializeObject<Dinner>(json);
 
             // Assert
+            Assert.Equal(dinner.Id, deserialized.Id);
             Assert.Equal(dinner.FamilyId, deserialized.FamilyId);
             Assert.Equal(dinner.Date, deserialized.Date);
+            Assert.Equal(dinner.Menu.First().DishId, deserialized.Menu.First().DishId);
         }
 
         [Fact]

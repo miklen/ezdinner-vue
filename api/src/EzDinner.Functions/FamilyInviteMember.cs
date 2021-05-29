@@ -1,16 +1,15 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Microsoft.Identity.Web;
 using EzDinner.Core.Aggregates.UserAggregate;
 using EzDinner.Core.Aggregates.FamilyAggregate;
 using EzDinner.Functions.Models.Command;
+using EzDinner.Authorization.Core;
 
 namespace EzDinner.Functions
 {
@@ -19,12 +18,14 @@ namespace EzDinner.Functions
         private readonly ILogger<FamilyInviteMember> _logger;
         private readonly IUserRepository _userRepository;
         private readonly IFamilyRepository _familyRepository;
+        private readonly IAuthzService _authz;
 
-        public FamilyInviteMember(ILogger<FamilyInviteMember> logger, IUserRepository userRepository, IFamilyRepository familyRepository)
+        public FamilyInviteMember(ILogger<FamilyInviteMember> logger, IUserRepository userRepository, IFamilyRepository familyRepository, IAuthzService authz)
         {
             _logger = logger;
             _userRepository = userRepository;
             _familyRepository = familyRepository;
+            _authz = authz;
         }
         
         /// <summary>
@@ -41,6 +42,7 @@ namespace EzDinner.Functions
 
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
+            if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId(), familyId, Resources.Family, Actions.Update)) return new UnauthorizedResult();
 
             // TODO: Refactor to FamilyService - responsibilty is to handle cross-aggregate logic
             var familyGuid = Guid.Parse(familyId);
