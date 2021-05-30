@@ -10,35 +10,35 @@ using Newtonsoft.Json;
 
 namespace EzDinner.Functions
 {
-    public class FamilyCreatedEvent
+    public class FamilyCreatedEventUpdatePolicies
     {
-        private readonly ILogger<FamilyCreatedEvent> _logger;
+        private readonly ILogger<FamilyCreatedEventUpdatePolicies> _logger;
         private readonly IAuthzService _authz;
 
-        public FamilyCreatedEvent(ILogger<FamilyCreatedEvent> logger, IAuthzService authz)
+        public FamilyCreatedEventUpdatePolicies(ILogger<FamilyCreatedEventUpdatePolicies> logger, IAuthzService authz)
         {
             _logger = logger;
             _authz = authz;
         }
       
-        [FunctionName(nameof(FamilyCreatedEvent))]
+        [FunctionName(nameof(FamilyCreatedEventUpdatePolicies))]
         public async Task Run([CosmosDBTrigger(
             databaseName: "EzDinner",
             collectionName: "Families",
             ConnectionStringSetting = "CosmosDb:ConnectionString",
-            LeaseCollectionName = "FamiliesLeases",
+            LeaseCollectionName = "Leases",
+            LeaseCollectionPrefix = "policies",
             CreateLeaseCollectionIfNotExists = true)] IReadOnlyList<Document> input)
         {
             if (input != null && input.Count > 0)
             {
-                _logger.LogInformation("Documents modified " + input.Count);
-                _logger.LogInformation("First document Id " + input[0].Id);
+                _logger.LogInformation("Families updated " + input.Count);
                 var updatePermissionsCommand = new UpdateAuthorizationPoliciesCommand(_authz);
 
                 foreach (var document in input)
                 {
                     var family = JsonConvert.DeserializeObject<Family>(document.ToString());
-                    // Ensure roles exists
+                    _logger.LogInformation("Updating policies for family " + family.Id);
                     await updatePermissionsCommand.Handle(family);
                 }
             }
