@@ -69,7 +69,7 @@
         </v-col>
       </v-row>
 
-      <v-row>
+      <!-- <v-row>
         <v-col>
           <v-combobox
             v-model="tags"
@@ -95,7 +95,7 @@
             </template>
           </v-combobox>
         </v-col>
-      </v-row>
+      </v-row> -->
     </v-card-text>
   </v-card>
 </template>

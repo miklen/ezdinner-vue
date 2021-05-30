@@ -1,4 +1,7 @@
-﻿using System;
+﻿using EzDinner.Functions.Models.Json;
+using Newtonsoft.Json;
+using NodaTime;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,7 +17,9 @@ namespace EzDinner.Functions.Models.Command
         /// <summary>
         /// Date is the unique identifier for a dinner. You can only have _one_ dinner pr. day
         /// </summary>
-        public DateTime Date { get; set; }
+        [JsonProperty]
+        [JsonConverter(typeof(LocalDateConverter))]
+        public LocalDate Date { get; set; }
         /// <summary>
         /// The dishId to add to the menu.
         /// </summary>

@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
 using EzDinner.Core.Aggregates.DinnerAggregate;
+using EzDinner.Functions.Models.Json;
+using Newtonsoft.Json;
+using NodaTime;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,8 +16,10 @@ namespace EzDinner.Functions.Models.Query
             public Guid DishId { get; set; }
             public Guid? RecipeId { get; set; }
         }
-        
-        public DateTime Date { get; set; }
+
+        [JsonProperty]
+        [JsonConverter(typeof(LocalDateConverter))]
+        public LocalDate Date { get; set; }
         public IEnumerable<MenuItemQueryModel>? Menu { get; set; }
         public bool IsPlanned { get; set; }
     }

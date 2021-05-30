@@ -16,6 +16,8 @@ using EzDinner.Authorization.Core;
 using Casbin.Adapter.EFCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using EzDinner.Functions.Models.Migration;
+using AutoMapper;
 
 namespace EzDinner.Functions
 {
@@ -47,8 +49,26 @@ namespace EzDinner.Functions
             await _casbinContext.Database.EnsureCreatedAsync();
             _logger.LogInformation("Updating family roles and permissions");
             await UpdateFamiliesPermissions(database);
+
+            _logger.LogInformation("Migrating Dinner dates to LocalDate");
+            await MigrateDinnersDateTimeToLocalTime(database);
+
             _logger.LogInformation("Migration done");
             return new OkResult();
+        }
+
+        private async Task MigrateDinnersDateTimeToLocalTime(Database database)
+        {
+            var dinnersContainer = database.GetContainer(DinnerRepository.CONTAINER);
+            var query = new QueryDefinition("SELECT * FROM c");
+            var dinnersQuery = dinnersContainer.GetItemQueryIterator<LegacyDateTimeDinner>(query);
+            while (dinnersQuery.HasMoreResults)
+            {
+                foreach (var legacyDinner in await dinnersQuery.ReadNextAsync())
+                {
+                    await dinnersContainer.UpsertItemAsync(legacyDinner.Migrate());
+                }
+            }
         }
 
         private async Task UpdateFamiliesPermissions(Database database)

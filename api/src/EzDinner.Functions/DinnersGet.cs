@@ -12,6 +12,8 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
+using NodaTime;
+using NodaTime.Text;
 
 namespace EzDinner.Functions
 {
@@ -35,16 +37,17 @@ namespace EzDinner.Functions
         public async Task<IActionResult?> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "dinners/family/{familyId}/dates/{fromDate}/{toDate}")] HttpRequest req,
             string familyId,
-            DateTime fromDate,
-            DateTime toDate
+            string fromDate,
+            string toDate
             )
         {
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
             if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId(), familyId, Resources.Dinner, Actions.Read)) return new UnauthorizedResult();
 
+            var pattern = LocalDatePattern.Iso;
             var parsedId = Guid.Parse(familyId);
-            var dinners = _dinnerService.GetAsync(parsedId, fromDate, toDate).Select(_mapper.Map<DinnersQueryModel>);
+            var dinners = _dinnerService.GetAsync(parsedId, pattern.Parse(fromDate).GetValueOrThrow(), pattern.Parse(toDate).GetValueOrThrow()).Select(_mapper.Map<DinnersQueryModel>);
             return new OkObjectResult(dinners);
         }
     }
