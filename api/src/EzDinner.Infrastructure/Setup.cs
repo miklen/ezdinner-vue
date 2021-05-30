@@ -4,6 +4,7 @@ using EzDinner.Core.Aggregates.DinnerAggregate;
 using EzDinner.Core.Aggregates.DishAggregate;
 using EzDinner.Core.Aggregates.FamilyAggregate;
 using EzDinner.Core.Aggregates.UserAggregate;
+using EzDinner.Infrastructure.Models.Json;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Fluent;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,10 @@ using Microsoft.Graph.Auth;
 using Microsoft.Identity.Client;
 using NetCasbin;
 using NetCasbin.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using NodaTime;
+using NodaTime.Serialization.JsonNet;
 
 namespace EzDinner.Infrastructure
 {
@@ -37,7 +42,13 @@ namespace EzDinner.Infrastructure
         public static IServiceCollection RegisterCosmosDb(this IServiceCollection services, IConfigurationSection section)
         {
             services.AddSingleton(_ => new CosmosClientBuilder(section.GetValue<string>("ConnectionString"))
-                .WithSerializerOptions(new CosmosSerializationOptions { PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase })
+                .WithCustomSerializer(new CosmosJsonNetSerializer(new JsonSerializerSettings()
+                {
+                    ContractResolver = new DefaultContractResolver
+                    {
+                        NamingStrategy = new CamelCaseNamingStrategy()
+                    }
+                }.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb)))
                 .Build());
             return services;
         }

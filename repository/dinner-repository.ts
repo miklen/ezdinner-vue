@@ -30,7 +30,7 @@ export default class DinnerRepository {
     recipeId: string | null,
   ) {
     return this.$axios.put('api/dinners/menuitem', {
-      date,
+      date: date.toISODate(),
       dishId,
       recipeId,
       familyId,
@@ -44,7 +44,7 @@ export default class DinnerRepository {
     recipeId: string | null,
   ) {
     return this.$axios.put('api/dinners/menuitem/remove', {
-      date,
+      date: date.toISODate(),
       dishId,
       recipeId,
       familyId,

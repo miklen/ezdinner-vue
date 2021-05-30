@@ -125,7 +125,7 @@ export default Vue.extend({
       const to = DateTime.now().plus({ week: 1 })
       const from = to.minus({ month: 1 })
       // setting dateRange triggers the watcher which populates dinners
-      this.dateRange = [from.toISO(), to.toISO()]
+      this.dateRange = [from.toISODate(), to.toISODate()]
     },
     isDinnerDateSelected(dinner: Dinner, selectedDate: DateTime | null) {
       if (!dinner?.date || !selectedDate) return false

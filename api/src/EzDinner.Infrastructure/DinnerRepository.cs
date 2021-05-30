@@ -2,6 +2,7 @@
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.Extensions.Configuration;
+using NodaTime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,12 +36,14 @@ namespace EzDinner.Infrastructure
         /// 
         /// </summary>
         /// <param name="familyId"></param>
-        /// <param name="exactDate"></param>
+        /// <param name="localDate"></param>
         /// <returns></returns>
-        public async Task<Dinner?> GetAsync(Guid familyId, DateTime exactDate)
+        public async Task<Dinner?> GetAsync(Guid familyId, LocalDate localDate)
         {
-            var sql = $"SELECT * FROM c WHERE c.familyId = '{familyId}' AND c.date = '{exactDate.Date:yyyy-MM-ddTHH:mm:sszzz}'";
-            var queryDefinition = new QueryDefinition(sql);
+            var sql = $"SELECT * FROM c WHERE c.familyId = @familyId AND c.date = @date";
+            var queryDefinition = new QueryDefinition(sql)
+                .WithParameter("@familyId", familyId)
+                .WithParameter("@date", localDate);
             var queryResultSetIterator = _container.GetItemQueryIterator<Dinner>(queryDefinition);
 
             while (queryResultSetIterator.HasMoreResults)
@@ -53,10 +56,13 @@ namespace EzDinner.Infrastructure
             return null;
         }
 
-        public async IAsyncEnumerable<Dinner> GetAsync(Guid familyId, DateTime fromDate, DateTime toDate)
+        public async IAsyncEnumerable<Dinner> GetAsync(Guid familyId, LocalDate fromDate, LocalDate toDate)
         {
-            var sql = $"SELECT * FROM c WHERE c.familyId = '{familyId}' AND c.date > '{fromDate:yyyy-MM-ddTHH:mm:sszzz}' and c.date < '{toDate:yyyy-MM-ddTHH:mm:sszzz}' ORDER BY c.date";
-            var queryDefinition = new QueryDefinition(sql);
+            var sql = $"SELECT * FROM c WHERE c.familyId = @familyId AND c.date >= @fromDate and c.date <= @toDate ORDER BY c.date";
+            var queryDefinition = new QueryDefinition(sql)
+                .WithParameter("@familyId", familyId)
+                .WithParameter("@fromDate", fromDate)
+                .WithParameter("@toDate", toDate);
             var queryResultSetIterator = _container.GetItemQueryIterator<Dinner>(queryDefinition);
 
             while (queryResultSetIterator.HasMoreResults)

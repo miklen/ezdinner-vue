@@ -1,4 +1,5 @@
 ﻿using EzDinner.Core.Aggregates.Shared;
+using NodaTime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,15 +12,15 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
         private readonly List<MenuItem> _menu;
         private readonly List<Tag> _tags;
 
-        public DateTime Date { get; }
+        public LocalDate Date { get; }
         public Guid FamilyId { get; private set; }
         public IEnumerable<MenuItem> Menu { get => _menu; }
         public IEnumerable<Tag> Tags { get => _tags; }
         public bool IsPlanned => Menu.Any();
 
-        public Dinner(Guid familyId, DateTime date) : base(Guid.NewGuid())
+        public Dinner(Guid familyId, LocalDate date) : base(Guid.NewGuid())
         {
-            Date = date.Date;
+            Date = date;
             FamilyId = familyId;
             _menu = new List<MenuItem>();
             _tags = new List<Tag>();
