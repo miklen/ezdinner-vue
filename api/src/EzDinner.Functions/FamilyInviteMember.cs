@@ -42,7 +42,7 @@ namespace EzDinner.Functions
 
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
-            if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId(), familyId, Resources.Family, Actions.Update)) return new UnauthorizedResult();
+            if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId()!, familyId, Resources.Family, Actions.Update)) return new UnauthorizedResult();
 
             // TODO: Refactor to FamilyService - responsibilty is to handle cross-aggregate logic
             var familyGuid = Guid.Parse(familyId);
