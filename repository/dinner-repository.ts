@@ -8,19 +8,16 @@ export default class DinnerRepository {
     this.$axios = $axios
   }
 
-  async getRange(familyId: number, from: DateTime, to: DateTime) {
-    const result = await this.$axios.get(
+  getRange(familyId: number, from: DateTime, to: DateTime) {
+    return this.$axios.$get(
       `api/dinners/family/${familyId}/dates/${from.toISODate()}/${to.toISODate()}`,
     )
-    return result.data
   }
 
-  async get(familyId: string, exactDate: DateTime) {
-    return (
-      await this.$axios.get(
-        `api/dinners/family/${familyId}/date/${exactDate.toISODate()}`,
-      )
-    ).data
+  get(familyId: string, exactDate: DateTime) {
+    return this.$axios.$get(
+      `api/dinners/family/${familyId}/date/${exactDate.toISODate()}`,
+    )
   }
 
   addDishToMenu(

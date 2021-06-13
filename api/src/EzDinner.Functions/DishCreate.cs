@@ -35,12 +35,12 @@ namespace EzDinner.Functions
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
             var newDish = await req.GetBodyAs<CreateDishCommandModel>();
-            if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId(), newDish.FamilyId, Resources.Dish, Actions.Create)) return new UnauthorizedResult();
+            if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId()!, newDish.FamilyId, Resources.Dish, Actions.Create)) return new UnauthorizedResult();
            
             if (string.IsNullOrWhiteSpace(newDish.Name)) return new BadRequestObjectResult("MISSING_NAME");
             if (newDish.FamilyId == Guid.Empty) return new BadRequestObjectResult("MISSING_FAMILYID");
 
-            var dish = new Dish(newDish.FamilyId, newDish.Name);
+            var dish = Dish.CreateNew(newDish.FamilyId, newDish.Name);
             await _dishRepository.SaveAsync(dish);
 
             return new OkObjectResult(dish.Id);

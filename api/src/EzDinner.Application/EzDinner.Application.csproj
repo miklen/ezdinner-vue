@@ -1,7 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+<<<<<<< HEAD
     <TargetFramework>netstandard2.1</TargetFramework>
+=======
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+>>>>>>> 194f5cb7f9f502afad53e0fb048b83ec77674de8
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -16,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\EzDinner.Authorization.Core\EzDinner.Authorization.Core.csproj" />
     <ProjectReference Include="..\EzDinner.Core\EzDinner.Core.csproj" />
+    <ProjectReference Include="..\EzDinner.Infrastructure\EzDinner.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -71,6 +71,11 @@ export default Vue.extend({
         },
         {
           icon: 'mdi-silverware-fork-knife',
+          title: 'Dishes',
+          to: '/dishes',
+        },
+        {
+          icon: 'mdi-calendar-edit',
           title: 'Plan',
           to: '/plan',
         },

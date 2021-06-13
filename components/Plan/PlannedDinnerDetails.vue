@@ -136,13 +136,14 @@ export default Vue.extend({
       return date.toLocaleString(DateTime.DATE_HUGE)
     },
     async createDish() {
+      const dishName = this.dishSearch
+      this.dishSearch = ''
       const element = this.$refs.dishSelector as HTMLElement
       element.blur()
       const dishId = await this.$repositories.dishes.create(
         this.$accessor.activeFamilyId,
-        this.dishSearch,
+        dishName,
       )
-      this.dishSearch = ''
       // repopulate dishes to add the new dish to the list
       this.$accessor.dishes.populateDishes()
       this.addDishToMenu(dishId, null)

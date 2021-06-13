@@ -11,11 +11,11 @@ using EzDinner.Core.Aggregates.DishAggregate;
 using EzDinner.Core.Aggregates.DinnerAggregate;
 using EzDinner.Core.Aggregates.FamilyAggregate;
 using System.Collections.Generic;
-using EzDinner.Application.Commands;
-using EzDinner.Authorization.Core;
+using EzDinner.Authorization.Core;  
 using Casbin.Adapter.EFCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using EzDinner.Application.Commands.Authorization;
 
 namespace EzDinner.Functions
 {

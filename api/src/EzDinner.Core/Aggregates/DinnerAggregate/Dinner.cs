@@ -18,12 +18,27 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
         public IEnumerable<Tag> Tags { get => _tags; }
         public bool IsPlanned => Menu.Any();
 
-        public Dinner(Guid familyId, LocalDate date) : base(Guid.NewGuid())
+        
+        /// <summary>
+        /// For serialization purpose only
+        /// </summary>
+        public Dinner(Guid id, Guid familyId, LocalDate date, IEnumerable<MenuItem> menu, IEnumerable<Tag> tags) : base(id)
         {
             Date = date;
             FamilyId = familyId;
-            _menu = new List<MenuItem>();
-            _tags = new List<Tag>();
+            _menu = menu.ToList();
+            _tags = tags.ToList();
+        }
+
+        /// <summary>
+        /// Create a new Dinner for a given calendar date. The date is relative to the family and does not consider timezones or time in any way.
+        /// </summary>
+        /// <param name="familyId"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public static Dinner CreateNew(Guid familyId, LocalDate date)
+        {
+            return new Dinner(id: Guid.NewGuid(), familyId, date, menu: new List<MenuItem>(), tags: new List<Tag>());
         }
 
 
