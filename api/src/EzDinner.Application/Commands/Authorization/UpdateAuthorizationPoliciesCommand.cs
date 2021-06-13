@@ -2,7 +2,7 @@
 using EzDinner.Core.Aggregates.FamilyAggregate;
 using System.Threading.Tasks;
 
-namespace EzDinner.Application.Commands
+namespace EzDinner.Application.Commands.Authorization
 {
     public class UpdateAuthorizationPoliciesCommand
     {

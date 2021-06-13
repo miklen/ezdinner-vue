@@ -36,7 +36,7 @@ namespace EzDinner.Functions
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
             var menuItem = await req.GetBodyAs<DinnerAddRemoveMenuItemCommandModel>();
-            if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId(), menuItem.FamilyId, Resources.Dinner, Actions.Update)) return new UnauthorizedResult();
+            if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId()!, menuItem.FamilyId, Resources.Dinner, Actions.Update)) return new UnauthorizedResult();
             
             _logger.LogInformation($"Adding dish: {menuItem.DishId} to date: {menuItem.Date}");
             var dinner = await _dinnerService.GetAsync(menuItem.FamilyId, menuItem.Date);

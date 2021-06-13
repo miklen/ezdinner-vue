@@ -26,7 +26,7 @@ namespace EzDinner.IntegrationTests.DinnerRepositoryTests
             // Arrange
             var familyId = Guid.NewGuid();
             var date = new LocalDate(2021, 1, 1);
-            var dinner = new Dinner(familyId, date);
+            var dinner = Dinner.CreateNew(familyId, date);
             await _dinnerRepository.SaveAsync(dinner);
             try
             {
@@ -47,8 +47,8 @@ namespace EzDinner.IntegrationTests.DinnerRepositoryTests
             var familyId = Guid.NewGuid();
             var dateMin = new LocalDate(2021, 1, 1);
             var dateMax = dateMin.PlusDays(1);
-            var dinner1 = new Dinner(familyId, dateMin);
-            var dinner2 = new Dinner(familyId, dateMax);
+            var dinner1 = Dinner.CreateNew(familyId, dateMin);
+            var dinner2 = Dinner.CreateNew(familyId, dateMax);
             await _dinnerRepository.SaveAsync(dinner1);
             await _dinnerRepository.SaveAsync(dinner2);
             try

@@ -9,16 +9,19 @@ export default class DishesRepository {
   }
 
   async all(activeFamilyId: string) {
-    return (await this.$axios.get(`/api/dishes/family/${activeFamilyId}`))
-      .data as Dish[]
+    return (await this.$axios.$get(
+      `/api/dishes/family/${activeFamilyId}`,
+    )) as Dish[]
   }
 
-  async create(familyId: string, dishName: string): Promise<string> {
-    return (
-      await this.$axios.post('api/dishes', {
-        name: dishName,
-        familyId,
-      })
-    ).data
+  create(familyId: string, dishName: string) {
+    return this.$axios.$post('api/dishes', {
+      name: dishName,
+      familyId,
+    })
+  }
+
+  delete(familyId: string, dishId: string) {
+    return this.$axios.$delete(`/api/dishes/family/${familyId}/id/${dishId}`)
   }
 }
