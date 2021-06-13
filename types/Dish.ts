@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { Tag } from './Tag'
 
 export declare class Recipe {
@@ -13,4 +14,10 @@ export declare class Dish {
   id: string
   recipeId: string
   recipeName: string
+}
+
+export declare class DishStats {
+  dishId: string
+  lastUsed: DateTime
+  timesUsed: number
 }

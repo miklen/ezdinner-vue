@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using EzDinner.Infrastructure;
 using EzDinner.Core.Aggregates.DinnerAggregate;
 using EzDinner.Authorization.Core;
+using EzDinner.Query.Core.DishQueries;
 
 [assembly: FunctionsStartup(typeof(EzDinner.Functions.Startup))]
 
@@ -61,6 +62,7 @@ namespace EzDinner.Functions
              .RegisterCasbin(Configuration.GetSection("CosmosDb"))
              .RegisterRepositories()
              .AddScoped<IDinnerService, DinnerService>()
+             .AddScoped<IDishQueryService, DishQueryService>()
              .AddSingleton<IAuthzService, AuthzService>();
         }
     }

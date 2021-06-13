@@ -12,26 +12,27 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
+using NodaTime;
 
 namespace EzDinner.Functions
 {
-    public class DishesGet
+    public class DishesGetStats
     {
-        private readonly ILogger<DishCreate> _logger;
-        private readonly IDishQueryRepository _dishRepository;
+        private readonly ILogger<DishesGetStats> _logger;
+        private readonly IDishQueryService _dishQueryService;
         private readonly IAuthzService _authz;
 
-        public DishesGet(ILogger<DishCreate> logger, IDishQueryRepository dishRepository, IAuthzService authz)
+        public DishesGetStats(ILogger<DishesGetStats> logger, IDishQueryService dishQueryService, IAuthzService authz)
         {
             _logger = logger;
-            _dishRepository = dishRepository;
+            _dishQueryService = dishQueryService;
             _authz = authz;
         }
         
-        [FunctionName(nameof(DishesGet))]
+        [FunctionName(nameof(DishesGetStats))]
         [RequiredScope("backendapi")]
         public async Task<IActionResult?> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "dishes/family/{familyId}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "dishes/stats/family/{familyId}")] HttpRequest req,
             string familyId
             )
         {
@@ -41,9 +42,8 @@ namespace EzDinner.Functions
 
             _logger.LogInformation("GetDishes called for familyId " + familyId);
             var parsedId = Guid.Parse(familyId);
-            var dishes = await _dishRepository.GetDishesAsync(parsedId);
-
-            return new OkObjectResult(dishes.SelectMany(DishesQueryModel.FromDomain));
+            var dishes = await _dishQueryService.GetDishUsageStatsAsync(parsedId, LocalDate.MinIsoValue, LocalDate.MaxIsoValue);
+            return new OkObjectResult(dishes);
         }
     }
 }

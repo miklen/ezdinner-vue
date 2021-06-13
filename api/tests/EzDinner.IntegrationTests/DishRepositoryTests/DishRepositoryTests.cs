@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using EzDinner.Core.Aggregates.DishAggregate;
 using EzDinner.Infrastructure;
+using EzDinner.Query.Core.DishQueries;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,12 +19,14 @@ namespace EzDinner.IntegrationTests.DishRepositoryTests
     {
         private readonly ServiceProvider _provider;
         private readonly IDishRepository _dishRepository;
+        private readonly IDishQueryRepository _dishQueryRepository;
         private readonly Container _container;
 
         public DishRepositoryTests(StartupFixture startup)
         {
             _provider = startup.Provider;
             _dishRepository = (IDishRepository)_provider.GetService(typeof(IDishRepository));
+            _dishQueryRepository = (IDishQueryRepository)_provider.GetService(typeof(IDishQueryRepository));
             var client = (CosmosClient)_provider.GetService(typeof(CosmosClient));
             var config = (IConfiguration)_provider.GetService(typeof(IConfiguration));
             var dbName = config.GetValue<string>("CosmosDb:Database");
@@ -50,7 +53,7 @@ namespace EzDinner.IntegrationTests.DishRepositoryTests
                 foreach (var dish in dishes) await _container.UpsertItemAsync(dish);
 
                 // Act
-                var result = await _dishRepository.GetDishesAsync(familyId);
+                var result = await _dishQueryRepository.GetDishesAsync(familyId);
 
                 // Assert
                 Assert.Equal(dishes.Count, result.Count());
@@ -75,7 +78,7 @@ namespace EzDinner.IntegrationTests.DishRepositoryTests
                 foreach (var dish in dishes) await _container.UpsertItemAsync(dish);
 
                 // Act
-                var result = await _dishRepository.GetDishesAsync(Guid.NewGuid());
+                var result = await _dishQueryRepository.GetDishesAsync(Guid.NewGuid());
 
                 // Assert
                 Assert.Empty(result);
@@ -102,7 +105,7 @@ namespace EzDinner.IntegrationTests.DishRepositoryTests
                 foreach (var dish in dishes) await _container.UpsertItemAsync(dish);
 
                 // Act
-                var result = await _dishRepository.GetDishesAsync(familyId);
+                var result = await _dishQueryRepository.GetDishesAsync(familyId);
 
                 // Assert
                 Assert.Equal(dishes.Count-1, result.Count());
@@ -128,7 +131,7 @@ namespace EzDinner.IntegrationTests.DishRepositoryTests
                 foreach (var dish in dishes) await _container.UpsertItemAsync(dish);
 
                 // Act
-                var result = await _dishRepository.GetDishesAsync(familyId);
+                var result = await _dishQueryRepository.GetDishesAsync(familyId);
 
                 // Assert
                 Assert.Empty(result);

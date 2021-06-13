@@ -1,4 +1,5 @@
 ﻿using EzDinner.Core.Aggregates.DishAggregate;
+using EzDinner.Query.Core.DishQueries;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace EzDinner.Infrastructure
 {
-    public class DishRepository : IDishRepository
+    public class DishRepository : IDishRepository, IDishQueryRepository
     {
         private readonly CosmosClient _client;
         private readonly Container _container;

@@ -1,5 +1,6 @@
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
-import { Dish } from '~/types/Dish'
+import { DateTime } from 'luxon'
+import { Dish, DishStats } from '~/types/Dish'
 
 export default class DishesRepository {
   $axios: NuxtAxiosInstance
@@ -23,5 +24,17 @@ export default class DishesRepository {
 
   delete(familyId: string, dishId: string) {
     return this.$axios.$delete(`/api/dishes/family/${familyId}/id/${dishId}`)
+  }
+
+  async allUsageStats(
+    activeFamilyId: string,
+  ): Promise<{ [key: string]: DishStats }> {
+    const result = await this.$axios.$get(
+      `api/dishes/stats/family/${activeFamilyId}`,
+    )
+    Object.keys(result).forEach((i: any) => {
+      result[i].lastUsed = DateTime.fromISO(result[i].lastUsed)
+    })
+    return result
   }
 }

@@ -20,28 +20,27 @@
           <v-card-text v-if="!dish.recipes || !dish.recipes.length"
             >No recipes yet</v-card-text
           > -->
-          <!-- <v-list>
+          <v-list>
             <v-list-item>
               <v-list-item-content>
-                <v-list-item-subtitle>Times for dinner: 1</v-list-item-subtitle>
+                <v-list-item-subtitle
+                  >Times for dinner:
+                  {{ getTimesUsed(dish.id) }}</v-list-item-subtitle
+                >
               </v-list-item-content>
             </v-list-item>
             <v-list-item>
               <v-list-item-content>
                 <v-list-item-subtitle
-                  >Last time used: 2021-01-01</v-list-item-subtitle
+                  >Last time used:
+                  {{ getLastUsed(dish.id) }}</v-list-item-subtitle
                 >
               </v-list-item-content>
             </v-list-item>
-          </v-list> -->
+          </v-list>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn
-              v-bind="attrs"
-              text
-              color="grey darken-1"
-              v-on="on"
-              @click="openConfirmDialog(dish)"
+            <v-btn text color="grey darken-1" @click="openConfirmDialog(dish)"
               ><v-icon>mdi-trash-can</v-icon></v-btn
             >
           </v-card-actions>
@@ -53,7 +52,8 @@
         <v-card-title>Delete?</v-card-title>
         <v-card-text
           >Are you sure you want to delete
-          <strong>{{ dishToDelete.name }}</strong></v-card-text
+          <strong>{{ dishToDelete.name }}</strong
+          >?</v-card-text
         >
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -69,13 +69,14 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Dish } from '~/types/Dish'
+import { Dish, DishStats } from '~/types/Dish'
 export default Vue.extend({
   data() {
     return {
       confirmDialog: false,
       dishToDelete: {} as Dish,
       searchDish: '',
+      stats: {} as { [key: string]: DishStats },
     }
   },
   computed: {
@@ -86,11 +87,33 @@ export default Vue.extend({
     },
   },
 
+  watch: {
+    activeFamilyId(newValue: string) {
+      if (!newValue) return
+      this.init()
+    },
+  },
+
   async created() {
-    await this.$accessor.dishes.populateDishes()
+    await this.init()
   },
 
   methods: {
+    async init() {
+      if (!this.$accessor.activeFamilyId) return
+      await this.$accessor.dishes.populateDishes()
+      this.stats = await this.$repositories.dishes.allUsageStats(
+        this.$accessor.activeFamilyId,
+      )
+    },
+
+    getLastUsed(dishId: string) {
+      return this.stats[dishId]?.lastUsed.toLocaleString() ?? 'Never used'
+    },
+    getTimesUsed(dishId: string) {
+      return this.stats[dishId]?.timesUsed ?? 0
+    },
+
     openConfirmDialog(dishToDelete: Dish) {
       this.dishToDelete = dishToDelete
       this.confirmDialog = true
