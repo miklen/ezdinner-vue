@@ -40,7 +40,7 @@ namespace EzDinner.Functions
             if (string.IsNullOrWhiteSpace(newDish.Name)) return new BadRequestObjectResult("MISSING_NAME");
             if (newDish.FamilyId == Guid.Empty) return new BadRequestObjectResult("MISSING_FAMILYID");
 
-            var dish = new Dish(newDish.FamilyId, newDish.Name);
+            var dish = Dish.CreateNew(newDish.FamilyId, newDish.Name);
             await _dishRepository.SaveAsync(dish);
 
             return new OkObjectResult(dish.Id);

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using EzDinner.Application.Commands;
+using EzDinner.Application.Commands.Authorization;
 using EzDinner.Authorization.Core;
 using EzDinner.Core.Aggregates.FamilyAggregate;
 using Microsoft.Azure.Documents;

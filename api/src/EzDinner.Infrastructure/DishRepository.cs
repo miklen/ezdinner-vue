@@ -24,8 +24,9 @@ namespace EzDinner.Infrastructure
 
         public async Task<IEnumerable<Dish>> GetDishesAsync(Guid familyId)
         {
-            var sql = $"SELECT * FROM c WHERE c.familyId = '{familyId}'";
-            var queryDefinition = new QueryDefinition(sql);
+            var queryDefinition = new QueryDefinition($"SELECT * FROM c WHERE c.familyId = @familyId AND (c.deleted = @deleted OR IS_DEFINED(c.deleted) = false)")
+                .WithParameter("@familyId", familyId.ToString())
+                .WithParameter("@deleted", false);
             var queryResultSetIterator = _container.GetItemQueryIterator<Dish>(queryDefinition);
             var dishes = new List<Dish>();
 
@@ -42,6 +43,18 @@ namespace EzDinner.Infrastructure
         public Task SaveAsync(Dish dish)
         {
             return _container.UpsertItemAsync(dish);
+        }
+
+        public async Task<Dish?> GetDishAsync(Guid dishId)
+        {
+            var sql = new QueryDefinition($"SELECT * FROM c WHERE c.id = @dishId")
+                .WithParameter("@dishId", dishId.ToString());
+            var resultIterator = _container.GetItemQueryIterator<Dish>(sql);
+            while (resultIterator.HasMoreResults)
+            {
+                foreach (var dish in await resultIterator.ReadNextAsync()) return dish;
+            }
+            return null;
         }
     }
 }

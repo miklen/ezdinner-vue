@@ -9,7 +9,7 @@ namespace EzDinner.Core.Aggregates
         /// <summary>
         /// The aggregate root's unique Id.
         /// </summary>
-        public TIdType Id { get; set; }
+        public TIdType Id { get; }
         
         /// <summary>
         /// The partial key is a necessity for CosmosDb to distribute load.

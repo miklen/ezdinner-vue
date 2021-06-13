@@ -16,11 +16,11 @@
       >
         <v-card rounded="lg">
           <v-card-title>{{ dish.name }}</v-card-title>
-          <v-card-subtitle>Recipes</v-card-subtitle>
+          <!-- <v-card-subtitle>Recipes</v-card-subtitle>
           <v-card-text v-if="!dish.recipes || !dish.recipes.length"
             >No recipes yet</v-card-text
-          >
-          <v-list>
+          > -->
+          <!-- <v-list>
             <v-list-item>
               <v-list-item-content>
                 <v-list-item-subtitle>Times for dinner: 1</v-list-item-subtitle>
@@ -33,7 +33,7 @@
                 >
               </v-list-item-content>
             </v-list-item>
-          </v-list>
+          </v-list> -->
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
@@ -60,7 +60,7 @@
           <v-btn color="grey darken-1" @click="closeConfirmDialog"
             >Cancel</v-btn
           >
-          <v-btn color="error">Delete</v-btn>
+          <v-btn color="error" @click="doDelete(dishToDelete.id)">Delete</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -99,7 +99,11 @@ export default Vue.extend({
       this.confirmDialog = false
       this.dishToDelete = {} as Dish
     },
-    delete(id: string) {},
+    async doDelete(id: string) {
+      await this.$repositories.dishes.delete(this.$accessor.activeFamilyId, id)
+      this.confirmDialog = false
+      this.$accessor.dishes.populateDishes()
+    },
   },
 })
 </script>

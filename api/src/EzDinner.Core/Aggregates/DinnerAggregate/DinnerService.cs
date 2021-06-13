@@ -19,7 +19,7 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
         public async Task<Dinner> GetAsync(Guid familyId, LocalDate exactDate)
         {
             var dinner = await _dinnerRepository.GetAsync(familyId, exactDate);
-            return dinner ?? new Dinner(familyId, exactDate);
+            return dinner ?? Dinner.CreateNew(familyId, exactDate);
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
 
         private IEnumerable<Dinner> CreateUnplannedDinners(Guid familyId, LocalDate fromDate, LocalDate toDate)
         {
-            foreach (var dinner in EachDay(fromDate, toDate).Select(d => new Dinner(familyId, d))) yield return dinner;
+            foreach (var dinner in EachDay(fromDate, toDate).Select(d => Dinner.CreateNew(familyId, d))) yield return dinner;
         }
 
         private IEnumerable<LocalDate> EachDay(LocalDate from, LocalDate thru)

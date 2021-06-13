@@ -29,11 +29,14 @@ export const actions = actionTree(
         to,
       )
 
-      // runtime join - consider if this is done better elsewhere
+      // client-side join
+      // TODO: Create query API that is specialized for this request
       const transformedDinner: Dinner[] = result.map((dinner: any) => {
         dinner.date = DateTime.fromISO(dinner.date)
         dinner.menu.map((item: any) => {
-          item.dishName = this.app.$accessor.dishes.dishMap[item.dishId]
+          item.dishName =
+            this.app.$accessor.dishes.dishMap[item.dishId] ??
+            'Dish not available'
           // TODO: add receipeName
           return item
         })
