@@ -92,7 +92,9 @@ export default Vue.extend({
     dishes(): Dish[] {
       return [...this.$accessor.dishes.dishes]
         .sort((a, b) => a.name.localeCompare(b.name))
-        .filter((dish) => dish.name.includes(this.searchDish))
+        .filter((dish) =>
+          dish.name?.toLowerCase().includes(this.searchDish?.toLowerCase()),
+        )
     },
     activeFamilyId() {
       return this.$accessor.activeFamilyId
