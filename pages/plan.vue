@@ -84,6 +84,10 @@ export default Vue.extend({
     selectedDinnerDate: null as DateTime | null,
   }),
 
+  async fetch() {
+    await this.init()
+  },
+
   head: {
     title: 'Plan',
   },
@@ -113,14 +117,9 @@ export default Vue.extend({
     },
   },
 
-  async created() {
-    await this.init()
-  },
-
   methods: {
     async init() {
       // dishes are used by child components
-      if (!this.$accessor.activeFamilyId) return
       await this.$accessor.dishes.populateDishes()
       const to = DateTime.now().plus({ week: 1 })
       const from = to.minus({ month: 1 })

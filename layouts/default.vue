@@ -82,7 +82,7 @@ export default Vue.extend({
       ],
     }
   },
-  async mounted() {
+  async fetch() {
     await this.getFamilySelectors()
     this.loading = false
   },

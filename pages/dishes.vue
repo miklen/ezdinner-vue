@@ -79,31 +79,39 @@ export default Vue.extend({
       stats: {} as { [key: string]: DishStats },
     }
   },
+
+  async fetch() {
+    await this.init()
+  },
+
+  head: {
+    title: 'Dishes',
+  },
+
   computed: {
     dishes(): Dish[] {
       return [...this.$accessor.dishes.dishes]
         .sort((a, b) => a.name.localeCompare(b.name))
         .filter((dish) => dish.name.includes(this.searchDish))
     },
+    activeFamilyId() {
+      return this.$accessor.activeFamilyId
+    },
   },
 
   watch: {
     activeFamilyId(newValue: string) {
       if (!newValue) return
+      this.stats = {}
       this.init()
     },
   },
 
-  async created() {
-    await this.init()
-  },
-
   methods: {
     async init() {
-      if (!this.$accessor.activeFamilyId) return
       await this.$accessor.dishes.populateDishes()
       this.stats = await this.$repositories.dishes.allUsageStats(
-        this.$accessor.activeFamilyId,
+        this.activeFamilyId,
       )
     },
 
@@ -123,7 +131,7 @@ export default Vue.extend({
       this.dishToDelete = {} as Dish
     },
     async doDelete(id: string) {
-      await this.$repositories.dishes.delete(this.$accessor.activeFamilyId, id)
+      await this.$repositories.dishes.delete(this.activeFamilyId, id)
       this.confirmDialog = false
       this.$accessor.dishes.populateDishes()
     },

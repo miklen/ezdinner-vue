@@ -1,6 +1,6 @@
 <template>
   <span>
-    <span> {{ familyName }} </span>
+    <span class="family-label" @click="menu = !menu"> {{ familyName }} </span>
     <v-menu v-model="menu" offset-y left>
       <template #activator="{ on, attrs }">
         <v-avatar
@@ -89,3 +89,9 @@ export default Vue.extend({
   },
 })
 </script>
+
+<style lang="scss" scoped>
+.family-label {
+  cursor: pointer;
+}
+</style>
