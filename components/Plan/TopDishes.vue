@@ -16,7 +16,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in topMeals" :key="item.name">
+              <tr v-for="item in topDishes" :key="item.name">
                 <td>{{ item.name }}</td>
                 <td>{{ item.times }}</td>
               </tr>
@@ -30,24 +30,31 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { DishStats } from '~/types/Dish'
 export default Vue.extend({
   data() {
     return {
-      topMeals: [
-        { name: 'McDonalds', times: 231 },
-        { name: 'Steak with fries', times: 123 },
-        { name: 'Pasta ala cabonara', times: 51 },
-        { name: 'Lasagne', times: 10 },
-        { name: 'Tortillias', times: 5 },
-        { name: 'Fish', times: 3 },
-        { name: 'Tacos', times: 2 },
-        { name: 'Nachos', times: 1 },
-        { name: 'Pancakes', times: 1 },
-        { name: 'Nudles', times: 1 },
-      ] as { name: string; times: number }[],
+      stats: {} as { [key: string]: DishStats },
     }
   },
 
-  methods: {},
+  async fetch() {
+    this.stats = await this.$repositories.dishes.allUsageStats(
+      this.$accessor.activeFamilyId,
+    )
+  },
+
+  computed: {
+    topDishes(): { name: string; times: number }[] {
+      const topDishes = this.$accessor.dishes.dishes
+        .map((d) => ({
+          name: d.name,
+          times: this.stats[d.id]?.timesUsed ?? 0,
+        }))
+        .sort((a, b) => b.times - a.times)
+        .slice(0, 10)
+      return topDishes
+    },
+  },
 })
 </script>
