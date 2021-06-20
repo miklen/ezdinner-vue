@@ -8,11 +8,13 @@ import * as families from './families'
 import * as dishes from './dishes'
 import * as dinners from './dinners'
 
+const localStoragePrefix = 'ezdinner'
+
 // Typings:
 // https://typed-vuex.roe.dev/
 
 export const state = () => ({
-  activeFamilyId: (null as unknown) as string,
+  activeFamilyId: loadFromLocalStorage('activeFamilyId') as string,
 })
 
 export type RootState = ReturnType<typeof state>
@@ -22,6 +24,7 @@ export const getters = getterTree(state, {})
 export const mutations = mutationTree(state, {
   updateFamilyId(state, familyId: string) {
     state.activeFamilyId = familyId
+    saveInLocalStorage('activeFamilyId', familyId)
   },
 })
 
@@ -46,3 +49,20 @@ export const accessorType = getAccessorType({
     dinners,
   },
 })
+
+export const loadFromLocalStorage = (key: string) => {
+  const value = window.localStorage.getItem(`${localStoragePrefix}:${key}`)
+  if (!value) return value
+  try {
+    return JSON.parse(value)
+  } catch (e) {
+    return value
+  }
+}
+
+export const saveInLocalStorage = (key: string, payload: any) => {
+  window.localStorage.setItem(
+    `${localStoragePrefix}:${key}`,
+    JSON.stringify(payload),
+  )
+}
