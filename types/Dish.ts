@@ -18,6 +18,6 @@ export declare class Dish {
 
 export declare class DishStats {
   dishId: string
-  lastUsed: DateTime
+  lastUsed: DateTime | undefined
   timesUsed: number
 }

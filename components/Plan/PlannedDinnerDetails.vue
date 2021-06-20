@@ -145,8 +145,8 @@ export default Vue.extend({
         dishName,
       )
       // repopulate dishes to add the new dish to the list
-      this.$accessor.dishes.populateDishes()
-      this.addDishToMenu(dishId, null)
+      await this.$accessor.dishes.updateDish({ dishId })
+      await this.addDishToMenu(dishId, null)
     },
     async addDishToMenu(dishId: string, recipeId: string | null) {
       await this.$repositories.dinners.addDishToMenu(

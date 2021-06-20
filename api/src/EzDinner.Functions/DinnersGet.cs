@@ -43,7 +43,7 @@ namespace EzDinner.Functions
         {
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
-            if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId(), familyId, Resources.Dinner, Actions.Read)) return new UnauthorizedResult();
+            if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId()!, familyId, Resources.Dinner, Actions.Read)) return new UnauthorizedResult();
 
             var pattern = LocalDatePattern.Iso;
             var parsedId = Guid.Parse(familyId);

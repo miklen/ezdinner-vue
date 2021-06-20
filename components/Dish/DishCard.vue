@@ -1,7 +1,32 @@
 <template>
   <span>
     <v-card rounded="lg">
-      <v-card-title>{{ dish.name }}</v-card-title>
+      <v-card-title v-show="!editNameMode"
+        ><v-row>
+          <v-col>{{ name }}</v-col>
+          <v-col cols="2">
+            <v-icon @click="enableEditNameMode()">mdi-pencil</v-icon>
+            <v-icon @click="confirmDialog = true">mdi-trash-can</v-icon></v-col
+          >
+        </v-row></v-card-title
+      >
+      <v-card-title v-show="editNameMode"
+        ><v-row>
+          <v-col
+            ><v-text-field
+              v-model="newName"
+              autofocus
+              dense
+              @keyup.enter="doUpdateName()"
+              @keyup.esc="editNameMode = false"
+            ></v-text-field
+          ></v-col>
+          <v-col cols="2">
+            <v-icon @click="doUpdateName()">mdi-check</v-icon>
+            <v-icon @click="editNameMode = false">mdi-close</v-icon></v-col
+          >
+        </v-row></v-card-title
+      >
       <!-- <v-card-subtitle>Recipes</v-card-subtitle>
             <v-card-text v-if="!dish.recipes || !dish.recipes.length"
               >No recipes yet</v-card-text
@@ -24,9 +49,6 @@
       </v-list>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn text color="grey darken-1" @click="confirmDialog = true"
-          ><v-icon>mdi-trash-can</v-icon></v-btn
-        >
       </v-card-actions>
     </v-card>
 
@@ -60,14 +82,24 @@ export default Vue.extend({
     },
     dishStats: {
       type: Object as PropType<DishStats>,
-      required: true,
+      required: false,
+      default(): DishStats {
+        return { dishId: this.dish.id, lastUsed: undefined, timesUsed: 0 }
+      },
     },
   },
 
   data() {
     return {
       confirmDialog: false,
+      editNameMode: false,
+      newName: '',
+      name: '',
     }
+  },
+
+  mounted() {
+    this.name = this.dish.name
   },
 
   methods: {
@@ -80,11 +112,29 @@ export default Vue.extend({
       this.$accessor.dishes.populateDishes()
     },
 
+    async doUpdateName() {
+      // no need to fetch all dishes again just make it look like it's updated
+      this.name = this.newName
+      this.editNameMode = false
+      try {
+        await this.$repositories.dishes.updateName(this.dish.id, this.newName)
+        await this.$accessor.dishes.updateDish({ dishId: this.dish.id })
+      } catch (e) {
+        // TODO: show error message
+        this.name = this.dish.name
+      }
+    },
+
+    enableEditNameMode() {
+      this.newName = this.name
+      this.editNameMode = true
+    },
+
     getLastUsed() {
-      return this.dishStats?.lastUsed.toLocaleString() ?? 'Never used'
+      return this.dishStats.lastUsed?.toLocaleString() ?? 'Never used'
     },
     getTimesUsed() {
-      return this.dishStats?.timesUsed ?? 0
+      return this.dishStats.timesUsed
     },
   },
 })

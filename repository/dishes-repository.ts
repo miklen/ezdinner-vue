@@ -15,6 +15,15 @@ export default class DishesRepository {
     )) as Dish[]
   }
 
+  /**
+   * Gets a dishs and all it's recipes
+   * @param dishId
+   * @returns dishes flattened per recipe available
+   */
+  async get(dishId: string) {
+    return (await this.$axios.$get(`api/dishes/${dishId}`)) as Dish[]
+  }
+
   create(familyId: string, dishName: string) {
     return this.$axios.$post('api/dishes', {
       name: dishName,
@@ -36,5 +45,9 @@ export default class DishesRepository {
       result[i].lastUsed = DateTime.fromISO(result[i].lastUsed)
     })
     return result
+  }
+
+  updateName(dishId: string, newName: string) {
+    return this.$axios.$put(`api/dishes/${dishId}/name/`, { name: newName })
   }
 }

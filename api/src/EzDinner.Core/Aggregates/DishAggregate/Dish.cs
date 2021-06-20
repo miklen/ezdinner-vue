@@ -6,7 +6,7 @@ namespace EzDinner.Core.Aggregates.DishAggregate
 {
     public class Dish : AggregateRoot<Guid>
     {
-        public string Name { get; }
+        public string Name { get; set; }
         public Guid FamilyId { get; }
         public IEnumerable<Recipe> Recipes { get; }
         public bool Deleted { get; private set; }
