@@ -21,6 +21,12 @@ export default {
           'Plan and track your dinner - get suggestions based on your history!',
       },
       {
+        hid: 'og:description',
+        name: 'og:description',
+        content:
+          'Plan and track your dinner - get suggestions based on your history!',
+      },
+      {
         hid: 'og:title',
         name: 'og:title',
         content: 'Easy Dinner Planner',
