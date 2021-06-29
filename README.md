@@ -1,4 +1,4 @@
-# ezdinner-nuxt
+# Easy Dinner Planner
 
 ## Build Setup
 

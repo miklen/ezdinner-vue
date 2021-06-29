@@ -14,7 +14,22 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' },
+      {
+        hid: 'description',
+        name: 'description',
+        content:
+          'Plan and track your dinner - get suggestions based on your history!',
+      },
+      {
+        hid: 'og:title',
+        name: 'og:title',
+        content: 'Easy Dinner Planner',
+      },
+      {
+        hid: 'og:site_name',
+        name: 'og:site_name',
+        content: 'Easy Dinner Planner',
+      },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
