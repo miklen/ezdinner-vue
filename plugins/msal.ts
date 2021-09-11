@@ -47,6 +47,9 @@ export class MsalPlugin implements PluginObject<MsalPluginOptions> {
         authority: options.loginAuthority,
         knownAuthorities: [options.knownAuthority],
       },
+      cache: {
+        cacheLocation: 'localStorage',
+      },
       system: {
         loggerOptions: {
           loggerCallback: (
