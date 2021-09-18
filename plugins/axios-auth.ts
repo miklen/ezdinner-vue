@@ -9,7 +9,7 @@ export default ({
   $msal: MsalPlugin
 }) => {
   app.$axios.onRequest(async (config: any) => {
-    if (!$msal.isAuthenticated) return config
+    if (!(await $msal.getIsAuthenticated())) return config
     const token = await $msal.acquireToken()
     config.headers.common.Authorization = `Bearer ${token}`
     return config
