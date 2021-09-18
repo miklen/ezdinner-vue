@@ -28,7 +28,8 @@ export class MsalPlugin implements PluginObject<MsalPluginOptions> {
     redirectUri: '',
   }
 
-  public isAuthenticated = false
+  private isAuthenticated = false
+  private isAuthenticatedPromise: Promise<boolean> = Promise.resolve(false)
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public install(vue: VueConstructor<Vue>, options?: MsalPluginOptions): void {
@@ -80,12 +81,31 @@ export class MsalPlugin implements PluginObject<MsalPluginOptions> {
       },
     }
     msalInstance = new msal.PublicClientApplication(msalConfig)
-    this.isAuthenticated = this.getIsAuthenticated()
+    this.isAuthenticatedPromise = this.setupLoginRedirectHandler()
+  }
+
+  public async setupLoginRedirectHandler() {
+    const response = await msalInstance.handleRedirectPromise()
+    if (response !== null) {
+      this.isAuthenticated = !!response?.account
+    } else {
+      // need to call getAccount here?
+      const currentAccounts = msalInstance.getAllAccounts()
+      if (!currentAccounts || currentAccounts.length < 1) {
+        this.isAuthenticated = false
+      } else if (currentAccounts.length > 1) {
+        // Add choose account code here
+      } else if (currentAccounts.length === 1) {
+        this.isAuthenticated = !!currentAccounts[0]
+      }
+    }
+
+    return this.isAuthenticated
   }
 
   public async signIn() {
     try {
-      const loginRequest: msal.PopupRequest = {
+      const loginRequest: msal.RedirectRequest = {
         scopes: [
           'openid',
           'profile',
@@ -93,11 +113,7 @@ export class MsalPlugin implements PluginObject<MsalPluginOptions> {
           'https://ezlifehacks.onmicrosoft.com/98d97e1a-7c16-4f2f-89e3-ca839335a122/backendapi',
         ],
       }
-      const loginResponse: msal.AuthenticationResult = await msalInstance.loginPopup(
-        loginRequest,
-      )
-      this.isAuthenticated = !!loginResponse.account
-      // do something with this?
+      return await msalInstance.loginRedirect(loginRequest)
     } catch (err) {
       // handle error
       if (err.errorMessage && err.errorMessage.includes('AADB2C90118')) {
@@ -165,8 +181,7 @@ export class MsalPlugin implements PluginObject<MsalPluginOptions> {
     return undefined
   }
 
-  private getIsAuthenticated(): boolean {
-    const accounts: msal.AccountInfo[] = msalInstance.getAllAccounts()
-    return accounts && accounts.length > 0
+  public async getIsAuthenticated(): Promise<boolean> {
+    return await this.isAuthenticatedPromise
   }
 }

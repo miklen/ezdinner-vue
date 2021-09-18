@@ -331,22 +331,21 @@ export default Vue.extend({
   head: {
     title: 'Welcome',
   },
-  computed: {
-    isAuthenticated() {
-      return this.$msal.isAuthenticated
-    },
-  },
+  computed: {},
   watch: {
-    isAuthenticated() {
-      if (this.isAuthenticated) this.$router.push('/home')
+    async isAuthenticated() {
+      if (await this.isAuthenticated()) this.$router.push('/home')
     },
   },
-  created() {
-    if (this.isAuthenticated) this.$router.push('/home')
+  async created() {
+    if (await this.isAuthenticated()) this.$router.push('/home')
   },
   methods: {
     signIn() {
       this.$msal.signIn()
+    },
+    async isAuthenticated() {
+      return await this.$msal.getIsAuthenticated()
     },
   },
 })

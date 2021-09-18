@@ -90,9 +90,9 @@ export default Vue.extend({
     clickSignOut() {
       this.$msal.signOut()
     },
-    showMenu(item: any) {
+    async showMenu(item: any) {
       if (!item.requireAuth) return true
-      return this.$msal.isAuthenticated
+      return await this.$msal.getIsAuthenticated()
     },
     getFamilySelectors() {
       return this.$accessor.families.getFamilySelectors()
