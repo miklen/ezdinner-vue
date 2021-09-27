@@ -156,9 +156,11 @@ export class MsalPlugin implements PluginObject<MsalPluginOptions> {
       return response.accessToken
     } catch (error) {
       if (error instanceof msal.InteractionRequiredAuthError) {
-        return msalInstance.acquireTokenPopup(request).catch((popupError) => {
-          console.error(popupError)
-        })
+        return msalInstance
+          .acquireTokenRedirect(request)
+          .catch((popupError) => {
+            console.error(popupError)
+          })
       }
       return false
     }
