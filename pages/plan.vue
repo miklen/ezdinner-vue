@@ -31,14 +31,6 @@
       <v-col>
         <v-timeline dense>
           <div v-for="(dinner, index) in dinners" :key="index">
-            <PlannedDinner
-              :dinner="dinner"
-              :selected="isDinnerDateSelected(dinner, selectedDinnerDate)"
-              @dinner:clicked="selectedDinnerDate = dinner.date"
-              @dinner:menuupdated="menuUpdated"
-              @dinner:close="selectedDinnerDate = null"
-            />
-
             <!-- Everytime a new week starts -->
             <v-timeline-item
               v-if="dinner.date.weekday === 1"
@@ -54,6 +46,14 @@
                 }}</v-col>
               </v-row>
             </v-timeline-item>
+
+            <PlannedDinner
+              :dinner="dinner"
+              :selected="isDinnerDateSelected(dinner, selectedDinnerDate)"
+              @dinner:clicked="selectedDinnerDate = dinner.date"
+              @dinner:menuupdated="menuUpdated"
+              @dinner:close="selectedDinnerDate = null"
+            />
           </div>
         </v-timeline>
       </v-col>
@@ -102,7 +102,7 @@ export default Vue.extend({
       return this.$accessor.activeFamilyId
     },
     dinners() {
-      return [...this.$accessor.dinners.dinners].reverse()
+      return [...this.$accessor.dinners.dinners]
     },
   },
 
@@ -152,3 +152,10 @@ export default Vue.extend({
   },
 })
 </script>
+
+<style lang="scss" scoped>
+.v-timeline-item {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+</style>

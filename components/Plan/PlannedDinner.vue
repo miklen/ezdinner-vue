@@ -103,4 +103,8 @@ export default Vue.extend({
 .planning-card {
   margin-bottom: 20px;
 }
+
+.v-timeline-item {
+  padding-bottom: 0px;
+}
 </style>
