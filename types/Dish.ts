@@ -7,6 +7,7 @@ export declare class Dish {
   url: string
   tags: Tag[]
   notes: string
+  rating: number
 }
 
 export declare class DishStats {

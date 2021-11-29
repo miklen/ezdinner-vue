@@ -13,7 +13,11 @@ namespace EzDinner.Core.Aggregates.DishAggregate
         public Uri? Url { get; set; }
         public IEnumerable<Tag> Tags { get; }
         public string Notes { get; set; }
-        public int Rating { get; set; }
+        
+        /// <summary>
+        /// Rating in 10 steps. Values are between 0-10.
+        /// </summary>
+        public int Rating { get; private set; }
 
         /// <summary>
         /// For serialization purpose only. Does not protect invariants and constraints.
@@ -37,6 +41,12 @@ namespace EzDinner.Core.Aggregates.DishAggregate
         public void Delete()
         {
             Deleted = true;
+        }
+
+        public void SetRating(int rating)
+        {
+            if (rating > 10 || rating < 0) throw new ArgumentException("Rating must be between 0 and 10");
+            Rating = rating;
         }
     }
 }

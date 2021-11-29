@@ -27,6 +27,20 @@
               >
                 <template #item="{ item }">
                   <v-list-item-content>{{ item.name }}</v-list-item-content>
+                  <v-list-item-action>
+                    <v-rating
+                      dense
+                      color="primary"
+                      half-increments
+                      empty-icon="mdi-heart-outline"
+                      full-icon="mdi-heart"
+                      half-icon="mdi-heart-half-full"
+                      length="5"
+                      size="20"
+                      :value="item.rating"
+                      readonly
+                    ></v-rating>
+                  </v-list-item-action>
                 </template>
 
                 <template #no-data>

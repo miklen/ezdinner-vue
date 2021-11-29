@@ -50,4 +50,10 @@ export default class DishesRepository {
   updateName(dishId: string, newName: string) {
     return this.$axios.$put(`api/dishes/${dishId}/name/`, { name: newName })
   }
+
+  setRating(dishId: string, newRating: any) {
+    return this.$axios.$put(`api/dishes/${dishId}/rating`, {
+      rating: newRating,
+    })
+  }
 }

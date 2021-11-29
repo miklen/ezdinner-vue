@@ -1,19 +1,12 @@
 <template>
   <span>
     <v-row>
-      <v-col cols="4">
+      <v-col cols="12" md="4">
         <v-text-field v-model="searchDish" label="Search dishes"></v-text-field>
       </v-col>
     </v-row>
     <v-row>
-      <v-col
-        v-for="dish in dishes"
-        :key="dish.id"
-        xs="12"
-        sm="12"
-        md="6"
-        lg="4"
-      >
+      <v-col v-for="dish in dishes" :key="dish.id" cols="12" md="6" lg="4">
         <DishCard
           :dish="dish"
           :dish-stats="stats[dish.id]"

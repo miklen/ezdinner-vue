@@ -2,8 +2,8 @@
   <span>
     <v-card rounded="lg">
       <v-card-title v-show="!editNameMode"
-        ><v-row>
-          <v-col>{{ name }}</v-col>
+        ><v-row style="overflow: hidden">
+          <v-col style="word-break: normal">{{ name }}</v-col>
           <v-col cols="2">
             <v-icon @click="enableEditNameMode()">mdi-pencil</v-icon>
             <v-icon @click="confirmDialog = true">mdi-trash-can</v-icon></v-col
@@ -27,11 +27,25 @@
           >
         </v-row></v-card-title
       >
+      <v-card-subtitle
+        ><v-row>
+          <v-rating
+            color="primary"
+            half-increments
+            empty-icon="mdi-heart-outline"
+            full-icon="mdi-heart"
+            half-icon="mdi-heart-half-full"
+            length="5"
+            size="20"
+            :value="dish.rating"
+            @input="setRating($event)"
+          ></v-rating> </v-row
+      ></v-card-subtitle>
       <v-list>
-        <v-list-item>
+        <v-list-item v-if="dishStats.lastUsed">
           <v-list-item-content>
             <v-list-item-subtitle
-              >Times for dinner: {{ getTimesUsed() }}</v-list-item-subtitle
+              >Times had for dinner: {{ getTimesUsed() }}</v-list-item-subtitle
             >
           </v-list-item-content>
           <v-list-item-action v-if="getTimesUsed() > 0"
@@ -42,8 +56,11 @@
         </v-list-item>
         <v-list-item>
           <v-list-item-content>
-            <v-list-item-subtitle
-              >Last time used: {{ getLastUsed() }}</v-list-item-subtitle
+            <v-list-item-subtitle v-if="dishStats.lastUsed"
+              >Last planned on {{ getLastUsed() }}</v-list-item-subtitle
+            >
+            <v-list-item-subtitle v-else
+              >Never been planned for dinner</v-list-item-subtitle
             >
           </v-list-item-content>
         </v-list-item>
@@ -121,6 +138,7 @@ export default Vue.extend({
       name: '',
       moveDialog: false,
       moveToDish: {} as Dish,
+      rating: 0,
     }
   },
 
@@ -154,6 +172,11 @@ export default Vue.extend({
       )
       this.moveDialog = false
       this.$emit('menuitem:moved')
+    },
+
+    async setRating(newRating: number) {
+      await this.$repositories.dishes.setRating(this.dish.id, newRating)
+      this.$emit('rating:updated')
     },
 
     async doUpdateName() {
