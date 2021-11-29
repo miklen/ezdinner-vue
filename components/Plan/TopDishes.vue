@@ -60,7 +60,7 @@ export default Vue.extend({
           times: this.stats[d.id]?.timesUsed ?? 0,
         }))
         .sort((a, b) => b.times - a.times)
-        .slice(0, Math.max(this.top, this.$accessor.dishes.dishes.length))
+        .slice(0, Math.min(this.top, this.$accessor.dishes.dishes.length))
       return topDishes
     },
   },
