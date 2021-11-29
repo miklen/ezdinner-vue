@@ -15,13 +15,28 @@
             <thead>
               <tr>
                 <th class="text-left">Dish</th>
-                <th class="text-left">Times</th>
+                <th class="text-center">Times</th>
+                <th class="text-center">Rating</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="item in topDishes" :key="item.name">
                 <td>{{ item.name }}</td>
-                <td>{{ item.times }}</td>
+                <td class="text-center">{{ item.times }}</td>
+                <td class="text-center">
+                  <v-rating
+                    dense
+                    color="primary"
+                    half-increments
+                    empty-icon="mdi-heart-outline"
+                    full-icon="mdi-heart"
+                    half-icon="mdi-heart-half-full"
+                    length="5"
+                    size="15"
+                    :value="item.rating"
+                    readonly
+                  ></v-rating>
+                </td>
               </tr>
             </tbody>
           </template>
@@ -58,6 +73,7 @@ export default Vue.extend({
         .map((d) => ({
           name: d.name,
           times: this.stats[d.id]?.timesUsed ?? 0,
+          rating: d.rating,
         }))
         .sort((a, b) => b.times - a.times)
         .slice(0, Math.min(this.top, this.$accessor.dishes.dishes.length))
