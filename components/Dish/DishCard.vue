@@ -27,10 +27,6 @@
           >
         </v-row></v-card-title
       >
-      <!-- <v-card-subtitle>Recipes</v-card-subtitle>
-            <v-card-text v-if="!dish.recipes || !dish.recipes.length"
-              >No recipes yet</v-card-text
-            > -->
       <v-list>
         <v-list-item>
           <v-list-item-content>
@@ -52,9 +48,6 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-      </v-card-actions>
     </v-card>
 
     <v-dialog v-model="confirmDialog" width="400">
@@ -157,9 +150,7 @@ export default Vue.extend({
       await this.$repositories.dinners.moveDinnerDishes(
         this.$accessor.activeFamilyId,
         this.dish.id,
-        this.dish.recipeId,
         this.moveToDish.id,
-        this.moveToDish.recipeId,
       )
       this.moveDialog = false
       this.$emit('menuitem:moved')

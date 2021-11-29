@@ -14,7 +14,6 @@ namespace EzDinner.Functions.Models.Query
         public class MenuItemQueryModel
         {
             public Guid DishId { get; set; }
-            public Guid? RecipeId { get; set; }
         }
 
         [JsonProperty]

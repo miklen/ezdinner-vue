@@ -24,10 +24,5 @@ namespace EzDinner.Functions.Models.Command
         /// The dishId to add to the menu.
         /// </summary>
         public Guid DishId { get; set; }
-        /// <summary>
-        /// If a recipe has been selected for the dish, then that is specified as well.
-        /// This value may be null as some dishes may not have recipes.
-        /// </summary>
-        public Guid? RecipeId { get; set; }
     }
 }

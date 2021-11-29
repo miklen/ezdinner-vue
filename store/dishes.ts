@@ -33,17 +33,13 @@ export const actions = actionTree(
     },
 
     async updateDish({ commit, state }, { dishId }: { dishId: string }) {
-      const dishRecipes = await this.$repositories.dishes.get(dishId)
+      const dish = await this.$repositories.dishes.get(dishId)
       const dishes = [...state.dishes]
-      for (const dish of dishRecipes) {
-        const index = dishes.findIndex(
-          (f) => f.id === dish.id && f.recipeId === dish.recipeId,
-        )
-        if (index === -1) {
-          dishes.push(dish)
-        } else {
-          dishes[index] = dish
-        }
+      const index = dishes.findIndex((f) => f.id === dish.id)
+      if (index === -1) {
+        dishes.push(dish)
+      } else {
+        dishes[index] = dish
       }
 
       commit('updateDishes', dishes)

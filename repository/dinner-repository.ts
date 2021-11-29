@@ -20,47 +20,27 @@ export default class DinnerRepository {
     )
   }
 
-  addDishToMenu(
-    familyId: string,
-    date: DateTime,
-    dishId: string,
-    recipeId: string | null,
-  ) {
+  addDishToMenu(familyId: string, date: DateTime, dishId: string) {
     return this.$axios.put('api/dinners/menuitem', {
       date: date.toISODate(),
       dishId,
-      recipeId,
       familyId,
     })
   }
 
-  removeDishFromMenu(
-    familyId: string,
-    date: DateTime,
-    dishId: string,
-    recipeId: string | null,
-  ) {
+  removeDishFromMenu(familyId: string, date: DateTime, dishId: string) {
     return this.$axios.put('api/dinners/menuitem/remove', {
       date: date.toISODate(),
       dishId,
-      recipeId,
       familyId,
     })
   }
 
-  moveDinnerDishes(
-    familyId: string,
-    dishId: string,
-    receipeId: string,
-    newDishId: string,
-    newRecipeId: string,
-  ) {
+  moveDinnerDishes(familyId: string, dishId: string, newDishId: string) {
     return this.$axios.put('api/dinners/menuitem/replace', {
       familyId,
       dishId,
-      receipeId,
       newDishId,
-      newRecipeId,
     })
   }
 }

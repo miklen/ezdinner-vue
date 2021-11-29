@@ -40,7 +40,7 @@ namespace EzDinner.Functions
             
             _logger.LogInformation($"Adding dish: {menuItem.DishId} to date: {menuItem.Date}");
             var dinner = await _dinnerService.GetAsync(menuItem.FamilyId, menuItem.Date);
-            dinner.AddMenuItem(new MenuItem(menuItem.DishId, menuItem.RecipeId));
+            dinner.AddMenuItem(new MenuItem(menuItem.DishId));
             await _dinnerRepository.SaveAsync(dinner);
 
             return new OkResult();

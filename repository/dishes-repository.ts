@@ -16,12 +16,12 @@ export default class DishesRepository {
   }
 
   /**
-   * Gets a dishs and all it's recipes
+   * Gets a dishs
    * @param dishId
-   * @returns dishes flattened per recipe available
+   * @returns dishes available
    */
   async get(dishId: string) {
-    return (await this.$axios.$get(`api/dishes/${dishId}`)) as Dish[]
+    return (await this.$axios.$get(`api/dishes/${dishId}`)) as Dish
   }
 
   create(familyId: string, dishName: string) {

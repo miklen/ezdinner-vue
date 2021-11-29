@@ -7,12 +7,10 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
     public class MenuItem : IEquatable<MenuItem>
     {
         public Guid DishId { get; }
-        public Guid? ReciepeId { get; }
 
-        public MenuItem(Guid dishId, Guid? reciepeId = null)
+        public MenuItem(Guid dishId)
         {
             DishId = dishId;
-            ReciepeId = reciepeId;
         }
 
         public override bool Equals(object? obj)
@@ -22,13 +20,12 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(DishId, ReciepeId);
+            return HashCode.Combine(DishId);
         }
 
         public bool Equals(MenuItem? other)
         {
-            return other != null && DishId.Equals(other.DishId) &&
-                   EqualityComparer<Guid?>.Default.Equals(ReciepeId, other.ReciepeId);
+            return other != null && DishId.Equals(other.DishId);
         }
     }
 }

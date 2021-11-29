@@ -41,7 +41,7 @@ namespace EzDinner.Functions
             _logger.LogInformation($"Replacing dishId: {replaceModel.DishId} with: {replaceModel.DishId}");
 
             await foreach (var dinner in _dinnerRepository.GetAsync(replaceModel.FamilyId, replaceModel.DishId)) {
-                dinner.ReplaceMenuItem(new MenuItem(replaceModel.DishId, replaceModel.RecipeId), new MenuItem(replaceModel.NewDishId, replaceModel.NewRecipeId));
+                dinner.ReplaceMenuItem(new MenuItem(replaceModel.DishId), new MenuItem(replaceModel.NewDishId));
                 await _dinnerRepository.SaveAsync(dinner);
             }
             

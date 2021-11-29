@@ -22,19 +22,11 @@
                 outlined
                 label="Add dish to menu"
                 placeholder="Start typing to search"
-                @input="addDishToMenu($event.id, $event.recipeId)"
+                @input="addDishToMenu($event.id)"
                 @keyup.enter.native="createDish"
               >
                 <template #item="{ item }">
-                  <template v-if="!item.recipeId">
-                    <v-list-item-content>{{ item.name }}</v-list-item-content>
-                  </template>
-                  <template v-else>
-                    <v-list-item-content>{{ item.name }}</v-list-item-content>
-                    <v-list-item-subtitle>
-                      {{ item.recipeId }}</v-list-item-subtitle
-                    >
-                  </template>
+                  <v-list-item-content>{{ item.name }}</v-list-item-content>
                 </template>
 
                 <template #no-data>
@@ -51,16 +43,8 @@
           <v-list>
             <v-list-item v-for="menuItem in dinner.menu" :key="menuItem.dishId">
               <v-list-item-title>{{ menuItem.dishName }}</v-list-item-title>
-              <v-list-item-subtitle>{{
-                menuItem.recipeName
-              }}</v-list-item-subtitle>
               <v-list-item-action>
-                <v-btn
-                  icon
-                  @click="
-                    removeDishFromMenu(menuItem.dishId, menuItem.recipeId)
-                  "
-                >
+                <v-btn icon @click="removeDishFromMenu(menuItem.dishId)">
                   <v-icon>mdi-close-circle-outline</v-icon>
                 </v-btn>
               </v-list-item-action>
@@ -146,38 +130,32 @@ export default Vue.extend({
       )
       // repopulate dishes to add the new dish to the list
       await this.$accessor.dishes.updateDish({ dishId })
-      await this.addDishToMenu(dishId, null)
+      await this.addDishToMenu(dishId)
     },
-    async addDishToMenu(dishId: string, recipeId: string | null) {
+    async addDishToMenu(dishId: string) {
       await this.$repositories.dinners.addDishToMenu(
         this.$accessor.activeFamilyId,
         this.dinner.date,
         dishId,
-        recipeId,
       )
       const dish = this.dishVariants.find((d) => d.id === dishId)
       this.$emit('dinner:menuupdated', {
         date: this.dinner.date,
         dishId,
-        recipeId,
         dishName: dish?.name,
-        receipeName: dish?.recipeName,
       })
       this.selectedDish = ''
     },
-    async removeDishFromMenu(dishId: string, recipeId: string | null) {
+    async removeDishFromMenu(dishId: string) {
       await this.$repositories.dinners.removeDishFromMenu(
         this.$accessor.activeFamilyId,
         this.dinner.date,
         dishId,
-        recipeId,
       )
       this.$emit('dinner:menuupdated', {
         date: this.dinner.date,
         dishId,
-        recipeId,
         dishName: '',
-        receipeName: '',
       })
     },
   },

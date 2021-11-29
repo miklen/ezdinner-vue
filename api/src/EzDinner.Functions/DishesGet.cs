@@ -43,7 +43,7 @@ namespace EzDinner.Functions
             var parsedId = Guid.Parse(familyId);
             var dishes = await _dishRepository.GetDishesAsync(parsedId);
 
-            return new OkObjectResult(dishes.SelectMany(DishesQueryModel.FromDomain));
+            return new OkObjectResult(dishes.Select(DishesQueryModel.FromDomain));
         }
     }
 }
