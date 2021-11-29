@@ -1,9 +1,12 @@
 <template>
   <span>
     <v-row>
-      <v-col class="text-center">
-        <h1>In rotation</h1>
+      <v-col align-left class="text-center">
+        <h1>Top {{ top }}</h1>
       </v-col>
+      <v-col cols="3" xl="2"
+        ><v-select v-model="top" :items="choices"></v-select
+      ></v-col>
     </v-row>
     <v-row>
       <v-col>
@@ -35,6 +38,8 @@ export default Vue.extend({
   data() {
     return {
       stats: {} as { [key: string]: DishStats },
+      top: 10,
+      choices: [10, 25, 50],
     }
   },
 
@@ -42,6 +47,9 @@ export default Vue.extend({
     this.stats = await this.$repositories.dishes.allUsageStats(
       this.$accessor.activeFamilyId,
     )
+    if (!this.$accessor.dishes.dishes.length) {
+      this.$accessor.dishes.populateDishes()
+    }
   },
 
   computed: {
@@ -52,7 +60,7 @@ export default Vue.extend({
           times: this.stats[d.id]?.timesUsed ?? 0,
         }))
         .sort((a, b) => b.times - a.times)
-        .slice(0, 10)
+        .slice(0, Math.max(this.top, this.$accessor.dishes.dishes.length))
       return topDishes
     },
   },

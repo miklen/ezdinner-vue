@@ -1,5 +1,5 @@
 <template>
-  <Content>
+  <Content split>
     <v-row>
       <v-col class="text-center">
         <h1>Welcome</h1>
@@ -9,15 +9,20 @@
         </span>
       </v-col>
     </v-row>
+    <template #support>
+      <TopDishes />
+    </template>
   </Content>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import Content from '~/components/Content.vue'
+import TopDishes from '~/components/Plan/TopDishes.vue'
 export default Vue.extend({
   components: {
     Content,
+    TopDishes,
   },
   head: {
     title: 'Home',

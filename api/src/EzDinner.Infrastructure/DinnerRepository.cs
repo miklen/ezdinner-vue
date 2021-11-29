@@ -74,6 +74,24 @@ namespace EzDinner.Infrastructure
             }
         }
 
+        public async IAsyncEnumerable<Dinner> GetAsync(Guid familyId, Guid dishId)
+        {
+            var sql = $"SELECT VALUE c FROM c JOIN s in c.menu WHERE c.familyId = @familyId AND CONTAINS(s.dishId, @dishId)";
+            var queryDefinition = new QueryDefinition(sql)
+                .WithParameter("@familyId", familyId)
+                .WithParameter("@dishId", dishId);
+   
+            var queryResultSetIterator = _container.GetItemQueryIterator<Dinner>(queryDefinition);
+
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                foreach (var dinner in await queryResultSetIterator.ReadNextAsync())
+                {
+                    yield return dinner;
+                }
+            }
+        }
+
         public Task SaveAsync(Dinner dinner)
         {
             return _container.UpsertItemAsync(dinner);

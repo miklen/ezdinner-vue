@@ -14,7 +14,11 @@
         md="6"
         lg="4"
       >
-        <DishCard :dish="dish" :dish-stats="stats[dish.id]"></DishCard>
+        <DishCard
+          :dish="dish"
+          :dish-stats="stats[dish.id]"
+          @menuitem:moved="getStats()"
+        ></DishCard>
       </v-col>
     </v-row>
   </span>
@@ -67,6 +71,9 @@ export default Vue.extend({
   methods: {
     async init() {
       await this.$accessor.dishes.populateDishes()
+      await this.getStats()
+    },
+    async getStats() {
       this.stats = await this.$repositories.dishes.allUsageStats(
         this.activeFamilyId,
       )

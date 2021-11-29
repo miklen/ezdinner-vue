@@ -2,6 +2,7 @@
 using EzDinner.Core.Aggregates.DinnerAggregate;
 using MicroElements.AutoFixture.NodaTime;
 using Newtonsoft.Json;
+using NodaTime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,15 +21,16 @@ namespace EzDinner.UnitTests.DinnerTests
         {
             // Arrange
             var dinner = Fixture.Build<Dinner>().Create();
-            var dishId = Guid.NewGuid();
-            var recipeId = Guid.NewGuid();
+            var menuItem = new MenuItem(Guid.NewGuid(), Guid.NewGuid());
+            var menuItem2 = new MenuItem(Guid.Parse(menuItem.DishId.ToString()), Guid.Parse(menuItem.ReciepeId.ToString()));
+            var dinnerCount = dinner.Menu.Count();
 
             // Act
-            dinner.AddMenuItem(dishId, recipeId);
-            dinner.AddMenuItem(Guid.Parse(dishId.ToString()), Guid.Parse(recipeId.ToString()));
+            dinner.AddMenuItem(menuItem);
+            dinner.AddMenuItem(menuItem);
 
             // Assert
-            Assert.Single(dinner.Menu);
+            Assert.Equal(dinnerCount + 1, dinner.Menu.Count());
         }
 
         [Fact]
@@ -36,15 +38,16 @@ namespace EzDinner.UnitTests.DinnerTests
         {
             // Arrange
             var dinner = Fixture.Build<Dinner>().Create();
-            var dishId = Guid.NewGuid();
-            var recipeId = Guid.NewGuid();
+            var menuItem = new MenuItem(Guid.NewGuid(), Guid.NewGuid());
+            var menuItem2 = new MenuItem(Guid.NewGuid(), null);
+            var dinnerCount = dinner.Menu.Count();
 
             // Act
-            dinner.AddMenuItem(dishId, recipeId);
-            dinner.AddMenuItem(Guid.Parse(dishId.ToString()), null);
+            dinner.AddMenuItem(menuItem);
+            dinner.AddMenuItem(menuItem2);
 
             // Assert
-            Assert.Equal(2, dinner.Menu.Count());
+            Assert.Equal(2 + dinnerCount, dinner.Menu.Count());
         }
 
         [Fact]
@@ -52,15 +55,15 @@ namespace EzDinner.UnitTests.DinnerTests
         {
             // Arrange
             var dinner = Fixture.Build<Dinner>().Create();
-            var dishId = Guid.NewGuid();
-            var recipeId = Guid.NewGuid();
+            var menuItem = new MenuItem(Guid.NewGuid(), Guid.NewGuid());
+            var dinnerCount = dinner.Menu.Count();
 
             // Act
-            dinner.AddMenuItem(dishId, recipeId);
-            dinner.RemoveMenuItem(dishId, recipeId);
+            dinner.AddMenuItem(menuItem);
+            dinner.RemoveMenuItem(menuItem);
 
             // Assert
-            Assert.Empty(dinner.Menu);
+            Assert.Equal(dinnerCount, dinner.Menu.Count());
         }
 
         [Fact]
@@ -68,16 +71,17 @@ namespace EzDinner.UnitTests.DinnerTests
         {
             // Arrange
             var dinner = Fixture.Build<Dinner>().Create();
-            var dishId = Guid.NewGuid();
-            var recipeId = Guid.NewGuid();
+            var menuItem = new MenuItem(Guid.NewGuid(), Guid.NewGuid());
+            var menuItem2 = new MenuItem(Guid.NewGuid());
+            var dinnerCount = dinner.Menu.Count();
 
             // Act
-            dinner.AddMenuItem(dishId, recipeId);
-            dinner.AddMenuItem(dishId, null);
-            dinner.RemoveMenuItem(dishId, null);
+            dinner.AddMenuItem(menuItem);
+            dinner.AddMenuItem(menuItem2);
+            dinner.RemoveMenuItem(menuItem2);
 
             // Assert
-            Assert.Single(dinner.Menu);
+            Assert.Equal(1 + dinnerCount, dinner.Menu.Count());
         }
 
         //[Fact]
@@ -103,9 +107,10 @@ namespace EzDinner.UnitTests.DinnerTests
         {
             // Arrange
             var dinner = Fixture.Create<Dinner>();
-            
+            var menuItem = new MenuItem(Guid.NewGuid());
+
             // Act
-            dinner.AddMenuItem(Guid.NewGuid());
+            dinner.AddMenuItem(menuItem);
 
             // Assert
             Assert.True(dinner.IsPlanned);
@@ -115,12 +120,70 @@ namespace EzDinner.UnitTests.DinnerTests
         public void Dinner_HasNoMenuItems_IsPlannedFalse()
         {
             // Arrange
-            var dinner = Fixture.Create<Dinner>();
+            var dinner = Dinner.CreateNew(Guid.NewGuid(), new LocalDate());
 
             // Act
 
             // Assert
             Assert.False(dinner.IsPlanned);
+        }
+
+        [Fact]
+        public void Menu_Replace_MenuItem()
+        {
+            // Arrange
+            var dinner = Fixture.Build<Dinner>().Create();
+            var menuItem = new MenuItem(Guid.NewGuid(), Guid.NewGuid());
+            var menuItem2 = new MenuItem(Guid.NewGuid(), null);
+            var dinnerCount = dinner.Menu.Count();
+
+            // Act
+            dinner.AddMenuItem(menuItem);
+
+            dinner.ReplaceMenuItem(menuItem, menuItem2);
+
+            // Assert
+            Assert.Contains(menuItem2, dinner.Menu);
+            Assert.DoesNotContain(menuItem, dinner.Menu);
+        }
+
+        [Fact]
+        public void Menu_Replace_MenuItem_ByValue_NotReference()
+        {
+            // Arrange
+            var dinner = Fixture.Build<Dinner>().Create();
+            var menuItem = new MenuItem(Guid.NewGuid(), Guid.NewGuid());
+            var menuItem2 = new MenuItem(Guid.NewGuid(), null);
+            
+            // Act
+            dinner.AddMenuItem(menuItem);
+
+            dinner.ReplaceMenuItem(new MenuItem(menuItem.DishId, menuItem.ReciepeId), menuItem2);
+
+            // Assert
+            Assert.Contains(menuItem2, dinner.Menu);
+            Assert.DoesNotContain(menuItem, dinner.Menu);
+        }
+
+        [Fact]
+        public void Menu_Replace_Preserves_Ordering()
+        {
+            // Arrange
+            var dinner = Fixture.Build<Dinner>().Create();
+            var menuItem = new MenuItem(Guid.NewGuid(), Guid.NewGuid());
+            var menuItem2 = new MenuItem(Guid.NewGuid(), null);
+            var menuItem3 = new MenuItem(Guid.NewGuid());
+            var menu = dinner.Menu.ToList();
+
+            dinner.ReplaceMenuItem(menu[0], menuItem);
+            dinner.ReplaceMenuItem(menu[1], menuItem2);
+            dinner.ReplaceMenuItem(menu[2], menuItem3);
+
+            menu = dinner.Menu.ToList();
+
+            Assert.Equal(menuItem, menu[0]);
+            Assert.Equal(menuItem2, menu[1]);
+            Assert.Equal(menuItem3, menu[2]);
         }
     }
 }

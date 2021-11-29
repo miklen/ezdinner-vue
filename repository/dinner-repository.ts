@@ -47,4 +47,20 @@ export default class DinnerRepository {
       familyId,
     })
   }
+
+  moveDinnerDishes(
+    familyId: string,
+    dishId: string,
+    receipeId: string,
+    newDishId: string,
+    newRecipeId: string,
+  ) {
+    return this.$axios.put('api/dinners/menuitem/replace', {
+      familyId,
+      dishId,
+      receipeId,
+      newDishId,
+      newRecipeId,
+    })
+  }
 }

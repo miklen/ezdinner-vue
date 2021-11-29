@@ -12,5 +12,6 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
         Task DeleteAsync(Dinner dinner);
         Task<Dinner?> GetAsync(Guid familyId, LocalDate exactDate);
         IAsyncEnumerable<Dinner> GetAsync(Guid familyId, LocalDate fromDate, LocalDate toDate);
+        IAsyncEnumerable<Dinner> GetAsync(Guid familyId, Guid dishId);
     }
 }

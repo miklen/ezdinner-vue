@@ -12,14 +12,14 @@ using Microsoft.Identity.Web.Resource;
 
 namespace EzDinner.Functions
 {
-    public class DinnerAddMenuItem
+    public class DinnerReplaceMenuItem
     {
         private readonly ILogger<DinnerAddMenuItem> _logger;
         private readonly IDinnerService _dinnerService;
         private readonly IDinnerRepository _dinnerRepository;
         private readonly IAuthzService _authz;
 
-        public DinnerAddMenuItem(ILogger<DinnerAddMenuItem> logger, IDinnerService dinnerService, IDinnerRepository dinnerRepository, IAuthzService authz)
+        public DinnerReplaceMenuItem(ILogger<DinnerAddMenuItem> logger, IDinnerService dinnerService, IDinnerRepository dinnerRepository, IAuthzService authz)
         {
             _logger = logger;
             _dinnerService = dinnerService;
@@ -27,22 +27,24 @@ namespace EzDinner.Functions
             _authz = authz;
         }
         
-        [FunctionName(nameof(DinnerAddMenuItem))]
+        [FunctionName(nameof(DinnerReplaceMenuItem))]
         [RequiredScope("backendapi")]
         public async Task<IActionResult?> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "dinners/menuitem")] HttpRequest req
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "dinners/menuitem/replace")] HttpRequest req
             )
         {
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
-            var menuItem = await req.GetBodyAs<DinnerAddRemoveMenuItemCommandModel>();
-            if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId()!, menuItem.FamilyId, Resources.Dinner, Actions.Update)) return new UnauthorizedResult();
-            
-            _logger.LogInformation($"Adding dish: {menuItem.DishId} to date: {menuItem.Date}");
-            var dinner = await _dinnerService.GetAsync(menuItem.FamilyId, menuItem.Date);
-            dinner.AddMenuItem(new MenuItem(menuItem.DishId, menuItem.RecipeId));
-            await _dinnerRepository.SaveAsync(dinner);
+            var replaceModel = await req.GetBodyAs<DinnerReplaceMenuItemCommandModel>();
+            if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId()!, replaceModel.FamilyId, Resources.Dinner, Actions.Update)) return new UnauthorizedResult();
 
+            _logger.LogInformation($"Replacing dishId: {replaceModel.DishId} with: {replaceModel.DishId}");
+
+            await foreach (var dinner in _dinnerRepository.GetAsync(replaceModel.FamilyId, replaceModel.DishId)) {
+                dinner.ReplaceMenuItem(new MenuItem(replaceModel.DishId, replaceModel.RecipeId), new MenuItem(replaceModel.NewDishId, replaceModel.NewRecipeId));
+                await _dinnerRepository.SaveAsync(dinner);
+            }
+            
             return new OkResult();
         }
     }

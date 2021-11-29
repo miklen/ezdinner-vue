@@ -49,11 +49,11 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
         /// </summary>
         /// <param name="dishId"></param>
         /// <param name="recipeId"></param>
-        public void AddMenuItem(Guid dishId, Guid? recipeId = null)
+        public void AddMenuItem(MenuItem menuItem)
         {
-            var dishIsAlreadyAdded = _menu.Any(w => w.DishId == dishId && w.ReciepeId == recipeId);
+            var dishIsAlreadyAdded = _menu.Any(w => w == menuItem);
             if (dishIsAlreadyAdded) return;
-            _menu.Add(new MenuItem(dishId, recipeId, _menu.Count));
+            _menu.Add(menuItem);
         }
 
         /// <summary>
@@ -62,11 +62,18 @@ namespace EzDinner.Core.Aggregates.DinnerAggregate
         /// </summary>
         /// <param name="dishId"></param>
         /// <param name="recipeId"></param>
-        public void RemoveMenuItem(Guid dishId, Guid? recipeId = null)
+        public void RemoveMenuItem(MenuItem menuItem)
         {
-            var itemOnMenu = _menu.FirstOrDefault(w => w.DishId == dishId && w.ReciepeId == recipeId);
+            var itemOnMenu = _menu.FirstOrDefault(w => w == menuItem);
             if (itemOnMenu is null) return;
             _menu.Remove(itemOnMenu);
+        }
+
+        public bool ReplaceMenuItem(MenuItem old, MenuItem replacement) {
+            var menuItemIndex = _menu.FindIndex(w => w.Equals(old));
+            if (menuItemIndex == -1) return false;
+            _menu[menuItemIndex] = replacement;
+            return true;
         }
     }
 }

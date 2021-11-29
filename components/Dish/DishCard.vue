@@ -38,6 +38,11 @@
               >Times for dinner: {{ getTimesUsed() }}</v-list-item-subtitle
             >
           </v-list-item-content>
+          <v-list-item-action v-if="getTimesUsed() > 0"
+            ><v-icon @click="moveDialog = true"
+              >mdi-transfer-right</v-icon
+            ></v-list-item-action
+          >
         </v-list-item>
         <v-list-item>
           <v-list-item-content>
@@ -68,6 +73,32 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="moveDialog" width="400">
+      <v-card>
+        <v-card-title
+          >Move {{ getTimesUsed() }} dinner occurrences?</v-card-title
+        >
+        <v-card-text
+          >Move all tracked dinner occurences of {{ dish.name }} to be tracked
+          as
+          <v-select
+            v-model="moveToDish"
+            :items="dishItems"
+            item-text="name"
+            return-object
+            style="width: 50%; display: inline-block; margin-left: 10px"
+          ></v-select
+        ></v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="grey darken-1" @click="moveDialog = false"
+            >Cancel</v-btn
+          >
+          <v-btn color="error" @click="doMove()">Move</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </span>
 </template>
 
@@ -95,7 +126,15 @@ export default Vue.extend({
       editNameMode: false,
       newName: '',
       name: '',
+      moveDialog: false,
+      moveToDish: {} as Dish,
     }
+  },
+
+  computed: {
+    dishItems(): Dish[] {
+      return this.$accessor.dishes.dishes
+    },
   },
 
   mounted() {
@@ -110,6 +149,18 @@ export default Vue.extend({
       )
       this.confirmDialog = false
       this.$accessor.dishes.populateDishes()
+    },
+
+    async doMove() {
+      await this.$repositories.dinners.moveDinnerDishes(
+        this.$accessor.activeFamilyId,
+        this.dish.id,
+        this.dish.recipeId,
+        this.moveToDish.id,
+        this.moveToDish.recipeId,
+      )
+      this.moveDialog = false
+      this.$emit('menuitem:moved')
     },
 
     async doUpdateName() {
