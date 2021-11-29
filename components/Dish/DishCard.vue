@@ -82,13 +82,13 @@
         <v-card-text
           >Move all tracked dinner occurences of {{ dish.name }} to be tracked
           as
-          <v-select
+          <v-autocomplete
             v-model="moveToDish"
             :items="dishItems"
             item-text="name"
             return-object
             style="width: 50%; display: inline-block; margin-left: 10px"
-          ></v-select
+          ></v-autocomplete
         ></v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -134,6 +134,8 @@ export default Vue.extend({
   computed: {
     dishItems(): Dish[] {
       return this.$accessor.dishes.dishes
+        .filter((w) => w.id !== this.dish.id)
+        .sort((a, b) => a.name.localeCompare(b.name))
     },
   },
 
