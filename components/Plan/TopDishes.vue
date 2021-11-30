@@ -2,7 +2,7 @@
   <span>
     <v-row>
       <v-col align-left class="text-center">
-        <h1>Top {{ top }}</h1>
+        <v-card-title>Top {{ top }}</v-card-title>
       </v-col>
       <v-col cols="3" xl="2"
         ><v-select v-model="top" :items="choices"></v-select

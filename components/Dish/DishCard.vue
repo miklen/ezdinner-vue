@@ -3,8 +3,12 @@
     <v-card rounded="lg">
       <v-card-title v-show="!editNameMode"
         ><v-row style="overflow: hidden">
-          <v-col style="word-break: normal">{{ name }}</v-col>
-          <v-col cols="2">
+          <v-col
+            style="word-break: normal; cursor: pointer"
+            @click="routeTo(dish.id)"
+            >{{ name }}</v-col
+          >
+          <v-col class="text-right" cols="3" lg="4" xl="2">
             <v-icon @click="enableEditNameMode()">mdi-pencil</v-icon>
             <v-icon @click="confirmDialog = true">mdi-trash-can</v-icon></v-col
           >
@@ -76,9 +80,7 @@
         >
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="grey darken-1" @click="confirmDialog = false"
-            >Cancel</v-btn
-          >
+          <v-btn @click="confirmDialog = false">Cancel</v-btn>
           <v-btn color="error" @click="doDelete()">Delete</v-btn>
         </v-card-actions>
       </v-card>
@@ -102,9 +104,7 @@
         ></v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="grey darken-1" @click="moveDialog = false"
-            >Cancel</v-btn
-          >
+          <v-btn @click="moveDialog = false">Cancel</v-btn>
           <v-btn color="error" @click="doMove()">Move</v-btn>
         </v-card-actions>
       </v-card>
@@ -202,6 +202,10 @@ export default Vue.extend({
     },
     getTimesUsed() {
       return this.dishStats.timesUsed
+    },
+
+    routeTo(id: string) {
+      this.$router.push({ name: 'dishes-id', params: { id } })
     },
   },
 })
