@@ -60,9 +60,16 @@ export default class DishesRepository {
     return this.$axios.$put(`api/dishes/${dishId}/name/`, { name: newName })
   }
 
-  setRating(dishId: string, newRating: any) {
+  updateRating(dishId: string, newRating: number) {
     return this.$axios.$put(`api/dishes/${dishId}/rating`, {
       rating: newRating,
+    })
+  }
+
+  updateNotes(dishId: string, notes: string, url: string) {
+    return this.$axios.$put(`api/dishes/${dishId}/notes`, {
+      notes,
+      url,
     })
   }
 }

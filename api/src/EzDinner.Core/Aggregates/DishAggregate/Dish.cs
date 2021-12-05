@@ -10,9 +10,9 @@ namespace EzDinner.Core.Aggregates.DishAggregate
         public string Name { get; set; }
         public Guid FamilyId { get; }
         public bool Deleted { get; private set; }
-        public Uri? Url { get; set; }
+        public Uri? Url { get; private set; }
         public IEnumerable<Tag> Tags { get; }
-        public string Notes { get; set; }
+        public string Notes { get; private set; }
         
         /// <summary>
         /// Rating in 10 steps. Values are between 0-10.
@@ -47,6 +47,23 @@ namespace EzDinner.Core.Aggregates.DishAggregate
         {
             if (rating > 10 || rating < 0) throw new ArgumentException("Rating must be between 0 and 10");
             Rating = rating;
+        }
+
+        public void SetUrl(string? url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                Url = null;
+                return;
+            }
+ 
+            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri)) throw new ArgumentException("URL must be valid");
+            Url = uri;
+        }
+
+        public void SetNotes(string notes)
+        {
+            Notes = notes;
         }
     }
 }

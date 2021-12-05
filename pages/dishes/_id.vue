@@ -1,48 +1,11 @@
 <template>
   <Content split>
-    <v-card-title v-show="!editNameMode"
-      ><v-row style="overflow: hidden">
-        <v-col style="word-break: normal">{{ name }}</v-col>
-        <v-col cols="3" md="1">
-          <v-icon @click="enableEditNameMode()">mdi-pencil</v-icon>
-          <v-icon @click="confirmDialog = true">mdi-trash-can</v-icon></v-col
-        >
-      </v-row></v-card-title
-    >
-    <v-card-title v-show="editNameMode"
-      ><v-row>
-        <v-col
-          ><v-text-field
-            v-model="newName"
-            autofocus
-            dense
-            @keyup.enter="doUpdateName()"
-            @keyup.esc="editNameMode = false"
-          ></v-text-field
-        ></v-col>
-        <v-col cols="2">
-          <v-icon @click="doUpdateName()">mdi-check</v-icon>
-          <v-icon @click="editNameMode = false">mdi-close</v-icon></v-col
-        >
-      </v-row></v-card-title
-    >
-
-    <v-card-subtitle
-      ><v-row>
-        <v-rating
-          color="primary"
-          half-increments
-          empty-icon="mdi-heart-outline"
-          full-icon="mdi-heart"
-          half-icon="mdi-heart-half-full"
-          length="5"
-          size="20"
-          :value="dish.rating"
-          @input="setRating($event)"
-        ></v-rating> </v-row
-    ></v-card-subtitle>
-
     <v-row>
+      <v-col>
+        <DishCard :dish="dish" :dish-stats="dish.dishStats" />
+      </v-col>
+    </v-row>
+    <!-- <v-row>
       <v-col>
         <v-card>
           <v-card-title>Family rating</v-card-title>
@@ -62,14 +25,14 @@
                   length="5"
                   size="20"
                   :value="dish.rating"
-                  @input="setRating($event)"
+                  @input="updateRating($event)"
                 ></v-rating>
               </v-col>
             </v-row>
           </v-card-text>
         </v-card>
       </v-col>
-    </v-row>
+    </v-row> -->
 
     <v-row>
       <v-col>
@@ -79,7 +42,7 @@
             <v-spacer></v-spacer>
             <v-card-actions v-show="editNotesMode">
               <v-btn @click="disableEditNotesMode()">Cancel</v-btn>
-              <v-btn color="primary">Save</v-btn>
+              <v-btn color="primary" @click="doUpdateNotes()">Save</v-btn>
             </v-card-actions>
             <v-card-actions v-show="!editNotesMode">
               <v-btn color="primary" @click="enableEditNotesMode()">Edit</v-btn>
@@ -88,7 +51,10 @@
           <v-card-text>
             <v-row>
               <v-col>
-                <v-icon class="float-left" style="margin-right: 5px"
+                <v-icon
+                  v-if="url || editNotesMode"
+                  class="float-left"
+                  style="margin-right: 5px"
                   >mdi-link-variant</v-icon
                 >
                 <v-text-field
@@ -102,70 +68,37 @@
                 }}</a>
               </v-col>
             </v-row>
-            <v-row>
-              <v-col v-if="editNotesMode">
-                <textarea ref="textarea" v-model="notes"></textarea>
-              </v-col>
-
-              <v-col v-else>
-                <!-- eslint-disable-next-line vue/no-v-html -->
-                <span v-html="notesHtml"></span>
-              </v-col>
-            </v-row>
           </v-card-text>
+          <v-row class="notes-area">
+            <v-col v-if="editNotesMode">
+              <textarea ref="textarea" v-model="notes"></textarea>
+            </v-col>
+
+            <v-col v-else>
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <span v-html="notesHtml"></span>
+            </v-col>
+          </v-row>
         </v-card>
       </v-col>
     </v-row>
 
-    <v-dialog v-model="confirmDialog" width="400">
-      <v-card>
-        <v-card-title>Delete?</v-card-title>
-        <v-card-text
-          >Are you sure you want to delete <strong>{{ dish.name }}</strong
-          >?</v-card-text
-        >
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn @click="confirmDialog = false">Cancel</v-btn>
-          <v-btn color="error" @click="doDelete()">Delete</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <!-- create some space at end -->
+    <v-row><v-col></v-col></v-row>
 
-    <v-dialog v-model="moveDialog" width="400">
-      <v-card>
-        <v-card-title
-          >Move {{ getTimesUsed() }} dinner occurrences?</v-card-title
-        >
-        <v-card-text
-          >Move all tracked dinner occurences of {{ dish.name }} to be tracked
-          as
-          <v-autocomplete
-            v-model="moveToDish"
-            :items="dishItems"
-            item-text="name"
-            return-object
-            style="width: 50%; display: inline-block; margin-left: 10px"
-          ></v-autocomplete
-        ></v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="grey darken-1" @click="moveDialog = false"
-            >Cancel</v-btn
-          >
-          <v-btn color="error" @click="doMove()">Move</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <template #support>
-      <v-card-title>Dates</v-card-title>
+      <v-card-title>Dates<v-spacer></v-spacer></v-card-title>
+      <v-card-subtitle
+        >You last had {{ dish.name }} {{ getDaysAgo() }} days
+        ago</v-card-subtitle
+      >
 
       <v-simple-table>
         <template #default>
           <thead>
             <tr>
               <th class="text-left">Date</th>
-              <th class="text-center">Days since last</th>
+              <th class="text-center">Days since previous</th>
             </tr>
           </thead>
           <tbody>
@@ -183,23 +116,22 @@
 <script lang="ts">
 import Vue from 'vue'
 import EasyMDE from 'easymde'
+// ignoring due to an import error that says marked should be default imported. It only works like this though
+// @ts-ignore
 import { marked } from 'marked'
 import 'easymde/dist/easymde.min.css'
 import { DateTime } from 'luxon'
-import { Dish, DishStats, DinnerDate } from '~/types/Dish'
+import DishCard from '~/components/Dish/DishCard.vue'
+import { Dish, DinnerDate } from '~/types/Dish'
 
 export default Vue.extend({
+  components: {
+    DishCard,
+  },
   data() {
     return {
-      confirmDialog: false,
-      editNameMode: false,
-      newName: '',
-      name: '',
-      moveDialog: false,
-      moveToDish: {} as Dish,
       rating: 0,
       dish: {} as Dish,
-      dishStats: {} as DishStats,
       familyMembers: ['MN', 'LN'],
       url: '',
       editNotesMode: false,
@@ -212,11 +144,10 @@ export default Vue.extend({
 
   async fetch() {
     this.dish = await this.$repositories.dishes.getFull(this.$route.params.id)
-    this.name = this.dish.name
     this.notes = this.dish.notes
     this.notesHtml = marked.parse(this.dish.notes || '')
     this.url = this.dish.url
-    this.dates = this.dish.dates
+    this.dates = this.dish.dates.reverse()
   },
 
   computed: {
@@ -230,48 +161,23 @@ export default Vue.extend({
   mounted() {},
 
   methods: {
-    async doDelete() {
-      await this.$repositories.dishes.delete(
-        this.$accessor.activeFamilyId,
-        this.dish.id,
-      )
-      this.confirmDialog = false
-      this.$accessor.dishes.populateDishes()
-    },
-
-    async doMove() {
-      await this.$repositories.dinners.moveDinnerDishes(
-        this.$accessor.activeFamilyId,
-        this.dish.id,
-        this.moveToDish.id,
-      )
-      this.moveDialog = false
-      this.$emit('menuitem:moved')
-    },
-
-    async setRating(newRating: number) {
-      await this.$repositories.dishes.setRating(this.dish.id, newRating)
+    async updateRating(newRating: number) {
+      await this.$repositories.dishes.updateRating(this.dish.id, newRating)
       this.$emit('rating:updated')
     },
 
-    async doUpdateName() {
-      // no need to fetch all dishes again just make it look like it's updated
-      this.name = this.newName
-      this.editNameMode = false
+    async doUpdateNotes() {
       try {
-        await this.$repositories.dishes.updateName(this.dish.id, this.newName)
-        await this.$accessor.dishes.updateDish({ dishId: this.dish.id })
+        await this.$repositories.dishes.updateNotes(
+          this.dish.id,
+          this.notes,
+          this.url,
+        )
+        this.disableEditNotesMode()
       } catch (e) {
-        // TODO: show error message
-        this.name = this.dish.name
+        // TODO replace with pretty component
+        alert('An error occured')
       }
-    },
-
-    async saveNotes() {},
-
-    enableEditNameMode() {
-      this.newName = this.name
-      this.editNameMode = true
     },
 
     enableEditNotesMode() {
@@ -295,16 +201,24 @@ export default Vue.extend({
       this.mde = null
     },
 
-    getLastUsed() {
-      return this.dishStats.lastUsed?.toLocaleString() ?? 'Never used'
-    },
-    getTimesUsed() {
-      return this.dishStats.timesUsed
-    },
-
     formatDate(date: string) {
       return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL)
+    },
+
+    getDaysAgo() {
+      if (!this.dish?.dishStats?.lastUsed) return 0
+      return Math.floor(
+        DateTime.now()
+          .diff(DateTime.fromISO(this.dish.dishStats.lastUsed), 'days')
+          .toObject()?.days || 0,
+      )
     },
   },
 })
 </script>
+
+<style lang="scss">
+.notes-area {
+  padding: 16px;
+}
+</style>

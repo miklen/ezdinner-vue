@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EzDinner.Core.Aggregates.DinnerAggregate;
 using EzDinner.Core.Aggregates.DishAggregate;
+using EzDinner.Query.Core.DishQueries;
 using NodaTime;
 using System;
 using System.Collections.Generic;
@@ -34,10 +35,12 @@ namespace EzDinner.Functions.Models.Query
 
         public List<DinnerDate> Dates { get; set; }
 
+        public DishStats DishStats { get; set; }
+
         public static DishesFullQueryModel FromDomain(Dish dish, IReadOnlyList<Dinner> dinners)
         {
             if (dish is null) throw new ArgumentNullException(nameof(dish));
-            return new DishesFullQueryModel { Id = dish.Id, Name = dish.Name, Rating = dish.Rating / 2d, Url = dish.Url?.ToString() ?? "", Notes = dish.Notes ?? "",  Dates = dinners.Aggregate(new List<DinnerDate>(), (acc, curr) => 
+            return new DishesFullQueryModel { Id = dish.Id, Name = dish.Name, Rating = dish.Rating / 2d, Url = dish.Url?.ToString() ?? "", Notes = dish.Notes ?? "",  DishStats = new DishStats(dish.Id, dinners), Dates = dinners.Aggregate(new List<DinnerDate>(), (acc, curr) => 
                 { 
                     acc.Add(new DinnerDate() { Date = curr.Date, DaysSinceLast = (curr.Date - (acc.FirstOrDefault()?.Date ?? curr.Date)).Days }); 
                     return acc; 
