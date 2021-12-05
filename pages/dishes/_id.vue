@@ -147,7 +147,7 @@ export default Vue.extend({
     this.notes = this.dish.notes
     this.notesHtml = marked.parse(this.dish.notes || '')
     this.url = this.dish.url
-    this.dates = this.dish.dates.reverse()
+    this.dates = this.dish.dates
   },
 
   computed: {

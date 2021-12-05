@@ -33,19 +33,19 @@ namespace EzDinner.Functions.Models.Query
         /// </summary>
         public string Url { get; set; }
 
-        public List<DinnerDate> Dates { get; set; }
+        public IEnumerable<DinnerDate> Dates { get; set; }
 
         public DishStats DishStats { get; set; }
 
         public static DishesFullQueryModel FromDomain(Dish dish, IReadOnlyList<Dinner> dinners)
         {
             if (dish is null) throw new ArgumentNullException(nameof(dish));
-            return new DishesFullQueryModel { Id = dish.Id, Name = dish.Name, Rating = dish.Rating / 2d, Url = dish.Url?.ToString() ?? "", Notes = dish.Notes ?? "",  DishStats = new DishStats(dish.Id, dinners), Dates = dinners.Aggregate(new List<DinnerDate>(), (acc, curr) => 
+            return new DishesFullQueryModel { Id = dish.Id, Name = dish.Name, Rating = dish.Rating / 2d, Url = dish.Url?.ToString() ?? "", Notes = dish.Notes ?? "",  DishStats = new DishStats(dish.Id, dinners), Dates = dinners.OrderBy(p => p.Date).Aggregate(new List<DinnerDate>(), (acc, curr) => 
                 { 
                     acc.Add(new DinnerDate() { Date = curr.Date, DaysSinceLast = (curr.Date - (acc.FirstOrDefault()?.Date ?? curr.Date)).Days }); 
                     return acc; 
                 }
-            )};
+            ).OrderByDescending(p => p.Date)};
         }
     }
 
