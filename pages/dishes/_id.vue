@@ -185,7 +185,10 @@ export default Vue.extend({
       // workaround to prevent textarea not being defined when deeplinking/cold-loading the page
       const interval = setInterval(() => {
         if (!this.$refs.textarea) return
-        this.mde = new EasyMDE({ element: this.$refs.textarea as HTMLElement })
+        this.mde = new EasyMDE({
+          element: this.$refs.textarea as HTMLElement,
+          spellChecker: false,
+        })
         this.mde.codemirror.on('change', () => {
           this.notes = this.mde?.value()!
           this.notesHtml = marked.parse(this.notes)
