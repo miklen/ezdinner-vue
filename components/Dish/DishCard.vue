@@ -3,8 +3,12 @@
     <v-card rounded="lg">
       <v-card-title v-show="!editNameMode"
         ><v-row style="overflow: hidden">
-          <v-col style="word-break: normal">{{ name }}</v-col>
-          <v-col cols="2">
+          <v-col
+            style="word-break: normal; cursor: pointer"
+            @click="routeTo(dish.id)"
+            >{{ name }}</v-col
+          >
+          <v-col class="text-right" cols="3" lg="4" xl="2">
             <v-icon @click="enableEditNameMode()">mdi-pencil</v-icon>
             <v-icon @click="confirmDialog = true">mdi-trash-can</v-icon></v-col
           >
@@ -38,33 +42,27 @@
             length="5"
             size="20"
             :value="dish.rating"
-            @input="setRating($event)"
+            @input="updateRating($event)"
           ></v-rating> </v-row
       ></v-card-subtitle>
-      <v-list>
-        <v-list-item v-if="dishStats.lastUsed">
-          <v-list-item-content>
-            <v-list-item-subtitle
-              >Times had for dinner: {{ getTimesUsed() }}</v-list-item-subtitle
-            >
-          </v-list-item-content>
-          <v-list-item-action v-if="getTimesUsed() > 0"
-            ><v-icon @click="moveDialog = true"
-              >mdi-transfer-right</v-icon
-            ></v-list-item-action
+
+      <v-card-text>
+        <v-row>
+          <v-col v-if="dishStats.timesUsed > 0">
+            You've had {{ name }} for dinner
+            {{ getTimesUsedText() }}
+          </v-col>
+          <v-col v-if="dishStats.timesUsed > 0" cols="2" xl="1">
+            <v-icon @click="moveDialog = true">mdi-transfer-right</v-icon>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col v-if="dishStats.lastUsed"
+            >Last was {{ getDaysAgo() }} days ago on {{ getLastUsed() }}</v-col
           >
-        </v-list-item>
-        <v-list-item>
-          <v-list-item-content>
-            <v-list-item-subtitle v-if="dishStats.lastUsed"
-              >Last planned on {{ getLastUsed() }}</v-list-item-subtitle
-            >
-            <v-list-item-subtitle v-else
-              >Never been planned for dinner</v-list-item-subtitle
-            >
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
+          <v-col v-else>Never been planned for dinner</v-col>
+        </v-row>
+      </v-card-text>
     </v-card>
 
     <v-dialog v-model="confirmDialog" width="400">
@@ -76,9 +74,7 @@
         >
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="grey darken-1" @click="confirmDialog = false"
-            >Cancel</v-btn
-          >
+          <v-btn @click="confirmDialog = false">Cancel</v-btn>
           <v-btn color="error" @click="doDelete()">Delete</v-btn>
         </v-card-actions>
       </v-card>
@@ -87,7 +83,7 @@
     <v-dialog v-model="moveDialog" width="400">
       <v-card>
         <v-card-title
-          >Move {{ getTimesUsed() }} dinner occurrences?</v-card-title
+          >Move {{ dishStats.timesUsed }} dinner occurrences?</v-card-title
         >
         <v-card-text
           >Move all tracked dinner occurences of {{ dish.name }} to be tracked
@@ -102,9 +98,7 @@
         ></v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="grey darken-1" @click="moveDialog = false"
-            >Cancel</v-btn
-          >
+          <v-btn @click="moveDialog = false">Cancel</v-btn>
           <v-btn color="error" @click="doMove()">Move</v-btn>
         </v-card-actions>
       </v-card>
@@ -113,6 +107,7 @@
 </template>
 
 <script lang="ts">
+import { DateTime } from 'luxon'
 import Vue, { PropType } from 'vue'
 import { Dish, DishStats } from '~/types/Dish'
 export default Vue.extend({
@@ -150,6 +145,12 @@ export default Vue.extend({
     },
   },
 
+  watch: {
+    'dish.name'() {
+      this.name = this.dish.name
+    },
+  },
+
   mounted() {
     this.name = this.dish.name
   },
@@ -174,8 +175,8 @@ export default Vue.extend({
       this.$emit('menuitem:moved')
     },
 
-    async setRating(newRating: number) {
-      await this.$repositories.dishes.setRating(this.dish.id, newRating)
+    async updateRating(newRating: number) {
+      await this.$repositories.dishes.updateRating(this.dish.id, newRating)
       this.$emit('rating:updated')
     },
 
@@ -198,10 +199,28 @@ export default Vue.extend({
     },
 
     getLastUsed() {
-      return this.dishStats.lastUsed?.toLocaleString() ?? 'Never used'
+      if (!this.dishStats.lastUsed) return 'Never used'
+      return DateTime.fromISO(this.dishStats.lastUsed).toLocaleString(
+        DateTime.DATE_FULL,
+      )
     },
-    getTimesUsed() {
-      return this.dishStats.timesUsed
+
+    getDaysAgo() {
+      if (!this.dishStats.lastUsed) return 0
+      return Math.floor(
+        DateTime.now()
+          .diff(DateTime.fromISO(this.dishStats.lastUsed), 'days')
+          .toObject()?.days || 0,
+      )
+    },
+
+    getTimesUsedText() {
+      const result = `${this.dishStats.timesUsed} time`
+      return this.dishStats.timesUsed === 1 ? result : result + 's'
+    },
+
+    routeTo(id: string) {
+      this.$router.push({ name: 'dishes-id', params: { id } })
     },
   },
 })

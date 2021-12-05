@@ -2,7 +2,7 @@
   <Content split>
     <v-row>
       <v-col class="text-center">
-        <h1>Dinner plan</h1>
+        <v-card-title>Dinner plan</v-card-title>
       </v-col>
       <v-col>
         <v-menu

@@ -24,6 +24,15 @@ export default class DishesRepository {
     return (await this.$axios.$get(`api/dishes/${dishId}`)) as Dish
   }
 
+  /**
+   * Gets a dishs with full information
+   * @param dishId
+   * @returns dishes available
+   */
+  async getFull(dishId: string) {
+    return (await this.$axios.$get(`api/dishes/${dishId}/full`)) as Dish
+  }
+
   create(familyId: string, dishName: string) {
     return this.$axios.$post('api/dishes', {
       name: dishName,
@@ -51,9 +60,16 @@ export default class DishesRepository {
     return this.$axios.$put(`api/dishes/${dishId}/name/`, { name: newName })
   }
 
-  setRating(dishId: string, newRating: any) {
+  updateRating(dishId: string, newRating: number) {
     return this.$axios.$put(`api/dishes/${dishId}/rating`, {
       rating: newRating,
+    })
+  }
+
+  updateNotes(dishId: string, notes: string, url: string) {
+    return this.$axios.$put(`api/dishes/${dishId}/notes`, {
+      notes,
+      url,
     })
   }
 }

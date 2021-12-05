@@ -57,7 +57,10 @@
           <v-list>
             <v-list-item v-for="menuItem in dinner.menu" :key="menuItem.dishId">
               <v-list-item-title>{{ menuItem.dishName }}</v-list-item-title>
-              <v-list-item-action>
+              <v-list-item-action style="display: inline">
+                <v-btn icon @click="routeTo(menuItem.dishId)">
+                  <v-icon>mdi-information-outline</v-icon>
+                </v-btn>
                 <v-btn icon @click="removeDishFromMenu(menuItem.dishId)">
                   <v-icon>mdi-close-circle-outline</v-icon>
                 </v-btn>
@@ -171,6 +174,9 @@ export default Vue.extend({
         dishId,
         dishName: '',
       })
+    },
+    routeTo(id: string) {
+      this.$router.push({ name: 'dishes-id', params: { id } })
     },
   },
 })
