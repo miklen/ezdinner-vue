@@ -85,7 +85,23 @@ export default Vue.extend({
   async fetch() {
     await this.getFamilySelectors()
     this.loading = false
+    if (this.activeFamilyId) {
+      this.$accessor.families.getActiveFamily()
+    }
   },
+
+  computed: {
+    activeFamilyId() {
+      return this.$accessor.activeFamilyId
+    },
+  },
+
+  watch: {
+    activeFamilyId() {
+      this.$accessor.families.getActiveFamily()
+    },
+  },
+
   methods: {
     clickSignOut() {
       this.$msal.signOut()

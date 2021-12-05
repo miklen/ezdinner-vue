@@ -13,6 +13,10 @@ export default class FamilyRepository {
     return (await this.$axios.get(`/api/families/`)).data as Family[]
   }
 
+  async get(familyId: string) {
+    return (await this.$axios.get(`/api/families/${familyId}`)).data as Family
+  }
+
   async familySelectors() {
     return (await this.$axios.get(`/api/families/select`))
       .data as FamilySelect[]

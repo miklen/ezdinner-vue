@@ -42,7 +42,7 @@
             length="5"
             size="20"
             :value="dish.rating"
-            @input="updateRating($event)"
+            readonly
           ></v-rating> </v-row
       ></v-card-subtitle>
 
@@ -173,11 +173,6 @@ export default Vue.extend({
       )
       this.moveDialog = false
       this.$emit('menuitem:moved')
-    },
-
-    async updateRating(newRating: number) {
-      await this.$repositories.dishes.updateRating(this.dish.id, newRating)
-      this.$emit('rating:updated')
     },
 
     async doUpdateName() {

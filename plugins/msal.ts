@@ -178,6 +178,10 @@ export class MsalPlugin implements PluginObject<MsalPluginOptions> {
     return claims?.family_name
   }
 
+  getObjectId(): string | undefined {
+    return this.getAccount()?.localAccountId
+  }
+
   private getAccount(): msal.AccountInfo | undefined {
     if (this.isAuthenticated) return msalInstance.getAllAccounts()[0]
     return undefined

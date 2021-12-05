@@ -11,6 +11,11 @@ export declare class DishStats {
   timesUsed: number
 }
 
+export declare class Rating {
+  familyMemberId: string
+  rating: number
+}
+
 export declare class Dish {
   name: string
   id: string
@@ -20,4 +25,13 @@ export declare class Dish {
   rating: number
   dates: DinnerDate[]
   dishStats: DishStats
+  ratings: Rating[]
+}
+
+export declare class DishSelector {
+  name: string
+  id: string
+  url: string
+  tags: Tag[]
+  rating: number
 }

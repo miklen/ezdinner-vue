@@ -41,7 +41,7 @@ namespace EzDinner.Functions
 
             var dishRating = await req.GetBodyAs<UpdateDishRatingCommandModel>();
 
-            dish.SetRating(dishRating.GetRatingInDomainFormat());
+            dish.SetRating(Guid.Parse(req.HttpContext.User.GetNameIdentifierId()!), dishRating.GetRatingInDomainFormat());
             await _dishRepository.SaveAsync(dish);
 
             return new OkResult();

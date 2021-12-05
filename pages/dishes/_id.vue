@@ -59,16 +59,21 @@
 
       <!-- side panel start -->
       <v-col>
-        <!-- <v-row>
+        <v-row>
           <v-col>
             <v-card>
               <v-card-title>Family rating</v-card-title>
               <v-card-text>
-                <v-row v-for="familyMember in familyMembers" :key="familyMember"
+                <v-row
+                  v-for="familyMember in familyMembers"
+                  :key="familyMember.id"
                   ><v-col cols="1">
-                    <v-avatar class="white--text" color="primary" size="36">{{
-                      familyMember
-                    }}</v-avatar></v-col
+                    <v-avatar
+                      class="white--text"
+                      :color="familyMember.id === userId ? 'primary' : 'grey'"
+                      size="40"
+                      >{{ getInitials(familyMember.name) }}</v-avatar
+                    ></v-col
                   ><v-col>
                     <v-rating
                       color="primary"
@@ -77,8 +82,9 @@
                       full-icon="mdi-heart"
                       half-icon="mdi-heart-half-full"
                       length="5"
-                      size="20"
-                      :value="dish.rating"
+                      size="25"
+                      :value="ratings[familyMember.id]"
+                      :readonly="familyMember.id !== userId"
                       @input="updateRating($event)"
                     ></v-rating>
                   </v-col>
@@ -86,7 +92,7 @@
               </v-card-text>
             </v-card>
           </v-col>
-        </v-row> -->
+        </v-row>
         <v-row>
           <v-col>
             <v-card>
@@ -130,6 +136,7 @@ import 'easymde/dist/easymde.min.css'
 import { DateTime } from 'luxon'
 import DishCard from '~/components/Dish/DishCard.vue'
 import { Dish, DinnerDate } from '~/types/Dish'
+import { FamilyMember } from '~/types/Family'
 
 export default Vue.extend({
   components: {
@@ -139,7 +146,6 @@ export default Vue.extend({
     return {
       rating: 0,
       dish: {} as Dish,
-      familyMembers: ['MN', 'LN'],
       url: '',
       editNotesMode: false,
       mde: null as EasyMDE | null,
@@ -150,11 +156,7 @@ export default Vue.extend({
   },
 
   async fetch() {
-    this.dish = await this.$repositories.dishes.getFull(this.$route.params.id)
-    this.notes = this.dish.notes
-    this.notesHtml = marked.parse(this.dish.notes || '')
-    this.url = this.dish.url
-    this.dates = this.dish.dates
+    await this.init()
   },
 
   computed: {
@@ -163,14 +165,34 @@ export default Vue.extend({
         .filter((w) => w.id !== this.dish.id)
         .sort((a, b) => a.name.localeCompare(b.name))
     },
+    familyMembers(): FamilyMember[] {
+      return this.$accessor.families.activeFamily?.familyMembers ?? []
+    },
+    userId() {
+      return this.$msal.getObjectId()
+    },
+    ratings(): { [key: string]: number } {
+      return Object.fromEntries(
+        this.dish?.ratings?.map((e) => [e.familyMemberId, e.rating]) ?? [],
+      )
+    },
   },
 
   mounted() {},
 
   methods: {
+    async init() {
+      this.dish = await this.$repositories.dishes.getFull(this.$route.params.id)
+      this.notes = this.dish.notes
+      this.notesHtml = marked.parse(this.dish.notes || '')
+      this.url = this.dish.url
+      this.dates = this.dish.dates
+    },
+
     async updateRating(newRating: number) {
       await this.$repositories.dishes.updateRating(this.dish.id, newRating)
       this.$emit('rating:updated')
+      this.init()
     },
 
     async doUpdateNotes() {
@@ -221,6 +243,15 @@ export default Vue.extend({
         DateTime.now()
           .diff(DateTime.fromISO(this.dish.dishStats.lastUsed), 'days')
           .toObject()?.days || 0,
+      )
+    },
+
+    getInitials(name: string) {
+      const parts = name.split(' ')
+      if (parts.length === 0) return '?'
+      if (parts.length === 1) return parts[0][0].toUpperCase()
+      return (
+        parts[0][0].toUpperCase() + parts[parts.length - 1][0].toUpperCase()
       )
     },
   },
