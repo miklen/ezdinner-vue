@@ -1,116 +1,123 @@
 <template>
-  <Content split>
-    <v-row>
-      <v-col>
-        <DishCard :dish="dish" :dish-stats="dish.dishStats" />
+  <span>
+    <v-row style="padding-bottom: 16px">
+      <!-- main content start -->
+      <v-col cols="12" md="8">
+        <v-row>
+          <v-col>
+            <DishCard :dish="dish" :dish-stats="dish.dishStats" />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-card>
+              <v-card-title
+                >Recipe &amp; notes
+                <v-spacer></v-spacer>
+                <v-card-actions v-show="editNotesMode">
+                  <v-btn @click="disableEditNotesMode()">Cancel</v-btn>
+                  <v-btn color="primary" @click="doUpdateNotes()">Save</v-btn>
+                </v-card-actions>
+                <v-card-actions v-show="!editNotesMode">
+                  <v-btn color="primary" @click="enableEditNotesMode()"
+                    >Edit</v-btn
+                  >
+                </v-card-actions></v-card-title
+              >
+              <v-card-text v-show="url || editNotesMode">
+                <v-row>
+                  <v-col>
+                    <v-icon class="float-left" style="margin-right: 5px"
+                      >mdi-link-variant</v-icon
+                    >
+                    <v-text-field
+                      v-show="editNotesMode"
+                      v-model="url"
+                      autofocus
+                      dense
+                    ></v-text-field>
+                    <a v-show="!editNotesMode" :href="url" target="_blank">{{
+                      url
+                    }}</a>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+              <v-row class="notes-area">
+                <v-col v-if="editNotesMode">
+                  <textarea ref="textarea" v-model="notes"></textarea>
+                </v-col>
+                <v-col v-else>
+                  <!-- eslint-disable-next-line vue/no-v-html -->
+                  <span v-html="notesHtml"></span>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-col>
+      <!-- main content end -->
+
+      <!-- side panel start -->
+      <v-col>
+        <!-- <v-row>
+          <v-col>
+            <v-card>
+              <v-card-title>Family rating</v-card-title>
+              <v-card-text>
+                <v-row v-for="familyMember in familyMembers" :key="familyMember"
+                  ><v-col cols="1">
+                    <v-avatar class="white--text" color="primary" size="36">{{
+                      familyMember
+                    }}</v-avatar></v-col
+                  ><v-col>
+                    <v-rating
+                      color="primary"
+                      half-increments
+                      empty-icon="mdi-heart-outline"
+                      full-icon="mdi-heart"
+                      half-icon="mdi-heart-half-full"
+                      length="5"
+                      size="20"
+                      :value="dish.rating"
+                      @input="updateRating($event)"
+                    ></v-rating>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row> -->
+        <v-row>
+          <v-col>
+            <v-card>
+              <v-card-title>Dates<v-spacer></v-spacer></v-card-title>
+              <v-card-subtitle
+                >You last had {{ dish.name }} {{ getDaysAgo() }} days
+                ago</v-card-subtitle
+              >
+              <v-simple-table>
+                <template #default>
+                  <thead>
+                    <tr>
+                      <th class="text-left">Date</th>
+                      <th class="text-center">Days since previous</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="date in dates" :key="date.date">
+                      <td>{{ formatDate(date.date) }}</td>
+                      <td class="text-center">{{ date.daysSinceLast }}</td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
+      <!-- side panel end -->
     </v-row>
-    <!-- <v-row>
-      <v-col>
-        <v-card>
-          <v-card-title>Family rating</v-card-title>
-          <v-card-text>
-            <v-row v-for="familyMember in familyMembers" :key="familyMember"
-              ><v-col cols="1">
-                <v-avatar class="white--text" color="primary" size="36">{{
-                  familyMember
-                }}</v-avatar></v-col
-              ><v-col>
-                <v-rating
-                  color="primary"
-                  half-increments
-                  empty-icon="mdi-heart-outline"
-                  full-icon="mdi-heart"
-                  half-icon="mdi-heart-half-full"
-                  length="5"
-                  size="20"
-                  :value="dish.rating"
-                  @input="updateRating($event)"
-                ></v-rating>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row> -->
-
-    <v-row>
-      <v-col>
-        <v-card>
-          <v-card-title
-            >Recipe &amp; notes
-            <v-spacer></v-spacer>
-            <v-card-actions v-show="editNotesMode">
-              <v-btn @click="disableEditNotesMode()">Cancel</v-btn>
-              <v-btn color="primary" @click="doUpdateNotes()">Save</v-btn>
-            </v-card-actions>
-            <v-card-actions v-show="!editNotesMode">
-              <v-btn color="primary" @click="enableEditNotesMode()">Edit</v-btn>
-            </v-card-actions></v-card-title
-          >
-          <v-card-text>
-            <v-row>
-              <v-col>
-                <v-icon
-                  v-if="url || editNotesMode"
-                  class="float-left"
-                  style="margin-right: 5px"
-                  >mdi-link-variant</v-icon
-                >
-                <v-text-field
-                  v-show="editNotesMode"
-                  v-model="url"
-                  autofocus
-                  dense
-                ></v-text-field>
-                <a v-show="!editNotesMode" :href="url" target="_blank">{{
-                  url
-                }}</a>
-              </v-col>
-            </v-row>
-          </v-card-text>
-          <v-row class="notes-area">
-            <v-col v-if="editNotesMode">
-              <textarea ref="textarea" v-model="notes"></textarea>
-            </v-col>
-
-            <v-col v-else>
-              <!-- eslint-disable-next-line vue/no-v-html -->
-              <span v-html="notesHtml"></span>
-            </v-col>
-          </v-row>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <!-- create some space at end -->
-    <v-row><v-col></v-col></v-row>
-
-    <template #support>
-      <v-card-title>Dates<v-spacer></v-spacer></v-card-title>
-      <v-card-subtitle
-        >You last had {{ dish.name }} {{ getDaysAgo() }} days
-        ago</v-card-subtitle
-      >
-
-      <v-simple-table>
-        <template #default>
-          <thead>
-            <tr>
-              <th class="text-left">Date</th>
-              <th class="text-center">Days since previous</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="date in dates" :key="date.date">
-              <td>{{ formatDate(date.date) }}</td>
-              <td class="text-center">{{ date.daysSinceLast }}</td>
-            </tr>
-          </tbody>
-        </template>
-      </v-simple-table>
-    </template>
-  </Content>
+  </span>
 </template>
 
 <script lang="ts">
