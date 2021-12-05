@@ -42,7 +42,7 @@ namespace EzDinner.Functions.Models.Query
             if (dish is null) throw new ArgumentNullException(nameof(dish));
             return new DishesFullQueryModel { Id = dish.Id, Name = dish.Name, Rating = dish.Rating / 2d, Url = dish.Url?.ToString() ?? "", Notes = dish.Notes ?? "",  DishStats = new DishStats(dish.Id, dinners), Dates = dinners.OrderBy(p => p.Date).Aggregate(new List<DinnerDate>(), (acc, curr) => 
                 { 
-                    acc.Add(new DinnerDate() { Date = curr.Date, DaysSinceLast = (curr.Date - (acc.FirstOrDefault()?.Date ?? curr.Date)).Days }); 
+                    acc.Add(new DinnerDate() { Date = curr.Date, DaysSinceLast = Period.Between(acc.LastOrDefault()?.Date ?? curr.Date, curr.Date, PeriodUnits.Days).Days }); 
                     return acc; 
                 }
             ).OrderByDescending(p => p.Date)};
