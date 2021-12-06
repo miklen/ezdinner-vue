@@ -20,9 +20,9 @@ namespace EzDinner.Application.Commands.Authorization
 
             // Ensure owner and members are assigned to their roles
             await _authz.AssignRoleToUserAsync(family.OwnerId, Roles.Owner, family.Id);
-            foreach (var familyMemberId in family.FamilyMemberIds)
+            foreach (var familyMember in family.FamilyMembers)
             {
-                await _authz.AssignRoleToUserAsync(familyMemberId, Roles.FamilyMember, family.Id);
+                await _authz.AssignRoleToUserAsync(familyMember.Id, Roles.FamilyMember, family.Id);
             }
         }
     }

@@ -9,6 +9,7 @@ using AutoMapper;
 using EzDinner.Core.Aggregates.FamilyAggregate;
 using EzDinner.Core.Aggregates.UserAggregate;
 using EzDinner.Functions.Models.Query;
+using EzDinner.Query.Core.FamilyQueries;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -24,10 +25,10 @@ namespace EzDinner.Functions
     {
         private readonly ILogger<FamiliesGet> _logger;
         private readonly IUserRepository _userRepository;
-        private readonly IFamilyRepository _familyRepository;
+        private readonly IFamilyQueryRepository _familyRepository;
         private readonly IMapper _mapper;
 
-        public FamiliesGet(ILogger<FamiliesGet> logger, IMapper mapper, IUserRepository userRepository, IFamilyRepository familyRepository)
+        public FamiliesGet(ILogger<FamiliesGet> logger, IMapper mapper, IUserRepository userRepository, IFamilyQueryRepository familyRepository)
         {
             _logger = logger;
             _userRepository = userRepository;
@@ -45,7 +46,7 @@ namespace EzDinner.Functions
             if (!authenticationStatus) return authenticationResponse;
 
             var userId = Guid.Parse(req.HttpContext.User.GetNameIdentifierId() ?? "");
-            var families = await _familyRepository.GetFamilySelectorsAsync(userId);
+            var families = await _familyRepository.GetFamiliesDetailsAsync(userId);
 
             var familieyQueryModels = families.Select(_mapper.Map<FamilySelectQueryModel>);
             return new OkObjectResult(families);

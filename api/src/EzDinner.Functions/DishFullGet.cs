@@ -44,7 +44,7 @@ namespace EzDinner.Functions
             if (dish is null) return new BadRequestObjectResult("DISH_NOT_FOUND");
             if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId()!, dish.FamilyId, Resources.Dish, Actions.Read)) return new UnauthorizedResult();
             var dinners = await _dinnerRepository.GetAsync(dish.FamilyId, dish.Id).ToListAsync();
-            return new OkObjectResult(DishesFullQueryModel.FromDomain(dish, dinners));
+            return new OkObjectResult(DishDetails.CreateNew(dish, dinners));
         }
     }
 }

@@ -8,6 +8,7 @@ using EzDinner.Infrastructure;
 using EzDinner.Core.Aggregates.DinnerAggregate;
 using EzDinner.Authorization.Core;
 using EzDinner.Query.Core.DishQueries;
+using EzDinner.Query.Core.FamilyQueries;
 
 [assembly: FunctionsStartup(typeof(EzDinner.Functions.Startup))]
 
@@ -63,6 +64,7 @@ namespace EzDinner.Functions
              .RegisterRepositories()
              .AddScoped<IDinnerService, DinnerService>()
              .AddScoped<IDishQueryService, DishQueryService>()
+             .AddScoped<IFamilyQueryService, FamilyQueryService>()
              .AddSingleton<IAuthzService, AuthzService>();
         }
     }

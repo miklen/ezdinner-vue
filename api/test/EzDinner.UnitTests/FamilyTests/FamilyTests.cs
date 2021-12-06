@@ -26,7 +26,7 @@ namespace EzDinner.UnitTests.FamilyTests
             Assert.Equal(family.Id, result.Id);
             Assert.Equal(family.OwnerId, result.OwnerId);
             Assert.Equal(family.Name, result.Name);
-            Assert.Equal(family.FamilyMemberIds.First(), result.FamilyMemberIds.First());
+            Assert.Equal(family.FamilyMembers.First().Id, result.FamilyMembers.First().Id);
             Assert.Equal(family.CreatedDate, result.CreatedDate);
             Assert.Equal(family.UpdatedDate, result.UpdatedDate);
         }

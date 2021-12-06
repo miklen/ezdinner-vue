@@ -6,6 +6,7 @@ using EzDinner.Core.Aggregates.FamilyAggregate;
 using EzDinner.Core.Aggregates.UserAggregate;
 using EzDinner.Infrastructure.Models.Json;
 using EzDinner.Query.Core.DishQueries;
+using EzDinner.Query.Core.FamilyQueries;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Fluent;
 using Microsoft.EntityFrameworkCore;
@@ -76,6 +77,7 @@ namespace EzDinner.Infrastructure
             services.AddScoped<IDishRepository, DishRepository>();
             services.AddScoped<IDishQueryRepository, DishRepository>();
             services.AddScoped<IDinnerRepository, DinnerRepository>();
+            services.AddScoped<IFamilyQueryRepository, FamilyRepository>();
             services.AddSingleton<IAuthzRepository, AuthzRepository>();
             return services;
         }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using EzDinner.Core.Aggregates.FamilyAggregate;
+using EzDinner.Query.Core.FamilyQueries;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,7 +20,7 @@ namespace EzDinner.Functions.Models.Query
     {
         public FamilySelectMapping()
         {
-            CreateMap<Family, FamilySelectQueryModel>();
+            CreateMap<FamilyDetails, FamilySelectQueryModel>();
         }
     }
 }

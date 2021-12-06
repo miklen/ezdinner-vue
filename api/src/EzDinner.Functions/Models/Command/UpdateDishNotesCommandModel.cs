@@ -6,7 +6,7 @@ namespace EzDinner.Functions.Models.Command
 {
     public class UpdateDishNotesCommandModel
     {
-        public string Notes { get; set; }
-        public string Url { get; set; }
+        public string? Notes { get; set; }
+        public string? Url { get; set; }
     }
 }
