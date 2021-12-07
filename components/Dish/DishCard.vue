@@ -74,8 +74,8 @@
         >
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn @click="confirmDialog = false">Cancel</v-btn>
-          <v-btn color="error" @click="doDelete()">Delete</v-btn>
+          <v-btn text @click="confirmDialog = false">Cancel</v-btn>
+          <v-btn text color="error" @click="doDelete()">Delete</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -98,8 +98,8 @@
         ></v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn @click="moveDialog = false">Cancel</v-btn>
-          <v-btn color="error" @click="doMove()">Move</v-btn>
+          <v-btn text @click="moveDialog = false">Cancel</v-btn>
+          <v-btn text color="error" @click="doMove()">Move</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

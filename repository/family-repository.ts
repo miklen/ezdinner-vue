@@ -37,4 +37,10 @@ export default class FamilyRepository {
     })
     return result.status === 200 || result.status === 204
   }
+
+  createFamilyMember(familyId: string, name: string) {
+    return this.$axios.$post(`api/families/${familyId}/member/noautonomy`, {
+      name,
+    })
+  }
 }

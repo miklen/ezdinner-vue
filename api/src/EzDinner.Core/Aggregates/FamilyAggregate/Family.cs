@@ -68,6 +68,16 @@ namespace EzDinner.Core.Aggregates.FamilyAggregate
         }
 
         /// <summary>
+        /// Create a family member that does not have autonomy on it's own (i.e. no login account accociated)
+        /// </summary>
+        /// <param name="name"></param>
+        public void CreateFamilyMember(string name)
+        {
+            _familyMembers.Add(FamilyMember.CreateFamilyMemberWithoutAutonomy(name));
+            UpdatedDate = DateTime.UtcNow;
+        }
+
+        /// <summary>
         /// Remove a family member from family
         /// </summary>
         /// <param name="familyMemberId"></param>

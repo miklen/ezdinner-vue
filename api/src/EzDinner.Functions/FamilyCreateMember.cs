@@ -13,17 +13,15 @@ using EzDinner.Authorization.Core;
 
 namespace EzDinner.Functions
 {
-    public class FamilyInviteMember
+    public class FamilyCreateMember
     {
-        private readonly ILogger<FamilyInviteMember> _logger;
-        private readonly IUserRepository _userRepository;
+        private readonly ILogger<FamilyCreateMember> _logger;
         private readonly IFamilyRepository _familyRepository;
         private readonly IAuthzService _authz;
 
-        public FamilyInviteMember(ILogger<FamilyInviteMember> logger, IUserRepository userRepository, IFamilyRepository familyRepository, IAuthzService authz)
+        public FamilyCreateMember(ILogger<FamilyCreateMember> logger, IFamilyRepository familyRepository, IAuthzService authz)
         {
             _logger = logger;
-            _userRepository = userRepository;
             _familyRepository = familyRepository;
             _authz = authz;
         }
@@ -34,9 +32,9 @@ namespace EzDinner.Functions
         /// <param name="req"></param>
         /// <param name="familyId"></param>
         /// <returns></returns>
-        [FunctionName(nameof(FamilyInviteMember))]
+        [FunctionName(nameof(FamilyCreateMember))]
         public async Task<IActionResult?> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "family/{familyId}/member")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "families/{familyId}/member/noautonomy")] HttpRequest req,
             string familyId)
         {
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
@@ -46,16 +44,13 @@ namespace EzDinner.Functions
             var familyGuid = Guid.Parse(familyId);
             if (familyGuid.Equals(Guid.Empty)) return new BadRequestObjectResult("MISSING_FAMILYID");
             
-            var command = await req.GetBodyAs<InviteFamilyMemberCommandModel>();
-            if (string.IsNullOrEmpty(command.Email)) return new BadRequestObjectResult("MISSING_EMAIL");
-
-            var user = await _userRepository.GetUser(command.Email);
-            if (user is null) return new NoContentResult();
+            var command = await req.GetBodyAs<CreateFamilyMemberCommandModel>();
+            if (string.IsNullOrEmpty(command.Name)) return new BadRequestObjectResult("MISSING_NAME");
 
             var family = await _familyRepository.GetFamily(familyGuid);
             if (family is null) return new BadRequestObjectResult("NOT_FOUND_FAMILY");
 
-            family.InviteFamilyMember(user.Id);
+            family.CreateFamilyMember(command.Name);
             await _familyRepository.SaveAsync(family);
             return new OkResult();
         }

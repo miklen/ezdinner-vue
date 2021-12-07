@@ -48,7 +48,10 @@ namespace EzDinner.Query.Core.FamilyQueries
         {
             // N+1 microservice problem... TODO solve by saving necessary information closer to usage or get list of users in one request
             var ownerIds = families.Select(s => s.OwnerId).Distinct();
-            var memberIds = families.SelectMany(s => s.FamilyMembers).Select(s => s.Id).Distinct();
+            var memberIds = families
+                .SelectMany(s => s.FamilyMembers)
+                .Where(w => w.HasAutonomy) // only those with autonomy has their own account and can be resolved in B2C.
+                .Select(s => s.Id).Distinct();
             var tasks = new List<Task<User>>();
             foreach (var userId in ownerIds.Union(memberIds))
             {
