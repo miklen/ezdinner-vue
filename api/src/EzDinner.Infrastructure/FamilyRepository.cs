@@ -1,4 +1,6 @@
 ﻿using EzDinner.Core.Aggregates.FamilyAggregate;
+using EzDinner.Core.Aggregates.UserAggregate;
+using EzDinner.Query.Core.FamilyQueries;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace EzDinner.Infrastructure
 {
-    public class FamilyRepository : IFamilyRepository
+    public class FamilyRepository : IFamilyRepository, IFamilyQueryRepository
     {
         private readonly CosmosClient _client;
         private readonly Container _container;
@@ -27,13 +29,14 @@ namespace EzDinner.Infrastructure
             return _container.UpsertItemAsync(family);
         }
 
-        public async Task<IEnumerable<Family>> GetFamilySelectorsAsync(Guid userId)
+        public async Task<IEnumerable<FamilyDetails>> GetFamiliesDetailsAsync(Guid userId)
         {
-            var sql = $"SELECT * FROM c WHERE c.ownerId = '{userId}' OR ARRAY_CONTAINS(c.familyMemberIds, '{userId}')";
-            var queryDefinition = new QueryDefinition(sql);
-            var queryResultSetIterator = _container.GetItemQueryIterator<Family>(queryDefinition);
+            var sql = $"SELECT VALUE c FROM c JOIN s in c.familyMembers WHERE CONTAINS(s.id, @userId)";
+            var queryDefinition = new QueryDefinition(sql)
+                .WithParameter("@userId", userId);
+            var queryResultSetIterator = _container.GetItemQueryIterator<FamilyDetails>(queryDefinition);
 
-            var families = new List<Family>();
+            var families = new List<FamilyDetails>();
             while (queryResultSetIterator.HasMoreResults)
             {
                 foreach (var family in await queryResultSetIterator.ReadNextAsync())
@@ -44,9 +47,26 @@ namespace EzDinner.Infrastructure
             return families;
         }
 
+        public async Task<FamilyDetails?> GetFamilyDetailsAsync(Guid familyId)
+        {
+            var sql = $"SELECT * FROM c WHERE c.id = @familyId";
+            var queryDefinition = new QueryDefinition(sql)
+                .WithParameter("@familyId", familyId);
+            var queryResultSetIterator = _container.GetItemQueryIterator<FamilyDetails>(queryDefinition);
+
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                foreach (var family in await queryResultSetIterator.ReadNextAsync())
+                {
+                    return family;
+                }
+            }
+            return null;
+        }
+
         public async Task<Family?> GetFamily(Guid familyId)
         {
-            var sql = $"SELECT * FROM c WHERE c.id = '{familyId}' OR ARRAY_CONTAINS(c.familyMemberIds, '{familyId}')";
+            var sql = $"SELECT * FROM c WHERE c.id = '{familyId}'";
             var queryDefinition = new QueryDefinition(sql);
             var queryResultSetIterator = _container.GetItemQueryIterator<Family>(queryDefinition);
 

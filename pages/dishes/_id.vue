@@ -15,11 +15,13 @@
                 >Recipe &amp; notes
                 <v-spacer></v-spacer>
                 <v-card-actions v-show="editNotesMode">
-                  <v-btn @click="disableEditNotesMode()">Cancel</v-btn>
-                  <v-btn color="primary" @click="doUpdateNotes()">Save</v-btn>
+                  <v-btn text @click="disableEditNotesMode()">Cancel</v-btn>
+                  <v-btn text color="primary" @click="doUpdateNotes()"
+                    >Save</v-btn
+                  >
                 </v-card-actions>
                 <v-card-actions v-show="!editNotesMode">
-                  <v-btn color="primary" @click="enableEditNotesMode()"
+                  <v-btn text color="primary" @click="enableEditNotesMode()"
                     >Edit</v-btn
                   >
                 </v-card-actions></v-card-title
@@ -70,7 +72,11 @@
                   ><v-col cols="1">
                     <v-avatar
                       class="white--text"
-                      :color="familyMember.id === userId ? 'primary' : 'grey'"
+                      :color="
+                        familyMember.id === userId || !familyMember.hasAutonomy
+                          ? 'primary'
+                          : 'grey'
+                      "
                       size="40"
                       >{{ getInitials(familyMember.name) }}</v-avatar
                     ></v-col
@@ -84,8 +90,10 @@
                       length="5"
                       size="25"
                       :value="ratings[familyMember.id]"
-                      :readonly="familyMember.id !== userId"
-                      @input="updateRating($event)"
+                      :readonly="
+                        familyMember.id !== userId && familyMember.hasAutonomy
+                      "
+                      @input="updateRating($event, familyMember.id)"
                     ></v-rating>
                   </v-col>
                 </v-row>
@@ -178,19 +186,30 @@ export default Vue.extend({
     },
   },
 
-  mounted() {},
+  watch: {
+    '$accessor.activeFamilyId'() {
+      this.$router.push('/dishes')
+    },
+  },
 
   methods: {
     async init() {
-      this.dish = await this.$repositories.dishes.getFull(this.$route.params.id)
+      this.dish = await this.$repositories.dishes.getFull(
+        this.$route.params.id,
+        this.$accessor.activeFamilyId,
+      )
       this.notes = this.dish.notes
       this.notesHtml = marked.parse(this.dish.notes || '')
       this.url = this.dish.url
       this.dates = this.dish.dates
     },
 
-    async updateRating(newRating: number) {
-      await this.$repositories.dishes.updateRating(this.dish.id, newRating)
+    async updateRating(newRating: number, familyMemberId: string) {
+      await this.$repositories.dishes.updateRating(
+        this.dish.id,
+        newRating,
+        familyMemberId,
+      )
       this.$emit('rating:updated')
       this.init()
     },

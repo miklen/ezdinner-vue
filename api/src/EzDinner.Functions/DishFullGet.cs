@@ -34,17 +34,18 @@ namespace EzDinner.Functions
         [FunctionName(nameof(DishFullGet))]
         [RequiredScope("backendapi")]
         public async Task<IActionResult?> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "dishes/{dishId}/full")] HttpRequest req,
-            string dishId
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "dishes/{dishId}/full/family/{familyId}")] HttpRequest req,
+            string dishId,
+            string familyId
             )
         {
             var (authenticationStatus, authenticationResponse) = await req.HttpContext.AuthenticateAzureFunctionAsync();
             if (!authenticationStatus) return authenticationResponse;
             var dish = await _dishRepository.GetDishAsync(Guid.Parse(dishId));
-            if (dish is null) return new BadRequestObjectResult("DISH_NOT_FOUND");
+            if (dish is null || !dish.FamilyId.Equals(Guid.Parse(familyId))) return new BadRequestObjectResult("DISH_NOT_FOUND");
             if (!_authz.Authorize(req.HttpContext.User.GetNameIdentifierId()!, dish.FamilyId, Resources.Dish, Actions.Read)) return new UnauthorizedResult();
             var dinners = await _dinnerRepository.GetAsync(dish.FamilyId, dish.Id).ToListAsync();
-            return new OkObjectResult(DishesFullQueryModel.FromDomain(dish, dinners));
+            return new OkObjectResult(DishDetails.CreateNew(dish, dinners));
         }
     }
 }

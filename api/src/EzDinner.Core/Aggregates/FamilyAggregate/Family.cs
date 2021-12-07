@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace EzDinner.Core.Aggregates.FamilyAggregate
 {
     public class Family : AggregateRoot<Guid>
     {
-        private readonly List<Guid> _familyMemberIds;
+        private readonly List<FamilyMember> _familyMembers;
 
-        public Guid OwnerId { get; }
+        public Guid OwnerId => _familyMembers.First(w => w.IsOwner).Id;
         public string Name { get; private set; }
-        public IEnumerable<Guid> FamilyMemberIds => _familyMemberIds;
+        public IEnumerable<FamilyMember> FamilyMembers => _familyMembers;
 
         public DateTime CreatedDate { get; }
         public DateTime UpdatedDate { get; private set; }
@@ -24,14 +25,13 @@ namespace EzDinner.Core.Aggregates.FamilyAggregate
         /// <param name="id"></param>
         /// <param name="ownerId"></param>
         /// <param name="name"></param>
-        /// <param name="familyMemberIds"></param>
+        /// <param name="familyMembers"></param>
         /// <param name="createdDate"></param>
         /// <param name="updatedDate"></param>
-        public Family(Guid id, Guid ownerId, string name, List<Guid> familyMemberIds, DateTime createdDate, DateTime updatedDate) : base(id)
+        public Family(Guid id, string name, List<FamilyMember> familyMembers, DateTime createdDate, DateTime updatedDate) : base(id)
         {
-            OwnerId = ownerId;
             Name = name;
-            _familyMemberIds = familyMemberIds;
+            _familyMembers = familyMembers;
             CreatedDate = createdDate;
             UpdatedDate = updatedDate;
         }
@@ -42,7 +42,7 @@ namespace EzDinner.Core.Aggregates.FamilyAggregate
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
 
             var createdDate = DateTime.UtcNow;
-            return new Family(id: Guid.NewGuid(), ownerId, name, familyMemberIds: new List<Guid>(), createdDate, updatedDate: createdDate);
+            return new Family(id: Guid.NewGuid(), name, familyMembers: new List<FamilyMember>() { FamilyMember.CreateOwner(ownerId) }, createdDate, updatedDate: createdDate);
         }
 
         /// <summary>
@@ -62,8 +62,18 @@ namespace EzDinner.Core.Aggregates.FamilyAggregate
         /// <param name="familyMemberId"></param>
         public void InviteFamilyMember(Guid familyMemberId)
         {
-            if (_familyMemberIds.Contains(familyMemberId)) return;
-            _familyMemberIds.Add(familyMemberId);
+            if (_familyMembers.Any(w => w.Id == familyMemberId)) return;
+            _familyMembers.Add(FamilyMember.CreateFamilyMember(familyMemberId));
+            UpdatedDate = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Create a family member that does not have autonomy on it's own (i.e. no login account accociated)
+        /// </summary>
+        /// <param name="name"></param>
+        public void CreateFamilyMember(string name)
+        {
+            _familyMembers.Add(FamilyMember.CreateFamilyMemberWithoutAutonomy(name));
             UpdatedDate = DateTime.UtcNow;
         }
 
@@ -73,7 +83,7 @@ namespace EzDinner.Core.Aggregates.FamilyAggregate
         /// <param name="familyMemberId"></param>
         public void RemoveFamilyMember(Guid familyMemberId)
         {
-            _familyMemberIds.Remove(familyMemberId);
+            _familyMembers.RemoveAll(w => w.Id == familyMemberId);
             UpdatedDate = DateTime.UtcNow;
         }
     }

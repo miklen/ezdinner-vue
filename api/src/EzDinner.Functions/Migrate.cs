@@ -16,6 +16,7 @@ using Casbin.Adapter.EFCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using EzDinner.Application.Commands.Authorization;
+using EzDinner.Functions.Models.Migrate;
 
 namespace EzDinner.Functions
 {
@@ -43,6 +44,8 @@ namespace EzDinner.Functions
             _logger.LogInformation("Migration started");
             _logger.LogInformation("Creating EzDinner database and repository collections");
             var database = await EnsureDatabaseAndCollectionsCreated(_configuration);
+            _logger.LogInformation("Converting families to V2");
+            await ConvertFamiliesToV2(database);
             _logger.LogInformation("Creating CasbinRules collection");
             await _casbinContext.Database.EnsureCreatedAsync();
             _logger.LogInformation("Updating family roles and permissions");
@@ -54,7 +57,7 @@ namespace EzDinner.Functions
 
         private async Task UpdateFamiliesPermissions(Database database)
         {
-            var families = await GetFamilies(database);
+            var families = await GetFamilies<Family>(database);
             
             // We cannot inject the AuthzService in the ctor, as the Casbin Enforcer tries to load policies in it's ctor and the CasbinRules container may not exist yet.
             // This will cause the function to fail on startup never reaching the Db.EnsureCreated line that would have created the container for the Enforcer to work.
@@ -67,12 +70,12 @@ namespace EzDinner.Functions
             }
         }
 
-        private static async Task<IEnumerable<Family>> GetFamilies(Database database)
+        private static async Task<IEnumerable<TFamilyType>> GetFamilies<TFamilyType>(Database database)
         {
             var familiesContainer = database.GetContainer(FamilyRepository.CONTAINER);
             var query = new QueryDefinition("SELECT * FROM c");
-            var familiesQuery = familiesContainer.GetItemQueryIterator<Family>(query);
-            var families = new List<Family>();
+            var familiesQuery = familiesContainer.GetItemQueryIterator<TFamilyType>(query);
+            var families = new List<TFamilyType>();
             while (familiesQuery.HasMoreResults)
             {
                 foreach (var family in await familiesQuery.ReadNextAsync())
@@ -92,6 +95,18 @@ namespace EzDinner.Functions
             await db.CreateContainerIfNotExistsAsync(new ContainerProperties(DinnerRepository.CONTAINER, $"/{nameof(Dinner.PartitionKey).ToCamelCase()}"));
             await db.CreateContainerIfNotExistsAsync(new ContainerProperties(FamilyRepository.CONTAINER, $"/{nameof(Family.PartitionKey).ToCamelCase()}"));
             return db;
+        }
+
+        private async Task ConvertFamiliesToV2(Database database)
+        {
+            var families = await GetFamilies<V1Family>(database);
+            var famRepo = _provider.GetService<IFamilyRepository>();
+            foreach (var family in families)
+            {
+                var converted = family.ConvertToV2();
+                if (converted is null) continue;
+                await famRepo.SaveAsync(converted);
+            }
         }
     }
 

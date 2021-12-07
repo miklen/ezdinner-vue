@@ -86,9 +86,9 @@ namespace EzDinner.Authorization.Core
                 await _authzRepository.AssignPolicyToRole(Roles.FamilyMember, familyId, Resources.Dish, Actions.All);
             }
 
-            if (!_authzRepository.RoleHasPolicy(Roles.FamilyMember, familyId, Resources.Family, Actions.All))
+            if (!_authzRepository.RoleHasPolicy(Roles.FamilyMember, familyId, Resources.Family, Actions.Read))
             {
-                await _authzRepository.AssignPolicyToRole(Roles.FamilyMember, familyId, Resources.Family, Actions.All);
+                await _authzRepository.AssignPolicyToRole(Roles.FamilyMember, familyId, Resources.Family, Actions.Read);
             }
         }
 
