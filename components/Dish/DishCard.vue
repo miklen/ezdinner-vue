@@ -4,7 +4,7 @@
       <v-card-title v-show="!editNameMode" @click="routeTo(dish.id)"
         ><v-row style="overflow: hidden">
           <v-col style="word-break: normal; cursor: pointer">{{ name }}</v-col>
-          <v-col class="text-right" cols="4" sm="3" lg="4" xl="2">
+          <v-col class="text-right" cols="4" sm="3" lg="5" xl="3">
             <v-icon @click.stop="enableEditNameMode()">mdi-pencil</v-icon>
             <v-icon @click.stop="moveDialog = true">mdi-transfer-right</v-icon>
             <v-icon @click.stop="confirmDialog = true"
