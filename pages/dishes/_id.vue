@@ -69,7 +69,7 @@
                 <v-row
                   v-for="familyMember in familyMembers"
                   :key="familyMember.id"
-                  ><v-col cols="1">
+                  ><v-col style="display: flex">
                     <v-avatar
                       class="white--text"
                       :color="
@@ -79,8 +79,7 @@
                       "
                       size="40"
                       >{{ getInitials(familyMember.name) }}</v-avatar
-                    ></v-col
-                  ><v-col>
+                    >
                     <v-rating
                       color="primary"
                       half-increments

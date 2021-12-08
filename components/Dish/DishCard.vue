@@ -1,16 +1,15 @@
 <template>
   <span>
     <v-card rounded="lg">
-      <v-card-title v-show="!editNameMode"
+      <v-card-title v-show="!editNameMode" @click="routeTo(dish.id)"
         ><v-row style="overflow: hidden">
-          <v-col
-            style="word-break: normal; cursor: pointer"
-            @click="routeTo(dish.id)"
-            >{{ name }}</v-col
-          >
-          <v-col class="text-right" cols="3" lg="4" xl="2">
-            <v-icon @click="enableEditNameMode()">mdi-pencil</v-icon>
-            <v-icon @click="confirmDialog = true">mdi-trash-can</v-icon></v-col
+          <v-col style="word-break: normal; cursor: pointer">{{ name }}</v-col>
+          <v-col class="text-right" cols="4" sm="3" lg="4" xl="2">
+            <v-icon @click.stop="enableEditNameMode()">mdi-pencil</v-icon>
+            <v-icon @click.stop="moveDialog = true">mdi-transfer-right</v-icon>
+            <v-icon @click.stop="confirmDialog = true"
+              >mdi-trash-can</v-icon
+            ></v-col
           >
         </v-row></v-card-title
       >
@@ -26,8 +25,8 @@
             ></v-text-field
           ></v-col>
           <v-col cols="2">
-            <v-icon @click="doUpdateName()">mdi-check</v-icon>
-            <v-icon @click="editNameMode = false">mdi-close</v-icon></v-col
+            <v-icon @click.stop="doUpdateName()">mdi-check</v-icon>
+            <v-icon @click.stop="editNameMode = false">mdi-close</v-icon></v-col
           >
         </v-row></v-card-title
       >
@@ -52,9 +51,7 @@
             You've had {{ name }} for dinner
             {{ getTimesUsedText() }}
           </v-col>
-          <v-col v-if="dishStats.timesUsed > 0" cols="2" xl="1">
-            <v-icon @click="moveDialog = true">mdi-transfer-right</v-icon>
-          </v-col>
+          <v-col> </v-col>
         </v-row>
         <v-row>
           <v-col v-if="dishStats.lastUsed"
