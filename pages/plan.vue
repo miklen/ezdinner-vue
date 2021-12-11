@@ -1,9 +1,6 @@
 <template>
   <Content split>
     <v-row>
-      <v-col class="text-center">
-        <v-card-title>Dinner plan</v-card-title>
-      </v-col>
       <v-col>
         <v-menu
           v-model="showDatePicker"
@@ -20,11 +17,17 @@
               prepend-icon="mdi-calendar"
               readonly
               v-bind="attrs"
+              style="width: 220px"
               v-on="on"
             ></v-text-field>
           </template>
           <v-date-picker v-model="dateRange" show-week range></v-date-picker>
         </v-menu>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12" class="text-center">
+        <v-card-title>Dinner plan</v-card-title>
       </v-col>
     </v-row>
     <v-row>
