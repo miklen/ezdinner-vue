@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { Tag } from './Tag'
 
 export declare class DinnerDate {
@@ -7,7 +8,7 @@ export declare class DinnerDate {
 
 export declare class DishStats {
   dishId: string
-  lastUsed: string | undefined
+  lastUsed: DateTime | undefined
   timesUsed: number
 }
 

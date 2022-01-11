@@ -30,9 +30,11 @@ export default class DishesRepository {
    * @returns dishes available
    */
   async getFull(dishId: string, familyId: string) {
-    return (await this.$axios.$get(
+    const result = (await this.$axios.$get(
       `api/dishes/${dishId}/full/family/${familyId}`,
-    )) as Dish
+    )) as any
+    result.dishStats.lastUsed = DateTime.fromISO(result.dishStats.lastUsed)
+    return result as Dish
   }
 
   create(familyId: string, dishName: string) {

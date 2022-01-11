@@ -258,9 +258,8 @@ export default Vue.extend({
     getDaysAgo() {
       if (!this.dish?.dishStats?.lastUsed) return 0
       return Math.floor(
-        DateTime.now()
-          .diff(DateTime.fromISO(this.dish.dishStats.lastUsed), 'days')
-          .toObject()?.days || 0,
+        DateTime.now().diff(this.dish.dishStats.lastUsed, 'days').toObject()
+          ?.days || 0,
       )
     },
 

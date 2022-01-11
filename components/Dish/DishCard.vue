@@ -51,7 +51,6 @@
             You've had {{ name }} for dinner
             {{ getTimesUsedText() }}
           </v-col>
-          <v-col> </v-col>
         </v-row>
         <v-row>
           <v-col v-if="dishStats.lastUsed"
@@ -192,17 +191,14 @@ export default Vue.extend({
 
     getLastUsed() {
       if (!this.dishStats.lastUsed) return 'Never used'
-      return DateTime.fromISO(this.dishStats.lastUsed).toLocaleString(
-        DateTime.DATE_FULL,
-      )
+      return this.dishStats.lastUsed.toLocaleString(DateTime.DATE_FULL)
     },
 
     getDaysAgo() {
       if (!this.dishStats.lastUsed) return 0
       return Math.floor(
-        DateTime.now()
-          .diff(DateTime.fromISO(this.dishStats.lastUsed), 'days')
-          .toObject()?.days || 0,
+        DateTime.now().diff(this.dishStats.lastUsed, 'days').toObject()?.days ||
+          0,
       )
     },
 

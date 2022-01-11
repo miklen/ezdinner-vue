@@ -124,6 +124,22 @@ export default Vue.extend({
             )
           },
         },
+        {
+          name: '⬆Date',
+          sorter: (a, b) => {
+            const aDate = this.stats[a.id]?.lastUsed?.toMillis() ?? Math.min()
+            const bDate = this.stats[b.id]?.lastUsed?.toMillis() ?? Math.min()
+            return aDate - bDate
+          },
+        },
+        {
+          name: '⬇Date',
+          sorter: (a, b) => {
+            const aDate = this.stats[a.id]?.lastUsed?.toMillis() ?? Math.max()
+            const bDate = this.stats[b.id]?.lastUsed?.toMillis() ?? Math.max()
+            return bDate - aDate
+          },
+        },
       ]
     },
     activeFamilyId() {
