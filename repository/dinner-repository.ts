@@ -1,5 +1,6 @@
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 import { DateTime } from 'luxon'
+import { Dinner } from '~/types/Dinner'
 
 export default class DinnerRepository {
   $axios: NuxtAxiosInstance
@@ -8,7 +9,7 @@ export default class DinnerRepository {
     this.$axios = $axios
   }
 
-  getRange(familyId: number, from: DateTime, to: DateTime) {
+  getRange(familyId: string, from: DateTime, to: DateTime): Promise<Dinner[]> {
     return this.$axios.$get(
       `api/dinners/family/${familyId}/dates/${from.toISODate()}/${to.toISODate()}`,
     )

@@ -3,6 +3,7 @@ import { Dish } from '@/types/Dish'
 
 export const state = () => ({
   dishes: [] as Dish[],
+  updating: null as null | Promise<Dish[]>,
 })
 
 export type DishesState = ReturnType<typeof state>
@@ -20,15 +21,23 @@ export const mutations = mutationTree(state, {
   updateDishes(state, dishes: Dish[]) {
     state.dishes = dishes
   },
+  setUpdating(state, updating: null | Promise<Dish[]>) {
+    state.updating = updating
+  },
 })
 
 export const actions = actionTree(
   { state, getters, mutations },
   {
-    async populateDishes({ commit, rootState }) {
-      const result = await this.$repositories.dishes.all(
+    async populateDishes({ commit, rootState, state }) {
+      if (state.updating) return state.updating
+
+      const resultPromise = this.$repositories.dishes.all(
         rootState.activeFamilyId,
       )
+      commit('setUpdating', resultPromise)
+      const result = await resultPromise
+      commit('setUpdating', null)
       commit('updateDishes', result)
     },
 
