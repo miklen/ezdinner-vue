@@ -118,6 +118,9 @@ export default Vue.extend({
         return dinner
       })
     },
+    routeTo(id: string) {
+      this.$router.push({ name: 'dishes-id', params: { id } })
+    },
   },
 })
 </script>
