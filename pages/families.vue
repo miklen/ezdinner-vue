@@ -4,7 +4,7 @@
       <v-col
         v-for="family in families"
         :key="family.id"
-        xs="12"
+        cols="12"
         sm="12"
         md="6"
         lg="4"
@@ -40,7 +40,7 @@
           >
         </v-card>
       </v-col>
-      <v-col xs="12" sm="12" md="6" lg="4">
+      <v-col cols="12" sm="12" md="6" lg="4">
         <v-card rounded="lg">
           <v-card-title>Create family</v-card-title>
           <v-card-text

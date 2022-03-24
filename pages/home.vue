@@ -1,5 +1,5 @@
 <template>
-  <Content split>
+  <Content :split="isFamilySelected">
     <v-row>
       <v-col class="text-center">
         <h1>Welcome</h1>
@@ -9,7 +9,7 @@
         </span>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row v-if="isFamilySelected">
       <v-col cols="12" xl="6">
         <v-card>
           <v-card-title>Dinner tonight</v-card-title>
@@ -91,11 +91,18 @@ export default Vue.extend({
     title: 'Home',
   },
 
+  computed: {
+    isFamilySelected() {
+      return !!this.$accessor.activeFamilyId
+    },
+  },
+
   watch: {
     '$accessor.activeFamilyId'() {},
   },
   methods: {
     async init() {
+      if (!this.isFamilySelected) return
       await this.$accessor.dishes.populateDishes()
       const today = DateTime.now()
       const dinners = await this.$repositories.dinners.getRange(

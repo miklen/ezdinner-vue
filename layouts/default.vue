@@ -58,28 +58,6 @@ export default Vue.extend({
   data() {
     return {
       loading: true,
-      links: [
-        {
-          icon: 'mdi-home',
-          title: 'Home',
-          to: '/home',
-        },
-        {
-          icon: 'mdi-account-group',
-          title: 'Families',
-          to: '/families',
-        },
-        {
-          icon: 'mdi-silverware-fork-knife',
-          title: 'Dishes',
-          to: '/dishes',
-        },
-        {
-          icon: 'mdi-calendar-edit',
-          title: 'Plan',
-          to: '/plan',
-        },
-      ],
     }
   },
   async fetch() {
@@ -91,6 +69,38 @@ export default Vue.extend({
   },
 
   computed: {
+    links() {
+      let nav = [
+        {
+          icon: 'mdi-home',
+          title: 'Home',
+          to: '/home',
+        },
+        {
+          icon: 'mdi-account-group',
+          title: 'Families',
+          to: '/families',
+        },
+      ]
+
+      if (this.activeFamilyId) {
+        nav = [
+          ...nav,
+          {
+            icon: 'mdi-silverware-fork-knife',
+            title: 'Dishes',
+            to: '/dishes',
+          },
+          {
+            icon: 'mdi-calendar-edit',
+            title: 'Plan',
+            to: '/plan',
+          },
+        ]
+      }
+      return nav
+    },
+
     activeFamilyId() {
       return this.$accessor.activeFamilyId
     },
