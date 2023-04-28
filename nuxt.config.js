@@ -43,9 +43,9 @@ export default {
   publicRuntimeConfig: {
     clientId: '654aa80d-4783-43db-8ed9-4e160bb1d765',
     loginAuthority:
-      'https://ezlifehacks.b2clogin.com/ezlifehacks.onmicrosoft.com/B2C_1_signupsignin/',
+      'https://ezlifehacks.b2clogin.com/ezlifehacks.onmicrosoft.com/B2C_1A_signup_signin/',
     passwordAuthority:
-      'https://ezlifehacks.b2clogin.com/ezlifehacks.onmicrosoft.com/B2C_1_passwordreset/',
+      'https://ezlifehacks.b2clogin.com/ezlifehacks.onmicrosoft.com/B2C_1A_PasswordReset/',
     knownAuthority: 'https://ezlifehacks.b2clogin.com',
     browserBaseURL:
       process.env.NODE_ENV === 'production'
