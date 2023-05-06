@@ -161,6 +161,8 @@ export class MsalPlugin implements PluginObject<MsalPluginOptions> {
           .catch((popupError) => {
             console.error(popupError)
           })
+      } else {
+        this.signOut()
       }
       return false
     }
